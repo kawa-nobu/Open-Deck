@@ -1,0 +1,37 @@
+[
+    {
+    "id" : 1,
+    "priority": 1,
+    "action": {
+        "type": "modifyHeaders",
+        "responseHeaders": [
+          {
+            "header": "Content-Security-Policy",
+            "operation": "remove"
+          },
+          {
+            "header": "X-Frame-Options",
+            "operation": "remove"
+          }
+        ]
+      },
+      "condition" : {
+        "urlFilter" : "twitter.com",
+        "resourceTypes": ["main_frame",
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"]
+        }
+    }
+]
