@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck(ProtoType)",
-  "version": "1",
+  "version": "1.0.1",
   "manifest_version": 3,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -20,7 +20,7 @@
   "permissions" : ["declarativeNetRequest"],
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
-    "matches": ["https://*.twitter.com/run-opdeck"],
+    "matches": ["https://*.twitter.com/*"],
     "js": ["content.js"]
     }]
   }
