@@ -34,7 +34,7 @@ function run(settings){
     let ins_html = document.createElement("div");
     ins_html.id = "opd_main_element";
     ins_html.style = "position: fixed;z-index: 999999;width: 100%;height: 100%;background: white;display: flex;flex-direction: row;overflow-x: scroll;overflow-y: hidden;";
-    let settings_html = `<div draggable="false" class="dsp_row" style="height: calc(100% - 20px);min-width: 100px;text-align: center;position: fixed;background-color: white;"><div><p>Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="dnr_reload" value="Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/></p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/></p></div></div>`;
+    let settings_html = `<div draggable="false" class="dsp_row" style="height: calc(100% - 20px);min-width: 100px;text-align: center;position: fixed;background-color: white;"><div><p>Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/></p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/></p></div></div>`;
     console.log(settings.row_settings.length)
     for (let index = 0; index < settings.row_settings.length; index++) {
         //console.log(default_element)
@@ -58,12 +58,17 @@ function run(settings){
         });
     });
     document.getElementById("dnr_reload").addEventListener("click", function(){
-        if(confirm("再読み込みします")){
+        if(confirm("declarativeNetRequestの再読み込みします")){
             chrome.runtime.sendMessage({message: "dnr_upd"}).then((value)=>{
                 if(value == true){
                     location.reload();
                 }
             });
+        }
+    });
+    document.getElementById("ext_reload").addEventListener("click", function(){
+        if(confirm("拡張機能の再読み込みします")){
+            chrome.runtime.sendMessage({message: "ext_reload"});
         }
     });
     document.getElementById("add_timeline").addEventListener("click", function(){
@@ -120,6 +125,7 @@ function run(settings){
             document.querySelectorAll(".row_close_btn")[index].addEventListener("click", function(){
                 this.closest("[class='dsp_row']").remove();
                 row_dd();
+                row_settings_save();
             })
             
         }

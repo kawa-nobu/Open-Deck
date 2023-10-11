@@ -8,5 +8,8 @@ chrome.runtime.onMessage.addListener(
             })
             sendResponse(true);
         }
+        if(request.message == "ext_reload"){
+            chrome.runtime.reload();
+        }
     }
 );
