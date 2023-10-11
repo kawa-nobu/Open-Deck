@@ -11,11 +11,12 @@
 ## 使った様子
 ![image](https://github.com/kawa-nobu/Open-Deck/assets/44832116/3928e2a3-4b7c-4e9b-a4b5-870640377bff)
 
-## 操作説明(v1.0.2)
-![image](https://github.com/kawa-nobu/Open-Deck/assets/44832116/ca356103-0a1b-4e44-a74d-08d017e1ce1f)
+## 操作説明(v1.0.3)
+![image](https://github.com/kawa-nobu/Open-Deck/assets/44832116/c58aa69d-38d1-44f0-bb30-248588a87a01)
+
 ![image](https://github.com/kawa-nobu/Open-Deck/assets/44832116/31a5aeb6-606b-4701-91c2-a2ada8f4eef6)
 
 ## すべてのカラムが真っ白の場合
-<img width="959" alt="image" src="https://github.com/kawa-nobu/Open-Deck/assets/44832116/fd42a7c6-9a97-47f6-acdb-d5a8134bf6ec">
+<img width="712" alt="image" src="https://github.com/kawa-nobu/Open-Deck/assets/44832116/6e3098b0-9120-4a0f-8001-38104cfe81e0">
 
-**画像の様な画面になった際は、操作説明内に記載の「Reload」ボタンを押してください**
+**画像の様な画面になった際は、操作説明内に記載の「Ext_Reload」ボタンを押した後再読み込みし、「dNR_Reload」ボタンを押してください。**
