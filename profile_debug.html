@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" >
+    <title>Open-Deck Profile Loader</title>
+    <script src="profile_debug.js" charset="UTF-8"></script>
+</head>
+<body>
+    <h1>Open-Deck Profile Loader</h1>
+    <p>カラム構成などのプロファイル読み込み/書き出しを行います。
+        <br>
+        試作版の新バージョン導入時などにお使いください。
+        <br>
+        入力/出力形式はJSON形式です。間違ったデータを入力した場合、正常に動作しません。
+        <br>
+        間違ったデータを入力してしまった際は「Debug」メニューの「init settings」クリックで初期化してください。
+    </p>
+    <section>
+        <h2>プロファイル書き出し</h2>
+        <p>「プロファイル書き出し」ボタンクリックでカラム設定を出力します。
+            <br>
+            ボタン下のテキストエリアに出力されるので、出力後はメモ帳などで保存してください。
+            <br>
+            出力されたプロファイルは下のプロファイル読み込みできます。
+        </p>
+        <div style="margin-bottom: 1rem;"><input id="output_profile_btn" type="button" value="プロファイル書き出し"/></div>
+        <h3>出力結果</h3>
+        <div><textarea id="profile_output_area" style="width: 20rem;height: 10rem;"></textarea></div>
+    </section>
+    <hr>
+    <section>
+        <h2>プロファイル読み込み</h2>
+        <p>下のテキストエリアにプロファイルを張り付けて「読み込み」ボタンを押すことにより、
+            <br>
+            カラム情報などを
+        </p>
+        <h3>プロファイルをJSON形式で入力</h3>
+        <div><textarea id="profile_input_area" style="width: 20rem;height: 10rem; margin-bottom: 0;"></textarea></div>
+        <div style="margin-top: 1rem;"><input id="input_profile_btn" type="button" value="プロファイル読み込み"/></div>
+    </section>
+</body>
+</html>

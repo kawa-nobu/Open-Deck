@@ -28,14 +28,14 @@ function run(settings){
     let default_element = {
         main_bar_empty_row:{html:`<div draggable="false" opd_row_type="main_bar_empty_row" id="main_bar_empty_row" class="dsp_row" style="height: calc(100% - 20px);min-width: 110px;"></div>`},
         empty_row:{html:`<div draggable="false" opd_row_type="empty_row" id="row_%row_num%" class="dsp_row dsp_row_emptyrow" style="height: calc(100% - 20px);min-width: 30rem;display: flex;align-items: center;justify-content: center;"><p>左のバーからカラムを追加</p></div>`},
-        home:{html:`<div draggable="true" opd_row_type="home" id="row_%row_num%" class="dsp_row" style="height: calc(100% - 20px);min-width: 30rem;"><div style="border: solid #00000073 1px; height: 20px;">≡ Home${default_element_bar}<input type="button" class="row_close_btn" value="X" style="margin-left: 14.4rem;vertical-align: text-top;font-size: 0.8rem;"/></div><object data="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></object></div>`},
-        notification:{html:`<div draggable="true" opd_row_type="notification" id="row_%row_num%" class="dsp_row" style="height: calc(100% - 20px);min-width: 30rem;"><div style="border: solid #00000073 1px; height: 20px;">≡ Notification${default_element_bar}<input type="button" class="row_close_btn" value="X" style="margin-left: 11.8rem;vertical-align: text-top;font-size: 0.8rem;"/></div><object data="https://twitter.com/notifications" type="text/html" style="width: 100%;height: 100%;"></object></div>`},
-        explore:{html:`<div draggable="true" opd_row_type="explore" opd_explore_path="%row_save_path%" id="row_%row_num%" class="dsp_row" style="height: calc(100% - 20px);min-width: 30rem;"><div style="border: solid #00000073 1px; height: 20px;">≡ Explore${default_element_bar}<input type="button" class="row_close_btn" value="X" style="margin-left: 13.6rem;vertical-align: text-top;font-size: 0.8rem;"/></div><object data="https://twitter.com%row_save_path%" type="text/html" style="width: 100%;height: 100%;"></object></div>`},
+        home:{html:`<div draggable="true" opd_row_type="home" id="row_%row_num%" class="dsp_row" style="height: calc(100% - 20px);min-width: 30rem;"><div style="border: solid #00000073 1px; height: 20px;">≡ Home${default_element_bar}<input type="button" class="row_close_btn" value="X" style="margin-left: 14.4rem;vertical-align: text-top;font-size: 0.8rem;"/></div><iframe allow="fullscreen" src="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></iframe></div>`},
+        notification:{html:`<div draggable="true" opd_row_type="notification" id="row_%row_num%" class="dsp_row" style="height: calc(100% - 20px);min-width: 30rem;"><div style="border: solid #00000073 1px; height: 20px;">≡ Notification${default_element_bar}<input type="button" class="row_close_btn" value="X" style="margin-left: 11.8rem;vertical-align: text-top;font-size: 0.8rem;"/></div><iframe allow="fullscreen" src="https://twitter.com/notifications" type="text/html" style="width: 100%;height: 100%;"></iframe></div>`},
+        explore:{html:`<div draggable="true" opd_row_type="explore" opd_explore_path="%row_save_path%" id="row_%row_num%" class="dsp_row" style="height: calc(100% - 20px);min-width: 30rem;"><div style="border: solid #00000073 1px; height: 20px;">≡ Explore${default_element_bar}<input type="button" class="row_close_btn" value="X" style="margin-left: 13.6rem;vertical-align: text-top;font-size: 0.8rem;"/></div><iframe allow="fullscreen" src="https://twitter.com%row_save_path%" type="text/html" style="width: 100%;height: 100%;"></iframe></div>`},
     };
     let ins_html = document.createElement("div");
     ins_html.id = "opd_main_element";
     ins_html.style = "position: fixed;z-index: 999999;width: 100%;height: 100%;background: white;display: flex;flex-direction: row;overflow-x: scroll;overflow-y: hidden;";
-    let settings_html = `<div draggable="false" opd_row_type="dsp_row" class="dsp_row" style="height: calc(100% - 20px);min-width: 100px;text-align: center;position: fixed;background-color: white;"><div><p>Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/></p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/></p></div></div>`;
+    let settings_html = `<div draggable="false" opd_row_type="dsp_row" class="dsp_row" style="height: calc(100% - 20px);min-width: 100px;text-align: center;position: fixed;background-color: white;"><div><p>Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="profile_load_save" value="Profile Load"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/></p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/></p></div></div>`;
     console.log(settings.row_settings.length)
     for (let index = 0; index < settings.row_settings.length; index++) {
         //console.log(default_element)
@@ -60,21 +60,32 @@ function run(settings){
     append_object_css();
     //CSS適用(追加/変更の時に呼び出し)
     function append_object_css(){
-        let row_object = document.querySelectorAll('.dsp_row:not([opd_row_type="dsp_row"], [opd_row_type="empty_row"], [opd_row_type="main_bar_empty_row"]) object');
+        let row_object = document.querySelectorAll('.dsp_row:not([opd_row_type="dsp_row"], [opd_row_type="empty_row"], [opd_row_type="main_bar_empty_row"]) iframe');
         for (let index = 0; index < row_object.length; index++) {
-            //各カラム読み込み後の動作
+            //バナー/表示モード変更
             row_object[index].addEventListener("load", function(){
+                //console.log(this)
                 let opd_row_div = this.closest("div[opd_row_type]");
                 let opd_row_banner_checkbox = opd_row_div.querySelector(".opd_banner");
                 let opd_row_tw_view_mode_opt = opd_row_div.querySelector(".opd_tw_view_mode");
                 //バナー表示設定読み込み適用
-                if(opd_row_banner_checkbox.checked == true){
+                /*if(opd_row_banner_checkbox.checked == true){
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
                 }else{
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
+                }*/
+                if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
+                }
+                if(opd_row_banner_checkbox.checked != true){
+                    //console.log(this)
+                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
+                }else{
+                    //console.log("else")
+                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
                 }
                 //ツイート表示項目設定読み込み適用
-                if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]")?.textcontent == undefined){
+                if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
                 }
                 switch (opd_row_tw_view_mode_opt.value) {
@@ -92,12 +103,57 @@ function run(settings){
                         break;
                 }
                 //console.log(opd_row_div.querySelector(".opd_banner").checked)
+            })
+            //各カラム読み込み後の動作(init)
+            row_object[index].addEventListener("load", function(){
+                console.log(this)
+                let opd_row_div = this.closest("div[opd_row_type]");
+                let opd_row_banner_checkbox = opd_row_div.querySelector(".opd_banner");
+                let opd_row_tw_view_mode_opt = opd_row_div.querySelector(".opd_tw_view_mode");
+                //バナー表示設定読み込み適用
+                /*if(opd_row_banner_checkbox.checked == true){
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
+                }else{
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
+                }*/
+                if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
+                }
+                if(opd_row_banner_checkbox.checked != true){
+                    //console.log(this)
+                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
+                }else{
+                    //console.log("else")
+                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
+                }
+                
+                //ツイート表示項目設定読み込み適用
+                if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
+                }
+                opd_row_tw_view_mode_opt.value = opd_row_tw_view_mode_opt.getAttribute("row_tw_view_mode_val")
+                switch (opd_row_tw_view_mode_opt.getAttribute("row_tw_view_mode_val")) {
+                    case "0":
+                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                        break;
+                    case "1":
+                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
+                        break;
+                    case "2":
+                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
+                        break;
+                    default:
+                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                        break;
+                }
+                //console.log(opd_row_div.querySelector(".opd_banner").checked)
                 //バナーチェックイベント
                 opd_row_banner_checkbox.addEventListener("change", function(){
                     row_settings_save();
-                    //console.log(this.closest("div[opd_row_type]").querySelector("object"))
-                    let banner_mode_target_object = this.closest("div[opd_row_type]").querySelector("object");
-                    if(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]')?.textcontent == undefined){
+                    //console.log(this.closest("div[opd_row_type]").querySelector("iframe"))
+                    let banner_mode_target_object = this.closest("div[opd_row_type]").querySelector("iframe");
+                    console.log(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]'))
+                    if(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
                         banner_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
                     }
                     if(this.checked != true){
@@ -111,10 +167,10 @@ function run(settings){
                 //ツイート表示モードイベント
                 opd_row_tw_view_mode_opt.addEventListener("change", function(){
                     row_settings_save();
-                    //console.log(this.closest("div[opd_row_type]").querySelector("object"))
-                    let tw_view_mode_target_object = this.closest("div[opd_row_type]").querySelector("object");
+                    //console.log(this.closest("div[opd_row_type]").querySelector("iframe"))
+                    let tw_view_mode_target_object = this.closest("div[opd_row_type]").querySelector("iframe");
                     //console.log(this.value)
-                    if(tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]')?.textcontent == undefined){
+                    if(tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]') == null){
                         tw_view_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
                     }
                     switch (this.value) {
@@ -132,23 +188,30 @@ function run(settings){
                             break;
                     }
                 })
-                //explore内容検出/保存
-                if(opd_row_div.getAttribute("opd_row_type") == 'explore'){
-                    let exp_object = opd_row_div.querySelector("object");
-                    let exp_old_url = exp_object.contentWindow.location.href;
+            }, {once: true})
+            //exploreURL検出処理
+            const opd_row_mutate = row_object[index].closest("div[opd_row_type]");
+            if(opd_row_mutate.getAttribute("opd_row_type") == 'explore'){
+                mutate_url(opd_row_mutate);
+            }
+        }
+    }
+    //URL監視
+    function mutate_url(element){
+        let exp_object = element.querySelector("iframe");
+        exp_object.addEventListener("load", function(){
+            let exp_old_url = exp_object.contentWindow.location.href;
                     let exp_observer = new MutationObserver(function(){
                         if(exp_old_url != exp_object.contentWindow.location.href){
                             let exp_url = new URL(exp_object.contentWindow.location.href);
-                            //console.log(`${exp_url.pathname}${exp_url.search}`);
-                            opd_row_div.setAttribute("opd_explore_path", `${exp_url.pathname}${exp_url.search}`);
+                            console.log(`${exp_url.pathname}${exp_url.search}`);
+                            element.setAttribute("opd_explore_path", `${exp_url.pathname}${exp_url.search}`);
                             row_settings_save();
                             exp_old_url = exp_object.contentWindow.location.href;
                         }
                     });
                     exp_observer.observe(exp_object.contentWindow.document, {childList: true, subtree: true});
-                }
-            })
-        }
+        })
     }
     //メインバーイベント
     document.getElementById("init_settings").addEventListener("click", function(){
@@ -156,6 +219,11 @@ function run(settings){
             alert("設定を初期化しました。再読み込みしてください。");
         });
     });
+    //プロファイルローダー
+    document.getElementById("profile_load_save").addEventListener("click", function(){
+        window.open(chrome.runtime.getURL("profile_debug.html"), "OPD-Profile-Loader", 'width=720, height=600')
+    });
+    //
     document.getElementById("dnr_reload").addEventListener("click", function(){
         if(confirm("declarativeNetRequestの再読み込みします")){
             chrome.runtime.sendMessage({message: "dnr_upd"}).then((value)=>{
@@ -202,23 +270,33 @@ function run(settings){
         let row_class = document.querySelectorAll(".dsp_row");
         for (let index = 0; index < row_class.length; index++) {
             row_class[index].addEventListener("dragstart", function(ev){
-                ev.dataTransfer.setData('text/plain', ev.target.id);
+                ev.dataTransfer.setData('text/html', ev.target.id);
             });
             row_class[index].addEventListener("dragover", function(ev){
                 ev.preventDefault();
-                this.style.borderLeft = '5px solid rgba(0, 0, 0, 0.500)';
+                this.style.borderLeft = '15px solid rgba(0, 0, 0, 0.500)';
             });
             row_class[index].addEventListener("dragleave", function(){
                 this.style.borderLeft = '';
             });
             row_class[index].addEventListener("drop", function(ev){
                 ev.preventDefault();
-                const dt_id = ev.dataTransfer.getData('text/plain');
+                //移動時初期表示設定
+                //bn_twview_mode(this.querySelector("iframe"));
+                //exploreのURLセット
+                console.log(row_class[index])
+                if(row_class[index].getAttribute("opd_row_type") == 'explore' && this.querySelector("iframe").src != `https://twitter.com${this.getAttribute("opd_explore_path")}`){
+                    //https://twitter.com
+                    console.log(this.getAttribute("opd_explore_path"))
+                    this.querySelector("iframe").src = `https://twitter.com${this.getAttribute("opd_explore_path")}`;
+                }
+                //移動セット
+                const dt_id = ev.dataTransfer.getData('text/html');
                 const dr_elem = document.getElementById(dt_id);
                 this.parentNode.insertBefore(dr_elem, this);
                 this.style.borderLeft = '';
-                append_object_css();
-                row_dd();
+                //append_object_css();
+                //row_dd();
                 row_settings_save();
             })
         }
@@ -229,7 +307,7 @@ function run(settings){
             document.querySelectorAll(".row_close_btn")[index].addEventListener("click", function(){
                 this.closest("[class='dsp_row']").remove();
                 append_object_css();
-                row_dd();
+                //row_dd();
                 row_settings_save();
             })
             

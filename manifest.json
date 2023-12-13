@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck(ProtoType)",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "manifest_version": 3,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -25,6 +25,6 @@
   }],
   "web_accessible_resources" : [{
     "matches" : ["https://*.twitter.com/*"],
-    "resources" : ["icon.png"]
+    "resources" : ["icon.png", "profile_debug.html"]
   }]
   }
