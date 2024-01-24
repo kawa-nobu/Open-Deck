@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck(ProtoType)",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "manifest_version": 3,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -17,7 +17,7 @@
       "path": "rules.json"
     }]
   },
-  "permissions" : ["storage","declarativeNetRequest"],
+  "permissions" : ["storage","declarativeNetRequest", "cookies"],
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
     "matches": ["https://*.twitter.com/*"],

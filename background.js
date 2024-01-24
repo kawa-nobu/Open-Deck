@@ -4,12 +4,13 @@ chrome.runtime.onMessage.addListener(
             chrome.declarativeNetRequest.updateEnabledRulesets(({disableRulesetIds: ["ruleset_1"]})).then((val)=>{
                 chrome.declarativeNetRequest.updateEnabledRulesets(({enableRulesetIds: ["ruleset_1"]})).then((value)=>{
                     console.log("dnr_update_ok");
+                    sendResponse(true);
                 })
             })
-            sendResponse(true);
         }
         if(request.message == "ext_reload"){
             chrome.runtime.reload();
         }
+        return true;
     }
 );
