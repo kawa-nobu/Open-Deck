@@ -1,6 +1,6 @@
 {
-    "name": "Open-Deck(ProtoType)",
-    "version": "1.0.7",
+    "name": "Open-Deck",
+    "version": "1.0.0",
     "manifest_version": 2,
     "description": "The OpenSource Deck",
     "icons" : {
@@ -8,47 +8,41 @@
     },
     "browser_specific_settings": {
       "gecko": {
-        "id": "opd_prototype@kwdev",
-        "strict_min_version": "113.0"
+        "id": "opd_release@kwdev",
+        "strict_min_version": "115.0"
       },
       "gecko_android": {
-        "id": "opd_prototype@kwdev",
-        "strict_min_version": "113.0"
+        "id": "opd_release@kwdev",
+        "strict_min_version": "115.0"
       }
     },
-    "declarative_net_request" : {
-      "rule_resources" : [{
-        "id": "ruleset_1",
-        "enabled": false,
-        "path": "rules.json"
-      }]
-    },
     "web_accessible_resources": [
-    "icon.png", 
-    "profile_debug.html",
-    "icon/settings.svg",
-    "icon/banner_hide.svg", 
-    "icon/top_hide.svg", 
-    "icon/pin.svg", 
-    "icon/pinned.svg", 
-    "icon/column_move.svg",
-    "icon/column_close.svg",
-    "icon/column_w_size.svg", 
-    "icon/column_add_1st.svg", 
-    "icon/column_add_2nd.svg", 
-    "icon/tl_column.svg", 
-    "icon/notice_column.svg", 
-    "icon/exp_column.svg", 
-    "icon/single_view.svg", 
-    "icon/second_view.svg", 
-    "icon/profile_save.svg", 
-    "icon/profile_delete.svg"
+      "icon.png", 
+      "icon/logo_icon.svg",
+      "profile_debug.html",
+      "about_opd.html",
+      "icon/settings.svg",
+      "icon/banner_hide.svg", 
+      "icon/top_hide.svg", 
+      "icon/pin.svg", 
+      "icon/pinned.svg", 
+      "icon/column_move.svg",
+      "icon/column_close.svg",
+      "icon/column_w_size.svg", 
+      "icon/column_add_1st.svg", 
+      "icon/column_add_2nd.svg", 
+      "icon/tl_column.svg", 
+      "icon/notice_column.svg", 
+      "icon/exp_column.svg", 
+      "icon/single_view.svg", 
+      "icon/second_view.svg", 
+      "icon/profile_save.svg", 
+      "icon/profile_delete.svg"
     ],
     "background" : {
       "scripts": ["background.js"]
     },
     "permissions" : [
-      "tabs",
       "storage",
       "webRequest",
       "declarativeNetRequest",
@@ -58,5 +52,9 @@
     "content_scripts": [{
       "matches": ["https://twitter.com/*"],
       "js": ["content.js"]
-      }]
+      }],
+      "browser_action": {
+        "default_popup": "popup.html",
+        "default_icon": "icon.png"
+      }
 }
