@@ -1,8 +1,47 @@
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
         if(request.message == "dnr_upd"){
-            chrome.declarativeNetRequest.updateEnabledRulesets(({disableRulesetIds: ["ruleset_1"]}));
-            chrome.declarativeNetRequest.updateEnabledRulesets(({enableRulesetIds: ["ruleset_1"]}));
+            /*chrome.declarativeNetRequest.updateEnabledRulesets(({disableRulesetIds: ["ruleset_1"]}));
+            chrome.declarativeNetRequest.updateEnabledRulesets(({enableRulesetIds: ["ruleset_1"]}));*/
+            const dnr_rules = [
+                {
+                    id : 1,
+                    priority: 1,
+                    action: {
+                        type: "modifyHeaders",
+                        responseHeaders: [
+                            {
+                                header: "Content-Security-Policy",
+                                operation: "remove"
+                            },
+                            {
+                                header: "X-Frame-Options",
+                                operation: "remove"
+                            }
+                        ]
+                    },
+                    condition : {
+                        urlFilter : "twitter.com",
+                        resourceTypes: ["main_frame",
+                        "sub_frame",
+                        "stylesheet",
+                        "script",
+                        "image",
+                        "font",
+                        "object",
+                        "xmlhttprequest",
+                        "ping",
+                        "csp_report",
+                        "media",
+                        "websocket",
+                        "other"]
+                    }
+                }
+            ];
+            chrome.declarativeNetRequest.updateDynamicRules({
+                removeRuleIds: [1],
+                addRules: dnr_rules,
+            });
             console.log("dnr_update_ok");
             sendResponse(true);
         }
@@ -46,11 +85,11 @@ chrome.webRequest.onHeadersReceived.addListener(function (resp) {
                     break;
             }
         }
-        console.log(access_limit);
+        //(access_limit);
         send_content_script(access_limit);
       }
       if(resp.url.search(/HomeLatestTimeline/g) != -1){
-        console.log(resp);
+        //console.log(resp);
         for (let index = 0; index < resp.responseHeaders.length; index++) {
             switch (resp.responseHeaders[index].name) {
                 case "x-rate-limit-remaining":
@@ -66,11 +105,11 @@ chrome.webRequest.onHeadersReceived.addListener(function (resp) {
                     break;
             }
         }
-        console.log(access_limit)
-        send_content_script(access_limit)
+        //console.log(access_limit)
+        send_content_script(access_limit);
       }
       if(resp.url.search(/HomeTimeline/g) != -1){
-        console.log(resp);
+        //console.log(resp);
         for (let index = 0; index < resp.responseHeaders.length; index++) {
             switch (resp.responseHeaders[index].name) {
                 case "x-rate-limit-remaining":
@@ -86,8 +125,8 @@ chrome.webRequest.onHeadersReceived.addListener(function (resp) {
                     break;
             }
         }
-        console.log(access_limit)
-        send_content_script(access_limit)
+        //console.log(access_limit)
+        send_content_script(access_limit);
       }
     },{urls: ['*://twitter.com/i/api/*']},['responseHeaders']
   );
