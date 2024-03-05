@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" >
+    <title>Open-Deckについて</title>
+    <script src="about_opd.js" charset="UTF-8"></script>
+    <style>
+        html{
+            color-scheme: light dark;
+        }
+        .about_area1{
+            display: flex;
+            flex-direction: row;
+            width: 700px;
+        }
+        .about_area2{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 700px;
+            font-size: 1.3rem;
+        }
+        .about_area2 div{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 1rem;
+        }
+        .about_area1 h1{
+            font-size: 4rem;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+        .about_area1 h2{
+            font-size: 2rem;
+            margin-top: 0;
+        }
+        .opd_logo{
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            width: 200px;
+            min-height: 60px;
+            height: 200px;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+        .opd_logo_text{
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 400px;
+            height: 100px;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .opd_div_font{
+            font-size: 1.5rem;
+        }
+        .opd_div_font span{
+            margin-left: 0.5rem;
+        }
+        @media (prefers-color-scheme: dark) {
+            .opd_logo_text{
+                filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(329deg) brightness(104%) contrast(106%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="about_area1">
+        <div class="opd_logo"></div>
+        <div>
+            <div class="opd_logo_text"></div>
+            <div>
+                <div class="opd_div_font">CodeName:<span>Shizuku</span></div>
+                <div class="opd_div_font">Version:<span id="ext_version"></span></div>
+            </div>
+        </div>
+    </section>
+    <section class="about_area2">
+        <div>Development<br><a href="https://twitter.com/kw_nobu2" target="_blank" rel="noopener noreferrer">kawa-nobu</a></div>
+        <div>GitHub<br><a href="https://github.com/kawa-nobu/Open-Deck" target="_blank" rel="noopener noreferrer">Open-Deck</a></div>
+        <div>ChangeLog<br><a href="https://github.com/kawa-nobu/Open-Deck/releases" target="_blank" rel="noopener noreferrer">Releases</a></div>
+    </section>
+</body>
+</html>

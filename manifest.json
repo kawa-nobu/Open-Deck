@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck(ProtoType)",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "manifest_version": 3,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -10,14 +10,7 @@
     "*://*.twitter.com/*",
     "*://*.twimg.com/*"
   ],
-  "declarative_net_request" : {
-    "rule_resources" : [{
-      "id": "ruleset_1",
-      "enabled": false,
-      "path": "rules.json"
-    }]
-  },
-  "permissions" : ["tabs","storage","webRequest","declarativeNetRequest"],
+  "permissions" : ["storage","webRequest","declarativeNetRequest"],
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
     "matches": ["https://*.twitter.com/*"],
@@ -26,7 +19,9 @@
   "web_accessible_resources" : [{
     "matches" : ["https://*.twitter.com/*"],
     "resources" : ["icon.png", 
+    "icon/logo_icon.svg",
     "profile_debug.html",
+    "about_opd.html",
     "icon/settings.svg",
     "icon/banner_hide.svg", 
     "icon/top_hide.svg", 
@@ -44,5 +39,9 @@
     "icon/second_view.svg", 
     "icon/profile_save.svg", 
     "icon/profile_delete.svg"]
-  }]
+  }],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  }
   }
