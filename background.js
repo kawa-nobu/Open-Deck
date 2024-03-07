@@ -38,12 +38,13 @@ chrome.runtime.onMessage.addListener(
                     }
                 }
             ];
-            chrome.declarativeNetRequest.updateDynamicRules({
+            chrome.declarativeNetRequest.updateSessionRules({//updateDynamicRules
                 removeRuleIds: [1],
                 addRules: dnr_rules,
+            }, function(){
+                console.log("dnr_update_ok");
+                sendResponse(true);
             });
-            console.log("dnr_update_ok");
-            sendResponse(true);
         }
         if(request.message == "ext_reload"){
             chrome.runtime.reload();
