@@ -4,7 +4,7 @@ console.log("%cOpen-Deck Prototype", "background:#a1f4ff;padding:5px;border-radi
 //
 const url_path = new URL(location.href);
 let profile_store;
-let last_load_profile;
+let last_load_profile = 0;
 const ui_icon_define = {
     banner_hide:"icon/banner_hide.svg",
     top_bar_hide:"icon/top_hide.svg",
@@ -64,14 +64,48 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         }
     }
   });
+//他SNSログインデータ移植
+/*Misskey*/
+if(location.href == "https://misskey.io/"){
+    if(localStorage.getItem("account") == undefined){
+        chrome.storage.local.get("opd_misskey_account_data", function(value){
+            if(value.opd_misskey_account_data == undefined){
+                alert("Open-DeckにてMisskeyカラムを使用するにはログインして再読み込みしてください");
+            }else{
+                localStorage.setItem('account', value.opd_misskey_account_data);
+            }
+        });
+    }else{
+        chrome.storage.local.set({'opd_misskey_account_data': localStorage.getItem("account")}, function () {
+            console.log("misskey_sync_ok");
+        });
+    }
+}
+/*Bluesky*/
+/*if(location.href == "https://bsky.app/"){
+    if(localStorage.getItem("BSKY_STORAGE") == undefined){
+        chrome.storage.local.get("opd_bsky_account_data", function(value){
+            if(value.opd_bsky_account_data == undefined){
+                alert("Open-DeckにてBlueskyカラムを使用するにはログインして再読み込みしてください");
+            }else{
+                localStorage.setItem('BSKY_STORAGE', value.opd_bsky_account_data);
+            }
+        });
+    }else{
+        chrome.storage.local.set({'opd_bsky_account_data': localStorage.getItem("BSKY_STORAGE")}, function () {
+            console.log("bluesky_sync_ok");
+        });
+    }
+}*/
 //
-if(location.href == "https://twitter.com/run-opdeck"){
+if(location.href == "https://twitter.com/run-opdeck" || location.href ==  "https://twitter.com/i/" || location.href == "https://example.com/"){
     //testmode
-    if(url_path.pathname == "/opd_run_testmode.html"){
-        init();
-        /*chrome.runtime.sendMessage({message: "ext_page_load_dnr"}).then((value)=>{
+    if(url_path.pathname == "/run-opdeck_test.html"){
+        //init();
+        console.log("testmode")
+        chrome.runtime.sendMessage({message: "dnr_upd_internal_dsp"}).then((value)=>{
             init();
-        });*/
+        });
     }else{
         if(navigator.brave != undefined){
             chrome.runtime.sendMessage({message: "dnr_upd"}).then((value)=>{
@@ -92,7 +126,17 @@ if(location.href == "https://twitter.com/run-opdeck"){
                 last_load_profile = 0;
                 settings_init();
             }else{
-                last_load_profile = JSON.parse(value.opd_settings).last_load_profile;
+                if(JSON.parse(value.opd_settings).last_load_profile == undefined){
+                    if(confirm("プロファイルデータが壊れています。\r\n初期化するにはOKを押してください。\r\n初期化せずに続行する場合はキャンセルを押してください。")){
+                        chrome.storage.local.remove("opd_settings", function(){
+                            alert("初期化が完了しました");
+                        });
+                    }else{
+                        last_load_profile = 0;
+                    }
+                }else{
+                    last_load_profile = JSON.parse(value.opd_settings).last_load_profile;
+                }
                 //console.log(last_load_profile);
             }
             
@@ -480,6 +524,12 @@ function run(settings){
         display: flex;
         justify-content: space-between;
     }
+    .dsp_column_settings_panel_close_btn_wrap{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin: 0 0.5rem 0.5rem 0;
+    }
     .opd_ui_icon_color{
         filter: brightness(0) saturate(100%) invert(11%) sepia(16%) saturate(13%) hue-rotate(322deg) brightness(107%) contrast(80%);
     }
@@ -519,8 +569,10 @@ function run(settings){
     </style>`);
     //カラム要素作成-挿入
     let default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="カラム設定"><input class="opd_settings_btn" type="button" value="S"></label></span><span class="dsp_column_btn"><input class="opd_banner" type="checkbox" title="バナー表示切り替え" %column_banner_ch%><label class="dsp_column_banner_btn opd_ui_icon_color"></label></span><span class="dsp_column_btn"><input class="opd_top_bar" type="checkbox" title="トップ表示切り替え" %column_top_bar_ch%><label class="dsp_column_top_btn opd_ui_icon_color"></label></span>`;
-    let column_settings_panel = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">表示モード<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">すべて</option><option value="1">テキストのみ</option><option value="2">画像・動画付のみ</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div><div class="dsp_column_settings_content_div">自動更新<span><input class="opd_a_reload_bar" type="checkbox" %column_auto_reload_ch%></span></div><div class="dsp_column_settings_content_div">自動更新間隔<span><input class="opd_column_settings_input_text opd_a_reload_time_setting" type="number" value="%column_auto_reload_time%">秒</span></div></div></div></div>` ;
-    let column_settings_panel_no_auto = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">表示モード<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">すべて</option><option value="1">テキストのみ</option><option value="2">画像・動画付のみ</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div></div></div>` ;
+    let othersns_default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="カラム設定"><input class="opd_settings_btn" type="button" value="S"></label></span>`;
+    let column_settings_panel = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">表示モード<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">すべて</option><option value="1">テキストのみ</option><option value="2">画像・動画付のみ</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div><div class="dsp_column_settings_content_div">自動更新<span><input class="opd_a_reload_bar" type="checkbox" %column_auto_reload_ch%></span></div><div class="dsp_column_settings_content_div">自動更新間隔<span><input class="opd_column_settings_input_text opd_a_reload_time_setting" type="number" value="%column_auto_reload_time%">秒</span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="設定を閉じる" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
+    let column_settings_panel_no_auto = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">表示モード<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">すべて</option><option value="1">テキストのみ</option><option value="2">画像・動画付のみ</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="設定を閉じる" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
+    let column_settings_panel_othersns = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="設定を閉じる" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
     let default_element = {
         /*main_bar_empty_column:{html:`<!--<section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" opd_column_width="%column_width_num%" id="main_bar_empty_column" style="height:100%;min-width: 70px;"></div></section>-->`},*/
         empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>左のバーからカラムを追加</p></div></div></section>`},
@@ -528,11 +580,13 @@ function run(settings){
         home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Home</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe allow="fullscreen" src="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
         notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notification</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://twitter.com/notifications" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
         explore:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="explore" opd_column_width="%column_width_num%" opd_explore_path="%column_save_path%" opd_explore_title="%column_save_title%" opd_pinned_path="%column_pinned_save_path%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Explore</span></div></span>${default_element_bar}<span class="dsp_column_btn"><input class="opd_pinned_btn" type="checkbox" title="ピン止め切り替え" %column_pinned_ch%><label class="dsp_column_pin_btn opd_ui_icon_color"></label></span><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe allow="fullscreen" src="https://twitter.com%column_save_path%" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
+        misskey:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="misskey" opd_column_width="%column_width_num%"  style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Misskey.io</span></div></span>${othersns_default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_othersns}<iframe allow="fullscreen" src="https://misskey.io" type="text/html" style="width: 100%;height: 100%;" opd_iframe_width_only></iframe></div></section>`},
+        bsky:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="bsky" opd_column_width="%column_width_num%"  style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Bluesky</span></div></span>${othersns_default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_othersns}<iframe allow="fullscreen" src="https://bsky.app" type="text/html" style="width: 100%;height: 100%;" opd_iframe_width_only></iframe></div></section>`}
     };
     let ins_html = document.createElement("div");
     ins_html.id = "opd_main_element";
     ins_html.style = "position: fixed;z-index: 999999;top:0;width: 100%;height: 100%;background: white;display: flex;flex-direction: row;overflow: hidden;";
-    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nPrototype\r\nv${chrome.runtime.getManifest().version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${chrome.runtime.getManifest().version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
+    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nPrototype\r\nv${chrome.runtime.getManifest().version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${chrome.runtime.getManifest().version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" id="add_misskey" title="Misskeyカラム追加"><div class="dsp_btn_add_misskey_img">Mi</div></div><div class="dsp_btn_parent" id="add_bsky" title="BlueSkyカラム追加"><div class="dsp_btn_add_bsky_img">BS</div></div><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
     //let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 100px;text-align: center;background-color: white;"><div><p style="margin-top:0;padding-top:1em;">Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="profile_load_save" value="Profile Load"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/> <div class="dsp_btn_parent"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_explr_img"></div></div> </p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/><hr><input type="button" id="second_rack" value="Second Rack"/><hr><input type="button" id="profile_save" value="Profile_Save"/><br><input type="button" id="profile_delete" value="Profile_Delete"/><br>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 110px;"></div></section>`;
     let main_column_html = ``;
     let second_column_html = ``;
@@ -685,6 +739,12 @@ function run(settings){
                         case "explore":
                             preload_desc_array.push(`${preload_desc_count}-[${preload_array[preload_index].column_save_title}]-ユニバーサル(Explore)カラム`);
                             break;
+                        case "misskey":
+                            preload_desc_array.push(`Misskeyカラム`);
+                            break;
+                        case "bsky":
+                            preload_desc_array.push(`Blueskyカラム`);
+                            break;
                         default:
                             preload_desc_count = 0;
                             break;
@@ -714,67 +774,70 @@ function run(settings){
         for (let index = 0; index < column_object.length; index++) {
             //バナー/表示モード変更
             column_object[index].addEventListener("load", function(){
-                //console.log(this)
-                let opd_column_div = this.closest("div[opd_column_type]");
-                let opd_column_banner_checkbox = opd_column_div.querySelector(".opd_banner");
-                let opd_column_top_visible_checkbox = opd_column_div.querySelector(".opd_top_bar");
-                let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
-                //バナー表示設定読み込み適用
-                /*if(opd_column_banner_checkbox.checked == true){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                }else{
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
-                }*/
-                //バナー表示ロード
-                if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                }
-                if(opd_column_banner_checkbox.checked != true){
+                console.log(this.getAttribute("opd_iframe_width_only"))
+                if(this.getAttribute("opd_iframe_width_only") != ''){
                     //console.log(this)
-                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
-                }else{
-                    //console.log("else")
-                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
-                }
-                //トップ検索欄等削除適用
-                if(this.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
-                }
-                if(opd_column_top_visible_checkbox.checked != true){
-                    if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                        //div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]){display:none;}
-                        this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1)div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1)`;
+                    let opd_column_div = this.closest("div[opd_column_type]");
+                    let opd_column_banner_checkbox = opd_column_div.querySelector(".opd_banner");
+                    let opd_column_top_visible_checkbox = opd_column_div.querySelector(".opd_top_bar");
+                    let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
+                    //バナー表示設定読み込み適用
+                    /*if(opd_column_banner_checkbox.checked == true){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
                     }else{
-                        if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;} div[role="progressbar"] + div{display:none;}`;
-                        }else{
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
-                        }
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
+                    }*/
+                    //バナー表示ロード
+                    if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
                     }
-                }else{
-                    //console.log("else")
-                    this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
-                }
+                    if(opd_column_banner_checkbox.checked != true){
+                        //console.log(this)
+                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
+                    }else{
+                        //console.log("else")
+                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
+                    }
+                    //トップ検索欄等削除適用
+                    if(this.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
+                    }
+                    if(opd_column_top_visible_checkbox.checked != true){
+                        if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
+                            //div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]){display:none;}
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1)div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1)`;
+                        }else{
+                            if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;} div[role="progressbar"] + div{display:none;}`;
+                            }else{
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
+                            }
+                        }
+                    }else{
+                        //console.log("else")
+                        this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
+                    }
 
-                //ツイート表示項目設定読み込み適用
-                if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
+                    //ツイート表示項目設定読み込み適用
+                    if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
+                    }
+                    switch (opd_column_tw_view_mode_opt.value) {
+                        case "0":
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                            break;
+                        case "1":
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
+                            break;
+                        case "2":
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
+                            break;
+                        default:
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                            break;
+                    }
+                    //console.log(opd_column_div.querySelector(".opd_banner").checked)
                 }
-                switch (opd_column_tw_view_mode_opt.value) {
-                    case "0":
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                        break;
-                    case "1":
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
-                        break;
-                    case "2":
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
-                        break;
-                    default:
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                        break;
-                }
-                //console.log(opd_column_div.querySelector(".opd_banner").checked)
             })
             //各カラム読み込み後の動作(init)
             column_object[index].addEventListener("load", function(){
@@ -798,6 +861,11 @@ function run(settings){
                         settings_panel.removeAttribute("open");
                         settings_panel.style.display = "none";
                     }
+                });
+                opd_column_div.querySelector(".dsp_column_settings_panel_close_btn").addEventListener("click", function(){
+                    const settings_panel = this.closest("div[opd_column_type]").querySelector(".dsp_column_settings_panel");
+                    settings_panel.removeAttribute("open");
+                    settings_panel.style.display = "none";
                 })
                 //設定パネル&ホバー時動作
                 opd_column_div.querySelector(".dsp_column_settings_panel").addEventListener("mouseover", function(){
@@ -843,103 +911,6 @@ function run(settings){
                         column_settings_save("", last_load_profile);
                     })
                 }
-                //バナー表示設定読み込み適用
-                /*if(opd_column_banner_checkbox.checked == true){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                }else{
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
-                }*/
-                if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                }
-                if(opd_column_banner_checkbox.checked != true){
-                    //console.log(this)
-                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
-                }else{
-                    //console.log("else")
-                    this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
-                }
-
-                //トップ検索欄等削除適用
-                if(this.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
-                }
-                if(opd_column_top_visible_checkbox.checked != true){
-                    //console.log("home_notcheck")
-                    if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                        this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
-                    }else{
-                        if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;} div[role="progressbar"] + div{display:none;}`;
-                        }else{
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;};`;
-                        }
-                    }
-                }else{
-                    //console.log("else")
-                    this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
-                }
-                
-                //ツイート表示項目設定読み込み適用
-                if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
-                }
-                opd_column_tw_view_mode_opt.value = opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val")
-                switch (opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val")) {
-                    case "0":
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                        break;
-                    case "1":
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
-                        break;
-                    case "2":
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
-                        break;
-                    default:
-                        this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                        break;
-                }
-                //自動更新初期適用
-                let reload_test = 0;
-                let auto_reload_int = null;//チェックボックスイベントにも再利用
-                if(opd_column_auto_reload_checkbox != null){
-                    const auto_reload_target_elem = this;
-                    //console.log(opd_column_auto_reload_checkbox)
-                    opd_column_auto_reload_time_reload.addEventListener("change", function(){
-                        const auto_reload_time = auto_reload_target_elem.closest('div[opd_column_type]').querySelector(".opd_a_reload_time_setting");
-                        if(Number(auto_reload_time.value) >= 1){
-                            alert(`自動更新の秒数を${auto_reload_time.value}秒に設定しました`);
-                            column_settings_save("", last_load_profile);
-                        }else{
-                            alert(`1秒以上の秒数を入力してください`);
-                            auto_reload_time.value = '10';
-                            column_settings_save("", last_load_profile);
-                        }
-                    });
-                    //初期チェック動作
-                    if(opd_column_auto_reload_checkbox.checked){
-                        //console.log("init update!")
-                        const auto_reload_time_input = auto_reload_target_elem.closest('div[opd_column_type]').querySelector(".opd_a_reload_time_setting");
-                        const auto_reload_load_time = Number(auto_reload_time_input.value) * 1000;
-                        auto_reload_time_input.disabled = true;
-                        auto_reload_int = setInterval(function(){
-                            //console.log("update!")
-                            //console.log(auto_reload_target_elem.contentWindow)
-                            if(auto_reload_target_elem.contentWindow.location.pathname == "/home"){
-                                auto_reload_target_elem.contentWindow.document.querySelector('[aria-selected="true"]').click();
-                            };
-                            if(auto_reload_target_elem.contentWindow.location.pathname == "/search"){
-                                reload_test += 1;
-                                //console.log(reload_test);
-                                auto_reload_target_elem.contentWindow.scrollTo(0, 300);
-                                setTimeout(function(){
-                                    auto_reload_target_elem.contentWindow.scrollTo(0, 0);
-                                }, 10);
-                            };
-                        }, auto_reload_load_time);
-                    }
-                }
-
                 //カラム横幅設定イベント
                 opd_column_width_btn.addEventListener("click", function(){
                     const now_width = this.closest("div[opd_column_type]").getAttribute("opd_column_width");
@@ -971,132 +942,234 @@ function run(settings){
                         }
                     }
                 });
-                //console.log(opd_column_div.querySelector(".opd_banner").checked)
-                //バナーチェックイベント
-                opd_column_banner_checkbox.addEventListener("change", function(){
-                    column_settings_save("", last_load_profile);
-                    //console.log(this.closest("div[opd_column_type]").querySelector("iframe"))
-                    let banner_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
-                    //console.log(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]'))
-                    if(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
-                        banner_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                    }
-                    if(this.checked != true){
-                        //console.log(this)
-                        banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{visibility: hidden; width: 0;};`;
-                    }else{
-                        //console.log("else")
-                        banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
-                    }
-                });
 
-                //トップ検索欄等削除イベント
-                opd_column_top_visible_checkbox.addEventListener("change", function(){
-                    column_settings_save("", last_load_profile);
-                    let topvisible_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
-                    //console.log(topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]'))
-                    if(topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
-                        topvisible_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
+                //他SNSカラム対応
+                if(this.getAttribute("opd_iframe_width_only") != ''){
+                    //バナー表示設定読み込み適用
+                    /*if(opd_column_banner_checkbox.checked == true){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
+                    }else{
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
+                    }*/
+                    if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
                     }
-                    if(this.checked != true){
+                    if(opd_column_banner_checkbox.checked != true){
                         //console.log(this)
-                        //topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]), div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(h2[role="heading"]){display:none;};`;
+                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
+                    }else{
+                        //console.log("else")
+                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
+                    }
+
+                    //トップ検索欄等削除適用
+                    if(this.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
+                    }
+                    if(opd_column_top_visible_checkbox.checked != true){
+                        //console.log("home_notcheck")
                         if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                            topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
                         }else{
-                            //console.log(this.closest("div[opd_column_type]").getAttribute("opd_column_type"))
                             if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;} div[aria-label="ホームタイムライン"] * +div:first-of-type [data-testid="cellInnerDiv"]{} div[role="progressbar"] + div{display:none;}`;
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;} div[role="progressbar"] + div{display:none;}`;
                             }else{
-                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;};`;
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;};`;
                             }
                         }
                     }else{
                         //console.log("else")
-                        topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
+                        this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
                     }
-                });
                 
-                //Exproleピン止め
-                if(opd_column_pinned_checkbox != null){
-                    opd_column_pinned_checkbox.addEventListener("click", function(){
-                        if(this.checked){
-                            if(confirm("この場所でピン止めしますか?")){
-                                const now_path = this.closest("div[opd_column_type]").getAttribute("opd_explore_path");
-                                this.closest("div[opd_column_type]").setAttribute("opd_pinned_path",now_path);
+                    //ツイート表示項目設定読み込み適用
+                    if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
+                    }
+                    opd_column_tw_view_mode_opt.value = opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val")
+                    switch (opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val")) {
+                        case "0":
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                            break;
+                        case "1":
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
+                            break;
+                        case "2":
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
+                            break;
+                        default:
+                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                            break;
+                    }
+                    //自動更新初期適用
+                    let reload_test = 0;
+                    let auto_reload_int = null;//チェックボックスイベントにも再利用
+                    if(opd_column_auto_reload_checkbox != null){
+                        const auto_reload_target_elem = this;
+                        //console.log(opd_column_auto_reload_checkbox)
+                        opd_column_auto_reload_time_reload.addEventListener("change", function(){
+                            const auto_reload_time = auto_reload_target_elem.closest('div[opd_column_type]').querySelector(".opd_a_reload_time_setting");
+                            if(Number(auto_reload_time.value) >= 1){
+                                alert(`自動更新の秒数を${auto_reload_time.value}秒に設定しました`);
                                 column_settings_save("", last_load_profile);
                             }else{
-                                this.checked = false;
-                            }
-                        }else{
-                            if(confirm("ピン止めを解除します")){
-                                this.closest("div[opd_column_type]").setAttribute("opd_pinned_path","");
+                                alert(`1秒以上の秒数を入力してください`);
+                                auto_reload_time.value = '10';
                                 column_settings_save("", last_load_profile);
-                                this.checked = false;
-                            }else{
-                                this.checked = true;
                             }
-                        }
-                    });
-                }
-                //自動更新モードイベント
-                if(opd_column_auto_reload_checkbox != null){
-                    opd_column_auto_reload_checkbox.addEventListener("click", function(){
-                        let auto_reload_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
-                        const auto_reload_time_input = this.closest("div[opd_column_type]").querySelector(".opd_a_reload_time_setting");
-                        const auto_reload_time = Number(auto_reload_time_input.value) * 1000;
-                        if(this.checked){
+                        });
+                        //初期チェック動作
+                        if(opd_column_auto_reload_checkbox.checked){
+                            //console.log("init update!")
+                            const auto_reload_time_input = auto_reload_target_elem.closest('div[opd_column_type]').querySelector(".opd_a_reload_time_setting");
+                            const auto_reload_load_time = Number(auto_reload_time_input.value) * 1000;
                             auto_reload_time_input.disabled = true;
                             auto_reload_int = setInterval(function(){
                                 //console.log("update!")
-                                //console.log(auto_reload_target_object.contentWindow)
-                                if(auto_reload_target_object.contentWindow.location.pathname == "/home"){
-                                    auto_reload_target_object.contentWindow.document.querySelector('[aria-selected="true"]').click();
+                                //console.log(auto_reload_target_elem.contentWindow)
+                                if(auto_reload_target_elem.contentWindow.location.pathname == "/home"){
+                                    auto_reload_target_elem.contentWindow.document.querySelector('[aria-selected="true"]').click();
                                 };
-                                if(auto_reload_target_object.contentWindow.location.pathname == "/search"){
-                                    auto_reload_target_object.contentWindow.scrollTo(0, 300);
+                                if(auto_reload_target_elem.contentWindow.location.pathname == "/search"){
+                                    reload_test += 1;
+                                    //console.log(reload_test);
+                                    auto_reload_target_elem.contentWindow.scrollTo(0, 300);
                                     setTimeout(function(){
-                                        auto_reload_target_object.contentWindow.scrollTo(0, 0);
+                                        auto_reload_target_elem.contentWindow.scrollTo(0, 0);
                                     }, 10);
                                 };
-                            }, auto_reload_time);
-                            //console.log(auto_reload_time)
-                            column_settings_save("", last_load_profile);
+                            }, auto_reload_load_time);
+                        }
+                    }
+
+                    
+                    //console.log(opd_column_div.querySelector(".opd_banner").checked)
+                    //バナーチェックイベント
+                    opd_column_banner_checkbox.addEventListener("change", function(){
+                        column_settings_save("", last_load_profile);
+                        //console.log(this.closest("div[opd_column_type]").querySelector("iframe"))
+                        let banner_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
+                        //console.log(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]'))
+                        if(banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
+                            banner_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
+                        }
+                        if(this.checked != true){
+                            //console.log(this)
+                            banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{visibility: hidden; width: 0;};`;
                         }else{
-                            auto_reload_time_input.disabled = false;
-                            //console.log("update stop!")
-                            clearInterval(auto_reload_int);
-                            column_settings_save("", last_load_profile);
+                            //console.log("else")
+                            banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
                         }
                     });
-                }
-                /*if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore" || this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
+
+                    //トップ検索欄等削除イベント
+                    opd_column_top_visible_checkbox.addEventListener("change", function(){
+                        column_settings_save("", last_load_profile);
+                        let topvisible_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
+                        //console.log(topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]'))
+                        if(topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
+                            topvisible_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
+                        }
+                        if(this.checked != true){
+                            //console.log(this)
+                            //topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]), div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(h2[role="heading"]){display:none;};`;
+                            if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
+                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
+                            }else{
+                                //console.log(this.closest("div[opd_column_type]").getAttribute("opd_column_type"))
+                                if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
+                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;} div[aria-label="ホームタイムライン"] * +div:first-of-type [data-testid="cellInnerDiv"]{} div[role="progressbar"] + div{display:none;}`;
+                                }else{
+                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;};`;
+                                }
+                            }
+                        }else{
+                            //console.log("else")
+                            topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
+                        }
+                    });
+                
+                    //Exproleピン止め
+                    if(opd_column_pinned_checkbox != null){
+                        opd_column_pinned_checkbox.addEventListener("click", function(){
+                            if(this.checked){
+                                if(confirm("この場所でピン止めしますか?")){
+                                    const now_path = this.closest("div[opd_column_type]").getAttribute("opd_explore_path");
+                                    this.closest("div[opd_column_type]").setAttribute("opd_pinned_path",now_path);
+                                    column_settings_save("", last_load_profile);
+                                }else{
+                                    this.checked = false;
+                                }
+                            }else{
+                                if(confirm("ピン止めを解除します")){
+                                    this.closest("div[opd_column_type]").setAttribute("opd_pinned_path","");
+                                    column_settings_save("", last_load_profile);
+                                    this.checked = false;
+                                }else{
+                                    this.checked = true;
+                                }
+                            }
+                        });
+                    }
+                    //自動更新モードイベント
+                    if(opd_column_auto_reload_checkbox != null){
+                        opd_column_auto_reload_checkbox.addEventListener("click", function(){
+                            let auto_reload_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
+                            const auto_reload_time_input = this.closest("div[opd_column_type]").querySelector(".opd_a_reload_time_setting");
+                            const auto_reload_time = Number(auto_reload_time_input.value) * 1000;
+                            if(this.checked){
+                                auto_reload_time_input.disabled = true;
+                                auto_reload_int = setInterval(function(){
+                                    //console.log("update!")
+                                    //console.log(auto_reload_target_object.contentWindow)
+                                    if(auto_reload_target_object.contentWindow.location.pathname == "/home"){
+                                        auto_reload_target_object.contentWindow.document.querySelector('[aria-selected="true"]').click();
+                                    };
+                                    if(auto_reload_target_object.contentWindow.location.pathname == "/search"){
+                                        auto_reload_target_object.contentWindow.scrollTo(0, 300);
+                                        setTimeout(function(){
+                                            auto_reload_target_object.contentWindow.scrollTo(0, 0);
+                                        }, 10);
+                                    };
+                                }, auto_reload_time);
+                                //console.log(auto_reload_time)
+                                column_settings_save("", last_load_profile);
+                            }else{
+                                auto_reload_time_input.disabled = false;
+                                //console.log("update stop!")
+                                clearInterval(auto_reload_int);
+                                column_settings_save("", last_load_profile);
+                            }
+                        });
+                    }
+                    /*if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore" || this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
                     
-                }*/
-                //ツイート表示モードイベント
-                opd_column_tw_view_mode_opt.addEventListener("change", function(){
-                    column_settings_save("", last_load_profile);
-                    //console.log(this.closest("div[opd_column_type]").querySelector("iframe"))
-                    let tw_view_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
-                    //console.log(this.value)
-                    if(tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]') == null){
-                        tw_view_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
-                    }
-                    switch (this.value) {
-                        case "0":
-                            tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                            break;
-                        case "1":
-                            tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
-                            break;
-                        case "2":
-                            tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
-                            break;
-                        default:
-                            tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                            break;
-                    }
-                })
+                    }*/
+                    //ツイート表示モードイベント
+                    opd_column_tw_view_mode_opt.addEventListener("change", function(){
+                        column_settings_save("", last_load_profile);
+                        //console.log(this.closest("div[opd_column_type]").querySelector("iframe"))
+                        let tw_view_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
+                        //console.log(this.value)
+                        if(tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]') == null){
+                            tw_view_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
+                        }
+                        switch (this.value) {
+                            case "0":
+                                tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                                break;
+                            case "1":
+                                tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:has(div[aria-labelledby]){content-visibility:hidden; }`;
+                                break;
+                            case "2":
+                                tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = `div[data-testid="cellInnerDiv"]:not(:has(div[aria-labelledby])){content-visibility:hidden; }`;
+                                break;
+                            default:
+                                tw_view_mode_target_object.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
+                                break;
+                        }
+                    })
+                }
             }, {once: true})
             //exploreURL検出処理
             const opd_column_mutate = column_object[index].closest("div[opd_column_type]");
@@ -1223,6 +1296,26 @@ function run(settings){
         column_close();
         column_settings_save("", last_load_profile);
     });
+    //Misskeyカラム追加
+    document.getElementById("add_misskey").addEventListener("click", function(){
+        const new_column = default_element["misskey"]["html"].replaceAll("%column_num%", create_random_id()).replaceAll("%column_width_num%", "30");
+        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
+        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
+        append_object_css();
+        column_dd();
+        column_close();
+        column_settings_save("", last_load_profile);
+    });
+    //BlueSkyカラム追加
+    document.getElementById("add_bsky").addEventListener("click", function(){
+        const new_column = default_element["bsky"]["html"].replaceAll("%column_num%", create_random_id()).replaceAll("%column_width_num%", "30");
+        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
+        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
+        append_object_css();
+        column_dd();
+        column_close();
+        column_settings_save("", last_load_profile);
+    });
     //プロファイル保存ボタン
     document.getElementById("profile_save").addEventListener("click", function(){
         if(confirm("現在の構成でプロファイルを作成します")){
@@ -1318,10 +1411,20 @@ function run(settings){
     function column_close(){
         for (let index = 0; index < document.querySelectorAll(".column_close_btn").length; index++) {
             document.querySelectorAll(".column_close_btn")[index].addEventListener("click", function(){
-                this.closest(".dsp_column").remove();
-                append_object_css();
-                //column_dd();
-                column_settings_save("", last_load_profile);
+                const pin_checkbox = this.closest(".dsp_column").querySelector(".opd_pinned_btn")?.checked;
+                if(pin_checkbox == false || pin_checkbox == undefined){
+                    this.closest(".dsp_column").remove();
+                    append_object_css();
+                    //column_dd();
+                    column_settings_save("", last_load_profile);
+                }else{
+                    if(confirm("ピン止めされているカラムです\r\nカラムを閉じますか？")){
+                        this.closest(".dsp_column").remove();
+                        append_object_css();
+                        //column_dd();
+                        column_settings_save("", last_load_profile);
+                    }
+                }
             })
         }
     }

@@ -1,60 +1,73 @@
 {
-    "name": "Open-Deck(ProtoType)",
-    "version": "1.0.9",
-    "manifest_version": 2,
-    "description": "The OpenSource Deck",
-    "icons" : {
-      "128" : "icon.png"
+  "name": "Open-Deck(ProtoType)",
+  "version": "1.1.0",
+  "manifest_version": 2,
+  "description": "The OpenSource Deck",
+  "icons" : {
+    "128" : "icon.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "opd_prototype@kwdev",
+      "strict_min_version": "115.0"
     },
-    "browser_specific_settings": {
-      "gecko": {
-        "id": "opd_prototype@kwdev",
-        "strict_min_version": "115.0"
-      },
-      "gecko_android": {
-        "id": "opd_prototype@kwdev",
-        "strict_min_version": "115.0"
-      }
-    },
-    "web_accessible_resources": [
-      "icon.png", 
-      "icon/logo_icon.svg",
-      "profile_debug.html",
-      "about_opd.html",
-      "icon/settings.svg",
-      "icon/banner_hide.svg", 
-      "icon/top_hide.svg", 
-      "icon/pin.svg", 
-      "icon/pinned.svg", 
-      "icon/column_move.svg",
-      "icon/column_close.svg",
-      "icon/column_w_size.svg", 
-      "icon/column_add_1st.svg", 
-      "icon/column_add_2nd.svg", 
-      "icon/tl_column.svg", 
-      "icon/notice_column.svg", 
-      "icon/exp_column.svg", 
-      "icon/single_view.svg", 
-      "icon/second_view.svg", 
-      "icon/profile_save.svg", 
-      "icon/profile_delete.svg"
-    ],
-    "background" : {
-      "scripts": ["background.js"]
-    },
-    "permissions" : [
-      "storage",
-      "webRequest",
-      "declarativeNetRequest",
-       "*://*.twitter.com/*",
-       "*://*.twimg.com/*"
-    ],
-    "content_scripts": [{
-      "matches": ["https://twitter.com/*"],
-      "js": ["content.js"]
-      }],
-      "browser_action": {
-        "default_popup": "popup.html",
-        "default_icon": "icon.png"
-      }
+    "gecko_android": {
+      "id": "opd_prototype@kwdev",
+      "strict_min_version": "115.0"
+    }
+  },
+  "declarative_net_request" : {
+    "rule_resources" : [{
+      "id": "ruleset_1",
+      "enabled": false,
+      "path": "rules.json"
+    }]
+  },
+  "web_accessible_resources": [
+    "icon.png", 
+    "icon/logo_icon.svg",
+    "profile_debug.html",
+    "about_opd.html",
+    "icon/settings.svg",
+    "icon/banner_hide.svg", 
+    "icon/top_hide.svg", 
+    "icon/pin.svg", 
+    "icon/pinned.svg", 
+    "icon/column_move.svg",
+    "icon/column_close.svg",
+    "icon/column_w_size.svg", 
+    "icon/column_add_1st.svg", 
+    "icon/column_add_2nd.svg", 
+    "icon/tl_column.svg", 
+    "icon/notice_column.svg", 
+    "icon/exp_column.svg", 
+    "icon/single_view.svg", 
+    "icon/second_view.svg", 
+    "icon/profile_save.svg", 
+    "icon/profile_delete.svg"
+  ],
+  "background" : {
+    "scripts": ["background.js"]
+  },
+  "permissions" : [
+    "storage",
+    "webRequest",
+    "declarativeNetRequest",
+    "*://twitter.com/*",
+    "*://*.twimg.com/*",
+    "*://*.bsky.app/*",
+    "*://*.misskey.io/*",
+    "*://*.statsigapi.net/*",
+    "*://*.cloudflareinsights.com/",
+    "*://*.misskeyusercontent.com/"
+  ],
+  "content_scripts": [{
+    "matches": ["https://*.twitter.com/*", "*://*.misskey.io/*", "*://*.bsky.app/*"],
+    "js": ["content.js"],
+    "all_frames": true
+    }],
+    "browser_action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    }
 }
