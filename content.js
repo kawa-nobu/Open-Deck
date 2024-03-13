@@ -64,41 +64,8 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         }
     }
   });
-//他SNSログインデータ移植
-/*Misskey*/
-if(location.href == "https://misskey.io/"){
-    if(localStorage.getItem("account") == undefined){
-        chrome.storage.local.get("opd_misskey_account_data", function(value){
-            if(value.opd_misskey_account_data == undefined){
-                alert("Open-DeckにてMisskeyカラムを使用するにはログインして再読み込みしてください");
-            }else{
-                localStorage.setItem('account', value.opd_misskey_account_data);
-            }
-        });
-    }else{
-        chrome.storage.local.set({'opd_misskey_account_data': localStorage.getItem("account")}, function () {
-            console.log("misskey_sync_ok");
-        });
-    }
-}
-/*Bluesky*/
-/*if(location.href == "https://bsky.app/"){
-    if(localStorage.getItem("BSKY_STORAGE") == undefined){
-        chrome.storage.local.get("opd_bsky_account_data", function(value){
-            if(value.opd_bsky_account_data == undefined){
-                alert("Open-DeckにてBlueskyカラムを使用するにはログインして再読み込みしてください");
-            }else{
-                localStorage.setItem('BSKY_STORAGE', value.opd_bsky_account_data);
-            }
-        });
-    }else{
-        chrome.storage.local.set({'opd_bsky_account_data': localStorage.getItem("BSKY_STORAGE")}, function () {
-            console.log("bluesky_sync_ok");
-        });
-    }
-}*/
 //
-if(location.href == "https://twitter.com/run-opdeck" || location.href ==  "https://twitter.com/i/" || location.href == "https://example.com/"){
+if(location.href == "https://twitter.com/run-opdeck"){
     //testmode
     if(url_path.pathname == "/run-opdeck_test.html"){
         //init();
@@ -537,6 +504,9 @@ function run(settings){
         margin-left:110px
     }*/
     @media (prefers-color-scheme: dark) {
+        #main_rack_element{
+            background-color: black !important;
+        }
         .dsp_column_draggable_false, #first_rack_element, #second_rack_element, #second_rack_element, #main_bar_empty_column{
             background-color: black !important;
         }
@@ -577,16 +547,14 @@ function run(settings){
         /*main_bar_empty_column:{html:`<!--<section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" opd_column_width="%column_width_num%" id="main_bar_empty_column" style="height:100%;min-width: 70px;"></div></section>-->`},*/
         empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>左のバーからカラムを追加</p></div></div></section>`},
         second_empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 30rem;overflow: hidden;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_2)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>1段目のカラムが配置できます</p></div></div></section>`},
-        home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Home</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe allow="fullscreen" src="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
+        home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Home</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
         notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notification</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://twitter.com/notifications" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
-        explore:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="explore" opd_column_width="%column_width_num%" opd_explore_path="%column_save_path%" opd_explore_title="%column_save_title%" opd_pinned_path="%column_pinned_save_path%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Explore</span></div></span>${default_element_bar}<span class="dsp_column_btn"><input class="opd_pinned_btn" type="checkbox" title="ピン止め切り替え" %column_pinned_ch%><label class="dsp_column_pin_btn opd_ui_icon_color"></label></span><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe allow="fullscreen" src="https://twitter.com%column_save_path%" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
-        misskey:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="misskey" opd_column_width="%column_width_num%"  style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Misskey.io</span></div></span>${othersns_default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_othersns}<iframe allow="fullscreen" src="https://misskey.io" type="text/html" style="width: 100%;height: 100%;" opd_iframe_width_only></iframe></div></section>`},
-        bsky:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="bsky" opd_column_width="%column_width_num%"  style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Bluesky</span></div></span>${othersns_default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_othersns}<iframe allow="fullscreen" src="https://bsky.app" type="text/html" style="width: 100%;height: 100%;" opd_iframe_width_only></iframe></div></section>`}
+        explore:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="explore" opd_column_width="%column_width_num%" opd_explore_path="%column_save_path%" opd_explore_title="%column_save_title%" opd_pinned_path="%column_pinned_save_path%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Explore</span></div></span>${default_element_bar}<span class="dsp_column_btn"><input class="opd_pinned_btn" type="checkbox" title="ピン止め切り替え" %column_pinned_ch%><label class="dsp_column_pin_btn opd_ui_icon_color"></label></span><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://twitter.com%column_save_path%" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`}
     };
     let ins_html = document.createElement("div");
     ins_html.id = "opd_main_element";
     ins_html.style = "position: fixed;z-index: 999999;top:0;width: 100%;height: 100%;background: white;display: flex;flex-direction: row;overflow: hidden;";
-    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nPrototype\r\nv${chrome.runtime.getManifest().version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${chrome.runtime.getManifest().version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" id="add_misskey" title="Misskeyカラム追加"><div class="dsp_btn_add_misskey_img">Mi</div></div><div class="dsp_btn_parent" id="add_bsky" title="BlueSkyカラム追加"><div class="dsp_btn_add_bsky_img">BS</div></div><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
+    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nPrototype\r\nv${chrome.runtime.getManifest().version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${chrome.runtime.getManifest().version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
     //let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 100px;text-align: center;background-color: white;"><div><p style="margin-top:0;padding-top:1em;">Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="profile_load_save" value="Profile Load"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/> <div class="dsp_btn_parent"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_explr_img"></div></div> </p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/><hr><input type="button" id="second_rack" value="Second Rack"/><hr><input type="button" id="profile_save" value="Profile_Save"/><br><input type="button" id="profile_delete" value="Profile_Delete"/><br>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 110px;"></div></section>`;
     let main_column_html = ``;
     let second_column_html = ``;
@@ -969,12 +937,12 @@ function run(settings){
                     if(opd_column_top_visible_checkbox.checked != true){
                         //console.log("home_notcheck")
                         if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}`;
                         }else{
                             if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;} div[role="progressbar"] + div{display:none;}`;
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible; filter: none;} div[role="progressbar"] + div{display:none;}`;
                             }else{
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;};`;
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}`;
                             }
                         }
                     }else{
@@ -1005,6 +973,13 @@ function run(settings){
                     let reload_test = 0;
                     let auto_reload_int = null;//チェックボックスイベントにも再利用
                     if(opd_column_auto_reload_checkbox != null){
+                        //Home, Exproleカラムホバー中 自動更新上部遷移停止
+                        opd_column_div.querySelector("iframe").addEventListener("mouseover", function(){
+                            this.setAttribute("auto_reload_mouse_hover", "true");
+                        });
+                        opd_column_div.querySelector("iframe").addEventListener("mouseleave", function(){
+                            this.setAttribute("auto_reload_mouse_hover", "false");
+                        });
                         const auto_reload_target_elem = this;
                         //console.log(opd_column_auto_reload_checkbox)
                         opd_column_auto_reload_time_reload.addEventListener("change", function(){
@@ -1028,21 +1003,24 @@ function run(settings){
                                 //console.log("update!")
                                 //console.log(auto_reload_target_elem.contentWindow)
                                 if(auto_reload_target_elem.contentWindow.location.pathname == "/home"){
-                                    auto_reload_target_elem.contentWindow.document.querySelector('[aria-selected="true"]').click();
+                                    if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
+                                        auto_reload_target_elem.contentWindow.document.querySelector('[aria-selected="true"]').click();
+                                    }
                                 };
                                 if(auto_reload_target_elem.contentWindow.location.pathname == "/search"){
                                     reload_test += 1;
                                     //console.log(reload_test);
-                                    auto_reload_target_elem.contentWindow.scrollTo(0, 300);
-                                    setTimeout(function(){
-                                        auto_reload_target_elem.contentWindow.scrollTo(0, 0);
-                                    }, 10);
+                                    if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
+                                        auto_reload_target_elem.contentWindow.scrollTo(0, 300);
+                                        setTimeout(function(){
+                                            auto_reload_target_elem.contentWindow.scrollTo(0, 0);
+                                        }, 10);
+                                    }
                                 };
                             }, auto_reload_load_time);
                         }
                     }
 
-                    
                     //console.log(opd_column_div.querySelector(".opd_banner").checked)
                     //バナーチェックイベント
                     opd_column_banner_checkbox.addEventListener("change", function(){
@@ -1074,13 +1052,13 @@ function run(settings){
                             //console.log(this)
                             //topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]), div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(h2[role="heading"]){display:none;};`;
                             if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
+                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible;}`;
                             }else{
                                 //console.log(this.closest("div[opd_column_type]").getAttribute("opd_column_type"))
                                 if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;} div[aria-label="ホームタイムライン"] * +div:first-of-type [data-testid="cellInnerDiv"]{} div[role="progressbar"] + div{display:none;}`;
+                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;} [data-testid="app-bar-back"]{visibility: visible;} div[aria-label="ホームタイムライン"] * +div:first-of-type [data-testid="cellInnerDiv"]{} div[role="progressbar"] + div{display:none;}`;
                                 }else{
-                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;};`;
+                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible;}`;
                                 }
                             }
                         }else{
@@ -1123,13 +1101,17 @@ function run(settings){
                                     //console.log("update!")
                                     //console.log(auto_reload_target_object.contentWindow)
                                     if(auto_reload_target_object.contentWindow.location.pathname == "/home"){
-                                        auto_reload_target_object.contentWindow.document.querySelector('[aria-selected="true"]').click();
+                                        if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
+                                            auto_reload_target_object.contentWindow.document.querySelector('[aria-selected="true"]').click();
+                                        }
                                     };
                                     if(auto_reload_target_object.contentWindow.location.pathname == "/search"){
-                                        auto_reload_target_object.contentWindow.scrollTo(0, 300);
-                                        setTimeout(function(){
-                                            auto_reload_target_object.contentWindow.scrollTo(0, 0);
-                                        }, 10);
+                                        if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
+                                            auto_reload_target_object.contentWindow.scrollTo(0, 300);
+                                            setTimeout(function(){
+                                                auto_reload_target_object.contentWindow.scrollTo(0, 0);
+                                            }, 10);
+                                        }
                                     };
                                 }, auto_reload_time);
                                 //console.log(auto_reload_time)
@@ -1289,26 +1271,6 @@ function run(settings){
     //Explore(ユニバーサル)カラム追加
     document.getElementById("add_explore").addEventListener("click", function(){
         const new_column = default_element["explore"]["html"].replaceAll("%column_save_path%", "/explore").replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_pinned_save_path%", "").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
-        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
-        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
-        append_object_css();
-        column_dd();
-        column_close();
-        column_settings_save("", last_load_profile);
-    });
-    //Misskeyカラム追加
-    document.getElementById("add_misskey").addEventListener("click", function(){
-        const new_column = default_element["misskey"]["html"].replaceAll("%column_num%", create_random_id()).replaceAll("%column_width_num%", "30");
-        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
-        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
-        append_object_css();
-        column_dd();
-        column_close();
-        column_settings_save("", last_load_profile);
-    });
-    //BlueSkyカラム追加
-    document.getElementById("add_bsky").addEventListener("click", function(){
-        const new_column = default_element["bsky"]["html"].replaceAll("%column_num%", create_random_id()).replaceAll("%column_width_num%", "30");
         document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
         document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
         append_object_css();

@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck(ProtoType)",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "manifest_version": 2,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -15,13 +15,6 @@
       "id": "opd_prototype@kwdev",
       "strict_min_version": "115.0"
     }
-  },
-  "declarative_net_request" : {
-    "rule_resources" : [{
-      "id": "ruleset_1",
-      "enabled": false,
-      "path": "rules.json"
-    }]
   },
   "web_accessible_resources": [
     "icon.png", 
@@ -54,17 +47,11 @@
     "webRequest",
     "declarativeNetRequest",
     "*://twitter.com/*",
-    "*://*.twimg.com/*",
-    "*://*.bsky.app/*",
-    "*://*.misskey.io/*",
-    "*://*.statsigapi.net/*",
-    "*://*.cloudflareinsights.com/",
-    "*://*.misskeyusercontent.com/"
+    "*://*.twimg.com/*"
   ],
   "content_scripts": [{
-    "matches": ["https://*.twitter.com/*", "*://*.misskey.io/*", "*://*.bsky.app/*"],
-    "js": ["content.js"],
-    "all_frames": true
+    "matches": ["https://*.twitter.com/*"],
+    "js": ["content.js"]
     }],
     "browser_action": {
       "default_popup": "popup.html",
