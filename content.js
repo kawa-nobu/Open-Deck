@@ -1,6 +1,11 @@
+const prototype_version = true;
 //
 console.log("Welcome to Open-Deck!");
-console.log("%cOpen-Deck Prototype", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${chrome.runtime.getManifest().version}`);
+if(prototype_version){
+    console.log("%cOpen-Deck Prototype", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${chrome.runtime.getManifest().version}`);
+}else{
+    console.log("%cOpen-Deck", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${chrome.runtime.getManifest().version}`);
+}
 //
 const url_path = new URL(location.href);
 let profile_store;
@@ -124,9 +129,27 @@ if(location.href == "https://twitter.com/run-opdeck"){
                 if(value.opd_settings == undefined || ext_update_flag == true){
                     //settings_init();
                     //ext_settings = JSON.parse(value.opd_settings);
+                    if(profile_store[last_load_profile]?.profile == undefined){
+                        let recovery_setting = JSON.parse(value.opd_settings);
+                        recovery_setting.last_load_profile = 0;
+                        chrome.storage.local.set({'opd_settings': JSON.stringify(recovery_setting)}, function(){
+                            alert("破損した設定データの自動修復を行いました\r\n再読み込みします");
+                            last_load_profile = 0;
+                            window.reload();
+                        });
+                    }
                     ext_settings = {column_settings:profile_store[last_load_profile].profile};
                 }else{
                     //ext_settings = JSON.parse(value.opd_settings);
+                    if(profile_store[last_load_profile]?.profile == undefined){
+                        let recovery_setting = JSON.parse(value.opd_settings);
+                        recovery_setting.last_load_profile = 0;
+                        chrome.storage.local.set({'opd_settings': JSON.stringify(recovery_setting)}, function(){
+                            alert("破損した設定データの自動修復を行いました\r\n再読み込みします");
+                            last_load_profile = 0;
+                            window.reload();
+                        });
+                    }
                     ext_settings = {column_settings:profile_store[last_load_profile].profile};
                 }
                 //console.log(ext_settings);
@@ -547,8 +570,8 @@ function run(settings){
         /*main_bar_empty_column:{html:`<!--<section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" opd_column_width="%column_width_num%" id="main_bar_empty_column" style="height:100%;min-width: 70px;"></div></section>-->`},*/
         empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>左のバーからカラムを追加</p></div></div></section>`},
         second_empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 30rem;overflow: hidden;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_2)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>1段目のカラムが配置できます</p></div></div></section>`},
-        home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Home</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
-        notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notification</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://twitter.com/notifications" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
+        home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Timeline</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://twitter.com/home" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
+        notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notifications</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://twitter.com/notifications" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`},
         explore:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="explore" opd_column_width="%column_width_num%" opd_explore_path="%column_save_path%" opd_explore_title="%column_save_title%" opd_pinned_path="%column_pinned_save_path%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: 20px;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Explore</span></div></span>${default_element_bar}<span class="dsp_column_btn"><input class="opd_pinned_btn" type="checkbox" title="ピン止め切り替え" %column_pinned_ch%><label class="dsp_column_pin_btn opd_ui_icon_color"></label></span><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://twitter.com%column_save_path%" type="text/html" style="width: 100%;height: 100%;"></iframe></div></section>`}
     };
     let ins_html = document.createElement("div");
@@ -937,12 +960,12 @@ function run(settings){
                     if(opd_column_top_visible_checkbox.checked != true){
                         //console.log("home_notcheck")
                         if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}`;
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}`;
                         }else{
                             if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible; filter: none;} div[role="progressbar"] + div{display:none;}`;
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;} div[role="progressbar"] + div{display:none;}`;
                             }else{
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}`;
+                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}`;
                             }
                         }
                     }else{
@@ -1052,13 +1075,13 @@ function run(settings){
                             //console.log(this)
                             //topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]), div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(h2[role="heading"]){display:none;};`;
                             if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible;}`;
+                                topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible;}`;
                             }else{
                                 //console.log(this.closest("div[opd_column_type]").getAttribute("opd_column_type"))
                                 if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;} [data-testid="app-bar-back"]{visibility: visible;} div[aria-label="ホームタイムライン"] * +div:first-of-type [data-testid="cellInnerDiv"]{} div[role="progressbar"] + div{display:none;}`;
+                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;} [data-testid="app-bar-back"]{visibility: visible;} div[aria-label="ホームタイムライン"] * +div:first-of-type [data-testid="cellInnerDiv"]{} div[role="progressbar"] + div{display:none;}`;
                                 }else{
-                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;}[data-testid="app-bar-back"]{visibility: visible;}`;
+                                    topvisible_mode_target_object.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible;}`;
                                 }
                             }
                         }else{
@@ -1302,20 +1325,44 @@ function run(settings){
         const delete_num = Number(prompt("削除するプロファイル番号を半角入力"));
         if(last_load_profile != delete_num){
             if(confirm(`プロファイル${delete_num}を削除しますか?\r\n※削除後、残ったプロファイル番号は0から再度割り振られます。`)){
+                let after_profile_num = null;
                 profile_store.splice(delete_num, 1);
                 //console.log(profile_store)
                 chrome.storage.local.set({'opd_profile_store': JSON.stringify(profile_store)}, function () {
-                    let profile_list_btn_html = "";
-                    //プロファイルリスト初期化
-                    for (let index = 0; index < profile_store.length; index++) {
-                        profile_list_btn_html += `<div class="dsp_btn_parent" id="userProfile-${index}"><div class="dsp_btn_change_profile_btn">P${index}</div></div>`;
-                    }
-                    document.querySelector("#profile_btn_list").innerHTML = profile_list_btn_html;
-                    create_profile_list_btn();
+                    //
+                    chrome.storage.local.get("opd_settings", function(load_value){
+                        //console.log(last_load_profile)
+                        if(last_load_profile<delete_num){
+                            after_profile_num = last_load_profile;
+                        }else{
+                            after_profile_num = last_load_profile - 1;
+                        }
+                        if(after_profile_num < 0){
+                            after_profile_num = 0;
+                        }
+                        last_load_profile = after_profile_num;
+                        //
+                        console.log(after_profile_num)
+                        let load_setting = JSON.parse(load_value.opd_settings);
+                        load_setting.last_load_profile = after_profile_num;
+                        chrome.storage.local.set({'opd_settings': JSON.stringify(load_setting)}, function () {
+                            let profile_list_btn_html = "";
+                            //プロファイルリスト初期化
+                            for (let index = 0; index < profile_store.length; index++) {
+                                profile_list_btn_html += `<div class="dsp_btn_parent" id="userProfile-${index}"><div class="dsp_btn_change_profile_btn">P${index}</div></div>`;
+                            }
+                            document.querySelector(".profile_val_now").textContent = after_profile_num;
+                            document.querySelector("#profile_btn_list").innerHTML = profile_list_btn_html;
+                            create_profile_list_btn();
+                            });
+                        });
+                    //last_load_profile
+                    //
+                    //.aaaa
                 });
             }
         }else{
-            alert("表示中のプロファイルは削除できません")
+            alert("表示中のプロファイルは削除できません");
         }
     });
     //カラム移動
@@ -1512,7 +1559,12 @@ function settings_init(){
     //console.log(profile);
     chrome.storage.local.set({'opd_profile_store': JSON.stringify(profile)}, function () {
         chrome.storage.local.set({'opd_settings': JSON.stringify(settings)}, function () {
-            alert("初期設定構築が完了しました。\r\nようこそ！Open-Deck試作版へ！");
+            if(prototype_version){
+                alert("初期設定構築が完了しました。\r\nようこそ！Open-Deck試作版へ！");
+            }else{
+                alert("初期設定構築が完了しました！\r\nようこそ！Open-Deckへ！");
+            }
+            
             location.reload();
         });
     });
