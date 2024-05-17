@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "manifest_version": 3,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -8,16 +8,17 @@
   },
   "host_permissions": [
     "*://*.twitter.com/*",
-    "*://*.twimg.com/*"
+    "*://*.twimg.com/*",
+    "*://*.x.com/*"
   ],
   "permissions" : ["storage","webRequest","declarativeNetRequest"],
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
-    "matches": ["https://*.twitter.com/*"],
+    "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
     "js": ["content.js"]
   }],
   "web_accessible_resources" : [{
-    "matches" : ["https://*.twitter.com/*"],
+    "matches" : ["https://*.twitter.com/*", "https://*.x.com/*"],
     "resources" : ["icon.png", 
     "icon/logo_icon.svg",
     "profile_debug.html",

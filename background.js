@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(
                         ]
                     },
                     condition : {
-                        urlFilter : "twitter.com",
+                        urlFilter : "x.com",
                         resourceTypes: ["main_frame",
                         "sub_frame",
                         "stylesheet",
@@ -129,6 +129,6 @@ chrome.webRequest.onHeadersReceived.addListener(function (resp) {
         //console.log(access_limit)
         send_content_script(access_limit);
       }
-    },{urls: ['*://twitter.com/i/api/*']},['responseHeaders']
+    },{urls: ['*://x.com/i/api/*']},['responseHeaders']
   );
 //
