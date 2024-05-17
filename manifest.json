@@ -1,6 +1,6 @@
 {
     "name": "Open-Deck",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "manifest_version": 2,
     "description": "The OpenSource Deck",
     "icons" : {
@@ -47,10 +47,11 @@
       "webRequest",
       "declarativeNetRequest",
        "*://*.twitter.com/*",
+       "*://*.x.com/*",
        "*://*.twimg.com/*"
     ],
     "content_scripts": [{
-      "matches": ["https://twitter.com/*"],
+      "matches": ["https://twitter.com/*", "https://x.com/*"],
       "js": ["content.js"]
       }],
       "browser_action": {
