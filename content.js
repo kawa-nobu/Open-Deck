@@ -558,6 +558,42 @@ function run(settings){
         .dsp_column_settings_list {
             background: #474747
         }
+        
+    }
+    /*ダークモード検出時*/
+    #opd_main_element[opd-dsp-theme="dark"]{
+        
+    }
+    #opd_main_element[opd-dsp-theme="dark"] #main_rack_element{
+        background-color: black !important;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_draggable_false, #opd_main_element[opd-dsp-theme="dark"] #first_rack_element, #opd_main_element[opd-dsp-theme="dark"] #second_rack_element, #opd_main_element[opd-dsp-theme="dark"] #second_rack_element, #opd_main_element[opd-dsp-theme="dark"] #main_bar_empty_column{
+        background-color: black !important;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_draggable_true, #opd_main_element[opd-dsp-theme="dark"] .dsp_column_title{
+        background-color: #2e2e2e !important;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_tl_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_ntfc_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_explr_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_second_rack_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_profile_add_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_profile_delete_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_column_move_icon, #opd_main_element[opd-dsp-theme="dark"] .opd_ui_icon_color{
+        filter: brightness(0) saturate(100%) invert(48%) sepia(0%) saturate(93%) hue-rotate(266deg) brightness(93%) contrast(86%);
+    }
+    #opd_main_element[opd-dsp-theme="dark"] #api_limit_status:hover {
+        background: #555555;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_parent:hover{
+        background: #555555;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_btn:hover {
+        background: #555555;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .profile_val_now:hover {
+        background: #555555;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_settings_panel {
+        background: #2e2e2e;
+        border: 1px solid #5d5d5d;
+    }
+    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_settings_list {
+        background: #474747
     }
     </style>`);
     //カラム要素作成-挿入
@@ -1541,6 +1577,12 @@ function run(settings){
     const head_observer = new MutationObserver(function(){
         document.title = "Open-Deck";
         document.querySelector('link[rel="shortcut icon"]').href = chrome.runtime.getURL("icon.png");
+        //ダークモード検出&設定
+        const currentScheme = document.documentElement.style?.colorScheme;
+        if(currentScheme){
+            document.getElementById("opd_main_element").setAttribute("opd-dsp-theme", currentScheme);
+        }
+
     }).observe(document.querySelector("head"),{
         childList: true,
         characterData: true,
