@@ -1409,7 +1409,7 @@ function run(settings){
             column_class[index].addEventListener("dragstart", function(ev){
                 //console.log(this)
                 column_copy_source = this;
-                ev.dataTransfer.setData('text/html', ev.target.id);
+                ev.dataTransfer.setData('text/plain', ev.target.id);
             });
             column_class[index].addEventListener("dragover", function(ev){
                 ev.preventDefault();
@@ -1425,7 +1425,7 @@ function run(settings){
                 //exploreのURLセット
                 //console.log(column_class[index])
                 //移動セット
-                const dt_id = ev.dataTransfer.getData('text/html');
+                const dt_id = ev.dataTransfer.getData('text/plain');
                 const dr_elem = document.getElementById(dt_id);
                 if(dr_elem != null){
                     if(dr_elem?.querySelector("div")?.getAttribute("opd_column_type") == 'explore'){
