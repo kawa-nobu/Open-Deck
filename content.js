@@ -884,7 +884,7 @@ function run(settings){
                             return url.origin === post_column_window.location.origin && url.pathname.startsWith("/compose/post");
                         };
                         //GIF ボタンを消す
-                        post_column_window.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}</style>`);
+                        post_column_window.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
 
                         new MutationObserver(function(){
                             const back_button = post_column_window.document.querySelector('main button[data-testid="app-bar-back"]');
