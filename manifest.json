@@ -28,6 +28,8 @@
     "icon/top_hide.svg", 
     "icon/pin.svg", 
     "icon/pinned.svg", 
+    "icon/post.svg",
+    "icon/text_review.svg",
     "icon/column_move.svg",
     "icon/column_close.svg",
     "icon/column_w_size.svg", 
