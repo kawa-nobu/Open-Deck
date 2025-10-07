@@ -837,6 +837,8 @@ function run(settings){
                     }else{
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
                     }*/
+                    //共通CSS挿入
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_main_css>html{scrollbar-width:thin;}</style>`);
                     //バナー表示ロード
                     if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
