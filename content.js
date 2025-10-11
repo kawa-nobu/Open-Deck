@@ -837,7 +837,7 @@ function run(settings){
                     }else{
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
                     }*/
-                    //共通CSS挿入
+                    //共通CSS挿入(スクロールバー細くする)
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_main_css>html{scrollbar-width:thin;}</style>`);
                     //バナー表示ロード
                     if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
@@ -921,6 +921,9 @@ function run(settings){
                                 }
                             }, { capture: true });
                         }
+                        //文章校正機能
+                        const ext_text_review = new OpdExtTextReview();
+                        ext_text_review.Init(post_column_window);
                     }
                 }
             })

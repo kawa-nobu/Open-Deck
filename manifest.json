@@ -15,7 +15,7 @@
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
     "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
-    "js": ["content.js"]
+    "js": ["content.js", "extensions/text_review.js"]
   }],
   "web_accessible_resources" : [{
     "matches" : ["https://*.twitter.com/*", "https://*.x.com/*"],
