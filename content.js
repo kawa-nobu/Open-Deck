@@ -923,7 +923,7 @@ function run(settings){
                         }
                         //文章校正機能
                         const ext_text_review = new OpdExtTextReview();
-                        ext_text_review.Init(post_column_window);
+                        ext_text_review.Init(post_column_window, ui_icon_define);
                     }
                 }
             })
