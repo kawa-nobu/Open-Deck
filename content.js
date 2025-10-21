@@ -1,10 +1,11 @@
-const prototype_version = false;
-//
 console.log("Welcome to Open-Deck!");
-if(prototype_version){
-    console.log("%cOpen-Deck Prototype", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${chrome.runtime.getManifest().version}`);
+const manifest = chrome.runtime.getManifest();
+//試作版の場合は true にする
+const is_prototype = true;
+if(is_prototype){
+    console.log("%cOpen-Deck Prototype", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${manifest.version}`);
 }else{
-    console.log("%cOpen-Deck", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${chrome.runtime.getManifest().version}`);
+    console.log("%cOpen-Deck", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${manifest.version}`);
 }
 //
 const url_path = new URL(location.href);
@@ -122,7 +123,7 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
                 let ext_update_flag = null;
                 let ext_settings = null;
                 if(value.opd_settings != undefined){
-                    if(JSON.parse(value.opd_settings).version != chrome.runtime.getManifest().version){
+                    if(JSON.parse(value.opd_settings).version != manifest.version){
                         ext_update_flag = true;
                     }else{
                         ext_update_flag = false;
@@ -625,8 +626,8 @@ function run(settings){
     let ins_html = document.createElement("div");
     ins_html.id = "opd_main_element";
     ins_html.style = "position: fixed;z-index: 999999;top:0;width: 100%;height: 100%;background: white;display: flex;flex-direction: row;overflow: hidden;";
-    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nv${chrome.runtime.getManifest().version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${chrome.runtime.getManifest().version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_post" title="ポストカラム追加"><div class="dsp_btn_add_post_img"></div></div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
-    //let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 100px;text-align: center;background-color: white;"><div><p style="margin-top:0;padding-top:1em;">Open-Deck<br>Prototype<br>v${chrome.runtime.getManifest().version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="profile_load_save" value="Profile Load"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/> <div class="dsp_btn_parent"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_explr_img"></div></div> </p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/><hr><input type="button" id="second_rack" value="Second Rack"/><hr><input type="button" id="profile_save" value="Profile_Save"/><br><input type="button" id="profile_delete" value="Profile_Delete"/><br>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 110px;"></div></section>`;
+    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nv${manifest.version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${manifest.version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_post" title="ポストカラム追加"><div class="dsp_btn_add_post_img"></div></div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
+    //let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 100px;text-align: center;background-color: white;"><div><p style="margin-top:0;padding-top:1em;">Open-Deck<br>Prototype<br>v${manifest.version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="profile_load_save" value="Profile Load"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/> <div class="dsp_btn_parent"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_explr_img"></div></div> </p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/><hr><input type="button" id="second_rack" value="Second Rack"/><hr><input type="button" id="profile_save" value="Profile_Save"/><br><input type="button" id="profile_delete" value="Profile_Delete"/><br>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 110px;"></div></section>`;
     let main_column_html = ``;
     let second_column_html = ``;
     //設定2段
@@ -912,6 +913,15 @@ function run(settings){
                         if("navigation" in post_column_window && typeof post_column_window.navigation.addEventListener === "function"){
                             //投稿後は home に戻ってほしくないので遷移を阻止する
                             post_column_window.navigation.addEventListener("navigate", (e) => {
+                                //投稿後の遷移メッセージを無効化する
+                                const native_add_evt = post_column_window.EventTarget.prototype.addEventListener;
+                                post_column_window.EventTarget.prototype.addEventListener = (type, listener, options)=>{
+                                    if(type === "beforeunload"){
+                                        return;
+                                    }
+                                    return native_add_evt.call(this, type, listener, options);
+                                };
+                                //home への遷移を阻止する
                                 const dest = e.destination?.url;
                                 if(!dest) return;
                                 if(!isAllowed(dest)){
@@ -1570,7 +1580,7 @@ function run(settings){
     function column_settings_save(mode, profile_num){
         let settings_array = {
             column_settings:[],
-            version:chrome.runtime.getManifest().version
+            version:manifest.version
         };
         for (let index = 0; index < document.querySelectorAll("#opd_main_element div[opd_column_type]").length; index++) {
             let banner_checked = null;
@@ -1688,13 +1698,13 @@ function settings_init(){
     const settings = {
         last_load_profile:0,
         //column_settings:[{type:"main_bar_empty_column", banner:false, top_visible:true, tw_view_mode:"0", column_save_path:"", column_pinned_path:"", column_width:null}, {type:"home", banner:true, top_visible:true, tw_view_mode:"0", column_save_path:"", column_pinned_path:"", column_width:null}, {type:"notification", banner:false, top_visible:true, tw_view_mode:"0", column_save_path:"", column_pinned_path:"", column_width:null}, {type:"explore", banner:false, top_visible:true, tw_view_mode:"0", exp_type:"", column_save_path:"/explore", column_pinned_path:"", column_width:null}, {type:"empty_column", banner:false, top_visible:true, tw_view_mode:"0", column_save_path:"", column_pinned_path:"", column_width:null}],
-        version:chrome.runtime.getManifest().version
+        version:manifest.version
     };
     let profile = [{name:"default", profile: profile_store_default}];
     //console.log(profile);
     chrome.storage.local.set({'opd_profile_store': JSON.stringify(profile)}, function () {
         chrome.storage.local.set({'opd_settings': JSON.stringify(settings)}, function () {
-            if(prototype_version){
+            if(is_prototype){
                 alert("初期設定構築が完了しました。\r\nようこそ！Open-Deck試作版へ！");
             }else{
                 alert("初期設定構築が完了しました！\r\nようこそ！Open-Deckへ！");
