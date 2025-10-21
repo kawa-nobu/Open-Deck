@@ -112,7 +112,7 @@ class OpdExtTextReview {
             this.opd_text_review_token = crypto.randomUUID();
             setTimeout(() => {
                 column_window.document.dispatchEvent(new CustomEvent('opd_text_review_init', {
-                    detail: { token:this.opd_text_review_token }
+                    detail: JSON.stringify({ token:this.opd_text_review_token })
                 }));
             }, 10);
             
@@ -227,7 +227,7 @@ class OpdExtTextReview {
                 column_window.document.dispatchEvent(new CustomEvent('opd_text_review_apply', {
                     bubbles: true,
                     composed: true,
-                    detail: { text: indication_fix_str, token:this.opd_text_review_token }
+                    detail: JSON.stringify({ text: indication_fix_str, token: this.opd_text_review_token, is_firefox: this.IsFirefox() })
                 }));
             });
             panel_elem.querySelector(`#opd_text_review_apply_all`).addEventListener("click", (ev)=>{
@@ -240,7 +240,7 @@ class OpdExtTextReview {
                 column_window.document.dispatchEvent(new CustomEvent('opd_text_review_apply', {
                     bubbles: true,
                     composed: true,
-                    detail: { text: indication_fix_str, token:this.opd_text_review_token }
+                    detail: JSON.stringify({ text: indication_fix_str, token: this.opd_text_review_token, is_firefox: this.IsFirefox() })
                 }));
             });
         }
@@ -325,6 +325,11 @@ class OpdExtTextReview {
             }else{
                 return false;
             }
+        }
+        this.IsFirefox = () =>{
+            const extension_url = chrome.runtime.getURL('');
+            const is_firefox = extension_url.startsWith('moz-extension://') ? true : extension_url.startsWith('chrome-extension://') ? false : false;
+            return is_firefox;
         }
         this.CreateRandomID = () =>{
             //ランダムなIDを生成する関数
