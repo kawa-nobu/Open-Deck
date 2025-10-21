@@ -9,6 +9,7 @@ if(is_prototype){
 }
 //
 const url_path = new URL(location.href);
+let is_shift_pressed = false;
 let profile_store;
 let last_load_profile = 0;
 const ui_icon_define = {
@@ -37,6 +38,13 @@ function unix_time_mmss(input){
     const date = new Date(input * 1000);
     return date.toLocaleTimeString();
 }
+//ショートカットキー用に shift キーが押されていることを検出
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Shift') is_shift_pressed = true;
+});
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'Shift') is_shift_pressed = false;
+});
 //ストレージの書き込み監視(主にAPIリミット監視に使う)
 let api_limit_obj = null;
 let api_limit_dsc_obj = {time_line:"", recommend_timeline:"", search:""};
@@ -1397,10 +1405,17 @@ function run(settings){
         }
     });
     //ポストカラム追加
+    //TODO: カラム追加周りの処理をもっと簡略化すること
     document.getElementById("add_post").addEventListener("click", function(){
+        let add_target_column = null;
+        if(is_shift_pressed){
+            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
+        }else{
+            add_target_column = document.querySelector(".dsp_column_emptycolumn");
+        }
         const new_column = default_element["post"]["html"].replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
-        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
-        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
+        add_target_column.insertAdjacentHTML("beforebegin", new_column);
+        add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
         const all_webview = document.querySelectorAll('#main_rack_element iframe[opd_init_webview]');
         append_object_css("add_column", all_webview);
         column_dd();
@@ -1409,9 +1424,15 @@ function run(settings){
     });
     //タイムラインカラム追加
     document.getElementById("add_timeline").addEventListener("click", function(){
+        let add_target_column = null;
+        if(is_shift_pressed){
+            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
+        }else{
+            add_target_column = document.querySelector(".dsp_column_emptycolumn");
+        }
         const new_column = default_element["home"]["html"].replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
-        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
-        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
+        add_target_column.insertAdjacentHTML("beforebegin", new_column);
+        add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
         const all_webview = document.querySelectorAll('#main_rack_element iframe[opd_init_webview]');
         append_object_css("add_column", all_webview);
         column_dd();
@@ -1420,9 +1441,15 @@ function run(settings){
     });
     //通知カラム追加
     document.getElementById("add_notify").addEventListener("click", function(){
+        let add_target_column = null;
+        if(is_shift_pressed){
+            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
+        }else{
+            add_target_column = document.querySelector(".dsp_column_emptycolumn");
+        }
         const new_column = default_element["notification"]["html"].replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_width_num%", "30");
-        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
-        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
+        add_target_column.insertAdjacentHTML("beforebegin", new_column);
+        add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
         const all_webview = document.querySelectorAll('#main_rack_element iframe[opd_init_webview]');
         append_object_css("add_column", all_webview);
         column_dd();
@@ -1431,9 +1458,15 @@ function run(settings){
     });
     //Explore(ユニバーサル)カラム追加
     document.getElementById("add_explore").addEventListener("click", function(){
+        let add_target_column = null;
+        if(is_shift_pressed){
+            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
+        }else{
+            add_target_column = document.querySelector(".dsp_column_emptycolumn");
+        }
         const new_column = default_element["explore"]["html"].replaceAll("%column_save_path%", "/explore").replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_pinned_save_path%", "").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
-        document.querySelector(".dsp_column_emptycolumn").insertAdjacentHTML("beforebegin", new_column);
-        document.querySelector(".dsp_column_emptycolumn").scrollIntoView({behavior: "smooth",inline: "end"});
+        add_target_column.insertAdjacentHTML("beforebegin", new_column);
+        add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
         const all_webview = document.querySelectorAll('#main_rack_element iframe[opd_init_webview]');
         append_object_css("add_column", all_webview);
         column_dd();
