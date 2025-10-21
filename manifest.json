@@ -19,7 +19,8 @@
   }],
   "web_accessible_resources" : [{
     "matches" : ["https://*.twitter.com/*", "https://*.x.com/*"],
-    "resources" : ["icon.png", 
+    "resources" : ["extensions/text_review_helper.js",
+    "icon.png", 
     "icon/logo_icon.svg",
     "profile_debug.html",
     "about_opd.html",
