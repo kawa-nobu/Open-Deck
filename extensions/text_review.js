@@ -1,7 +1,6 @@
 // 文章校正機能で使用
 class OpdExtTextReview {
     constructor() {
-        this.opd_text_review_url = "https://opd.kwdev-sys.com/api/opd/text_review/review";
         this.opd_text_review_token = null;
         this.Init = (column_window, icons) => {
             //初期化
@@ -320,21 +319,10 @@ class OpdExtTextReview {
         }
         this.ReviewRquest = async(str)=>{
             //校正を開始し、結果を得る関数
-            const api_url = this.opd_text_review_url;
-            try{
-                const res = await fetch(api_url, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({"text":str}),
-                });
-
-                if(!res.ok){
-                    console.error(`ReviewFetchError->Code:${res.status}->Text:${res.statusText}`);
-                    return false;
-                }
-                return await res.json();
-            }catch(error){
-                console.error("Fetch failed:", error);
+            const review_result = await chrome.runtime.sendMessage({message: "text_review", review_text: str});
+            if(review_result){
+                return review_result;
+            }else{
                 return false;
             }
         }

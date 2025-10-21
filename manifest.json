@@ -9,7 +9,8 @@
   "host_permissions": [
     "*://*.twitter.com/*",
     "*://*.twimg.com/*",
-    "*://*.x.com/*"
+    "*://*.x.com/*",
+    "*://*.kwdev-sys.com/*"
   ],
   "permissions" : ["storage","webRequest","declarativeNetRequest"],
   "background" : {"service_worker" : "background.js"},
