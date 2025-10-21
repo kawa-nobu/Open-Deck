@@ -111,7 +111,6 @@ class OpdExtTextReview {
 
             //貼り付け認証トークンを追加する
             this.opd_text_review_token = crypto.randomUUID();
-            console.log(this.opd_text_review_token)
             setTimeout(() => {
                 column_window.document.dispatchEvent(new CustomEvent('opd_text_review_init', {
                     detail: { token:this.opd_text_review_token }
