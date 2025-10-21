@@ -1,7 +1,7 @@
 console.log("Welcome to Open-Deck!");
 const manifest = chrome.runtime.getManifest();
 //試作版の場合は true にする
-const is_prototype = true;
+const is_prototype = false;
 if(is_prototype){
     console.log("%cOpen-Deck Prototype", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${manifest.version}`);
 }else{
