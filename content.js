@@ -825,7 +825,6 @@ function run(settings){
         let column_object = null;
         if(mode == "session_set" || mode == "add_column"){
             column_object = session_webview_obj;
-            console.log(session_webview_obj)
         }else{
             column_object = document.querySelectorAll('.dsp_column:not([opd_column_type="dsp_column"], [opd_column_type="empty_column"], [opd_column_type="main_bar_empty_column"]) iframe');
         }
@@ -1407,12 +1406,10 @@ function run(settings){
     //ポストカラム追加
     //TODO: カラム追加周りの処理をもっと簡略化すること
     document.getElementById("add_post").addEventListener("click", function(){
-        let add_target_column = null;
-        if(is_shift_pressed){
-            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
-        }else{
-            add_target_column = document.querySelector(".dsp_column_emptycolumn");
-        }
+        const empty_column = document.querySelector(".dsp_column_emptycolumn");
+        const first_column = empty_column?.closest('div')?.querySelector('section[draggable="true"]');
+        const add_target_column = (is_shift_pressed && first_column) ? first_column : empty_column;
+
         const new_column = default_element["post"]["html"].replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
         add_target_column.insertAdjacentHTML("beforebegin", new_column);
         add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
@@ -1424,12 +1421,10 @@ function run(settings){
     });
     //タイムラインカラム追加
     document.getElementById("add_timeline").addEventListener("click", function(){
-        let add_target_column = null;
-        if(is_shift_pressed){
-            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
-        }else{
-            add_target_column = document.querySelector(".dsp_column_emptycolumn");
-        }
+        const empty_column = document.querySelector(".dsp_column_emptycolumn");
+        const first_column = empty_column?.closest('div')?.querySelector('section[draggable="true"]');
+        const add_target_column = (is_shift_pressed && first_column) ? first_column : empty_column;
+        
         const new_column = default_element["home"]["html"].replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
         add_target_column.insertAdjacentHTML("beforebegin", new_column);
         add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
@@ -1441,12 +1436,10 @@ function run(settings){
     });
     //通知カラム追加
     document.getElementById("add_notify").addEventListener("click", function(){
-        let add_target_column = null;
-        if(is_shift_pressed){
-            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
-        }else{
-            add_target_column = document.querySelector(".dsp_column_emptycolumn");
-        }
+        const empty_column = document.querySelector(".dsp_column_emptycolumn");
+        const first_column = empty_column?.closest('div')?.querySelector('section[draggable="true"]');
+        const add_target_column = (is_shift_pressed && first_column) ? first_column : empty_column;
+        
         const new_column = default_element["notification"]["html"].replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_width_num%", "30");
         add_target_column.insertAdjacentHTML("beforebegin", new_column);
         add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
@@ -1458,12 +1451,10 @@ function run(settings){
     });
     //Explore(ユニバーサル)カラム追加
     document.getElementById("add_explore").addEventListener("click", function(){
-        let add_target_column = null;
-        if(is_shift_pressed){
-            add_target_column = document.querySelector(".dsp_column_emptycolumn").closest('div').querySelector('section[draggable="true"]');
-        }else{
-            add_target_column = document.querySelector(".dsp_column_emptycolumn");
-        }
+        const empty_column = document.querySelector(".dsp_column_emptycolumn");
+        const first_column = empty_column?.closest('div')?.querySelector('section[draggable="true"]');
+        const add_target_column = (is_shift_pressed && first_column) ? first_column : empty_column;
+        
         const new_column = default_element["explore"]["html"].replaceAll("%column_save_path%", "/explore").replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_top_bar_ch%", "checked").replace("%column_tw_view_mode%", "0").replaceAll("%column_pinned_save_path%", "").replaceAll("%column_width_num%", "30").replaceAll("%column_auto_reload_ch%", "").replaceAll("%column_auto_reload_time%", "10000");
         add_target_column.insertAdjacentHTML("beforebegin", new_column);
         add_target_column.scrollIntoView({behavior: "smooth",inline: "end"});
