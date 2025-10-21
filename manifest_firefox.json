@@ -1,0 +1,64 @@
+{
+    "name": "Open-Deck",
+    "version": "1.1.2",
+    "manifest_version": 2,
+    "description": "The OpenSource Deck",
+    "icons" : {
+      "128" : "icon.png"
+    },
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "opd_release@kwdev",
+        "strict_min_version": "115.0"
+      },
+      "gecko_android": {
+        "id": "opd_release@kwdev",
+        "strict_min_version": "115.0"
+      }
+    },
+    "web_accessible_resources": [
+    "extensions/text_review_helper.js",
+    "icon.png", 
+    "icon/logo_icon.svg",
+    "profile_debug.html",
+    "about_opd.html",
+    "icon/settings.svg",
+    "icon/banner_hide.svg", 
+    "icon/top_hide.svg", 
+    "icon/pin.svg", 
+    "icon/pinned.svg", 
+    "icon/post.svg",
+    "icon/text_review.svg",
+    "icon/column_move.svg",
+    "icon/column_close.svg",
+    "icon/column_w_size.svg", 
+    "icon/column_add_1st.svg", 
+    "icon/column_add_2nd.svg", 
+    "icon/tl_column.svg", 
+    "icon/notice_column.svg", 
+    "icon/exp_column.svg", 
+    "icon/single_view.svg", 
+    "icon/second_view.svg", 
+    "icon/profile_save.svg", 
+    "icon/profile_delete.svg"
+    ],
+    "background" : {
+      "scripts": ["background.js"]
+    },
+    "permissions" : [
+      "storage",
+      "webRequest",
+      "declarativeNetRequest",
+       "*://*.twitter.com/*",
+       "*://*.x.com/*",
+       "*://*.twimg.com/*"
+    ],
+    "content_scripts": [{
+      "matches": ["https://twitter.com/*", "https://x.com/*"],
+      "js": ["content.js", "extensions/text_review.js"]
+      }],
+      "browser_action": {
+        "default_popup": "popup.html",
+        "default_icon": "icon.png"
+      }
+}
