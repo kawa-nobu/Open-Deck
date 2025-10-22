@@ -46,6 +46,27 @@ chrome.runtime.onMessage.addListener(
                 sendResponse(true);
             });
         }
+        if(request.message == "text_review"){
+            const api_url = "https://opd.kwdev-sys.com/api/opd/text_review/review";
+            (async () => {
+                try{
+                    const res = await fetch(api_url, {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({"text":request.review_text}),
+                    });
+
+                    if(!res.ok){
+                        console.error(`ReviewFetchError->Code:${res.status}->Text:${res.statusText}`);
+                        sendResponse(false);
+                    }
+                    sendResponse(await res.json());
+                }catch(error){
+                    console.error("Fetch failed:", error);
+                    sendResponse(false);
+                }
+            })();
+        }
         if(request.message == "ext_reload"){
             chrome.runtime.reload();
         }

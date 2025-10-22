@@ -1,6 +1,6 @@
 {
   "name": "Open-Deck",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "manifest_version": 3,
   "description": "The OpenSource Deck",
   "icons" : {
@@ -9,17 +9,19 @@
   "host_permissions": [
     "*://*.twitter.com/*",
     "*://*.twimg.com/*",
-    "*://*.x.com/*"
+    "*://*.x.com/*",
+    "*://*.kwdev-sys.com/*"
   ],
   "permissions" : ["storage","webRequest","declarativeNetRequest"],
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
     "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
-    "js": ["content.js"]
+    "js": ["content.js", "extensions/text_review.js"]
   }],
   "web_accessible_resources" : [{
     "matches" : ["https://*.twitter.com/*", "https://*.x.com/*"],
-    "resources" : ["icon.png", 
+    "resources" : ["extensions/text_review_helper.js",
+    "icon.png", 
     "icon/logo_icon.svg",
     "profile_debug.html",
     "about_opd.html",
@@ -28,6 +30,8 @@
     "icon/top_hide.svg", 
     "icon/pin.svg", 
     "icon/pinned.svg", 
+    "icon/post.svg",
+    "icon/text_review.svg",
     "icon/column_move.svg",
     "icon/column_close.svg",
     "icon/column_w_size.svg", 
