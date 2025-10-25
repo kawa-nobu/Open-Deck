@@ -900,44 +900,6 @@ function run(settings){
                     //ポストカラムの動作
                     if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") === "post"){
                         const post_column_window = opd_column_div.querySelector("iframe").contentWindow;
-                        const isAllowed = (u) => {
-                            const url = new URL(u, post_column_window.location.href);
-                            return url.origin === post_column_window.location.origin && url.pathname.startsWith("/compose/post");
-                        };
-                        //GIF ボタンを消す
-                        post_column_window.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
-
-                        new MutationObserver(function(){
-                            const back_button = post_column_window.document.querySelector('main button[data-testid="app-bar-back"]');
-                            if(!back_button) return;
-                            if(post_column_window.location.pathname === "/compose/post"){
-                                back_button.style.display = "none";
-                            }else{
-                                back_button.style.display = "block";
-                            }
-                        }).observe(post_column_window.document, {childList: true, subtree: true});
-
-                        if("navigation" in post_column_window && typeof post_column_window.navigation.addEventListener === "function"){
-                            //投稿後は home に戻ってほしくないので遷移を阻止する
-                            post_column_window.navigation.addEventListener("navigate", (e) => {
-                                //投稿後の遷移メッセージを無効化する
-                                const native_add_evt = post_column_window.EventTarget.prototype.addEventListener;
-                                post_column_window.EventTarget.prototype.addEventListener = (type, listener, options)=>{
-                                    if(type === "beforeunload"){
-                                        return;
-                                    }
-                                    return native_add_evt.call(this, type, listener, options);
-                                };
-                                //home への遷移を阻止する
-                                const dest = e.destination?.url;
-                                if(!dest) return;
-                                if(!isAllowed(dest)){
-                                    e.preventDefault();
-                                    //iframe では home 遷移を阻止できなかったため、location.replace() する
-                                    post_column_window.location.replace(post_column_window.location.href);
-                                }
-                            }, { capture: true });
-                        }
                         //文章校正機能
                         const ext_text_review = new OpdExtTextReview();
                         ext_text_review.Init(post_column_window, ui_icon_define);
