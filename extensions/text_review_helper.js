@@ -1,5 +1,51 @@
 // 文章校正機能で使用する、カスタムな文字置換イベントを作成する
 (() => {
+    const isAllowed = (u) => {
+        const url = new URL(u, location.href);
+        return url.origin === location.origin && url.pathname.startsWith("/compose/post");
+    };
+    //GIF ボタンを消す
+    document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
+    new MutationObserver(function(){
+        const back_button = document.querySelector('main button[data-testid="app-bar-back"]');
+        if(!back_button) return;
+        if(location.pathname === "/compose/post"){
+            back_button.style.display = "none";
+        }else{
+            back_button.style.display = "block";
+        }
+    }).observe(document, {childList: true, subtree: true});
+
+    if("navigation" in window && typeof navigation.addEventListener === "function"){
+        //投稿後の遷移メッセージを無効化する
+        const native_add_evt = EventTarget.prototype.addEventListener;
+        native_add_evt.call(window, 'beforeunload', function (e){
+            // 既存イベントをストップさせる
+            e.stopImmediatePropagation();
+        }, {capture: true});
+        
+        //以後追加されるイベントを阻止する
+        EventTarget.prototype.addEventListener = function (type, listener, options){
+            if(String(type).toLowerCase() === 'beforeunload'){
+                return;
+            }
+            return native_add_evt.call(this, type, listener, options);
+        };
+
+        //投稿後は home に戻ってほしくないので遷移を阻止する
+        navigation.addEventListener("navigate", (e) => {
+            //home への遷移を阻止する
+            const dest = e.destination?.url;
+            if(!dest) return;
+            if(!isAllowed(dest)){
+                e.preventDefault();
+                //iframe では home 遷移を阻止できなかったため、location.replace() する
+                location.replace(location.href);
+            }
+        }, { capture: true });
+    }
+
+    //校正周りの処理
     let target_editor_elem = null;
     let opd_paste_token = null;
     document.addEventListener("focusin", (ev) => {
