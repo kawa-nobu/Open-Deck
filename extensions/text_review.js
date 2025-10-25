@@ -5,7 +5,7 @@ class OpdExtTextReview {
         this.Init = (column_window, icons) => {
             //初期化
             let editable_elem = null;
-            let is_textarea_empty = false;
+            let is_textarea_empty = true;
             let review_state = false;
             column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_css>
                 /* Premium 勧誘要素非表示 */
