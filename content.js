@@ -918,6 +918,15 @@ function run(settings){
                 let opd_column_auto_reload_checkbox = opd_column_div.querySelector(".opd_a_reload_bar");
                 let opd_column_auto_reload_time_reload = opd_column_div.querySelector(".opd_a_reload_time_setting");
                 let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
+                let column_content_reload = null;
+                //自動更新関連仕込み
+                if(mode != "session_set"){
+                    const column_type = this.closest("div[opd_column_type]").getAttribute("opd_column_type");
+                    if(column_type === "home" || column_type === "explore"){
+                        column_content_reload = new OpdExtAutoReload();
+                        column_content_reload.Init(this.closest("div[opd_column_type]").querySelector("iframe").contentWindow);
+                    }
+                }
                 //設定パネルイベント
                 if(mode != "session_set"){
                     opd_column_div.querySelector(".opd_settings_btn").addEventListener("click", function(){
@@ -1214,17 +1223,12 @@ function run(settings){
                                     auto_reload_int = setInterval(function(){
                                         //console.log("update!")
                                         //console.log(auto_reload_target_object.contentWindow)
-                                        if(auto_reload_target_object.contentWindow.location.pathname == "/home"){
+                                        const path_name = auto_reload_target_object.contentWindow.location.pathname;
+                                        if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                auto_reload_target_object.contentWindow.document.querySelector('[aria-selected="true"]').click();
-                                            }
-                                        };
-                                        if(auto_reload_target_object.contentWindow.location.pathname == "/search"){
-                                            if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                auto_reload_target_object.contentWindow.scrollTo(0, 300);
-                                                setTimeout(function(){
-                                                    auto_reload_target_object.contentWindow.scrollTo(0, 0);
-                                                }, 10);
+                                                if (column_content_reload){
+                                                    column_content_reload.Reload(auto_reload_target_object.contentWindow);
+                                                }
                                             }
                                         };
                                     }, auto_reload_time);
