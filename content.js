@@ -1120,19 +1120,13 @@ function run(settings){
                             auto_reload_int = setInterval(function(){
                                 //console.log("update!")
                                 //console.log(auto_reload_target_elem.contentWindow)
-                                if(auto_reload_target_elem.contentWindow.location.pathname == "/home"){
+                                const path_name = auto_reload_target_elem.contentWindow.location.pathname;
+                                if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        auto_reload_target_elem.contentWindow.document.querySelector('[aria-selected="true"]').click();
-                                    }
-                                };
-                                if(auto_reload_target_elem.contentWindow.location.pathname == "/search"){
-                                    reload_test += 1;
-                                    //console.log(reload_test);
-                                    if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        auto_reload_target_elem.contentWindow.scrollTo(0, 300);
-                                        setTimeout(function(){
-                                            auto_reload_target_elem.contentWindow.scrollTo(0, 0);
-                                        }, 10);
+                                        if (column_content_reload){
+                                            column_content_reload.Reload(auto_reload_target_elem.contentWindow);
+                                            (function f(){auto_reload_target_elem.contentWindow.scrollTo(0,0);requestAnimationFrame(f);})();
+                                        }
                                     }
                                 };
                             }, auto_reload_load_time);
@@ -1228,6 +1222,7 @@ function run(settings){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
                                                 if (column_content_reload){
                                                     column_content_reload.Reload(auto_reload_target_object.contentWindow);
+                                                    (function f(){auto_reload_target_object.contentWindow.scrollTo(0,0);requestAnimationFrame(f);})();
                                                 }
                                             }
                                         };
