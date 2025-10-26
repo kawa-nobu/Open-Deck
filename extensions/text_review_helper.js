@@ -15,8 +15,8 @@
             back_button.style.display = "block";
         }
     }).observe(document, {childList: true, subtree: true});
-
-    if("navigation" in window && typeof navigation.addEventListener === "function"){
+    
+    (function() {
         //投稿後の遷移メッセージを無効化する
         const native_add_evt = EventTarget.prototype.addEventListener;
         native_add_evt.call(window, 'beforeunload', function (e){
@@ -31,19 +31,19 @@
             }
             return native_add_evt.call(this, type, listener, options);
         };
-
+        
         //投稿後は home に戻ってほしくないので遷移を阻止する
-        navigation.addEventListener("navigate", (e) => {
-            //home への遷移を阻止する
-            const dest = e.destination?.url;
-            if(!dest) return;
-            if(!isAllowed(dest)){
-                e.preventDefault();
-                //iframe では home 遷移を阻止できなかったため、location.replace() する
+        const originalPushState = history.pushState;
+        history.pushState = function(state, title, url) {
+            const dest = url ? new URL(url, location.href).href : location.href;
+            if (!isAllowed(dest)){
+                //home への遷移を阻止
                 location.replace(location.href);
+                return;
             }
-        }, { capture: true });
-    }
+            return originalPushState.apply(this, arguments);
+        };
+    })();
 
     //校正周りの処理
     let target_editor_elem = null;
