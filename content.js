@@ -900,44 +900,6 @@ function run(settings){
                     //ポストカラムの動作
                     if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") === "post"){
                         const post_column_window = opd_column_div.querySelector("iframe").contentWindow;
-                        const isAllowed = (u) => {
-                            const url = new URL(u, post_column_window.location.href);
-                            return url.origin === post_column_window.location.origin && url.pathname.startsWith("/compose/post");
-                        };
-                        //GIF ボタンを消す
-                        post_column_window.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
-
-                        new MutationObserver(function(){
-                            const back_button = post_column_window.document.querySelector('main button[data-testid="app-bar-back"]');
-                            if(!back_button) return;
-                            if(post_column_window.location.pathname === "/compose/post"){
-                                back_button.style.display = "none";
-                            }else{
-                                back_button.style.display = "block";
-                            }
-                        }).observe(post_column_window.document, {childList: true, subtree: true});
-
-                        if("navigation" in post_column_window && typeof post_column_window.navigation.addEventListener === "function"){
-                            //投稿後は home に戻ってほしくないので遷移を阻止する
-                            post_column_window.navigation.addEventListener("navigate", (e) => {
-                                //投稿後の遷移メッセージを無効化する
-                                const native_add_evt = post_column_window.EventTarget.prototype.addEventListener;
-                                post_column_window.EventTarget.prototype.addEventListener = (type, listener, options)=>{
-                                    if(type === "beforeunload"){
-                                        return;
-                                    }
-                                    return native_add_evt.call(this, type, listener, options);
-                                };
-                                //home への遷移を阻止する
-                                const dest = e.destination?.url;
-                                if(!dest) return;
-                                if(!isAllowed(dest)){
-                                    e.preventDefault();
-                                    //iframe では home 遷移を阻止できなかったため、location.replace() する
-                                    post_column_window.location.replace(post_column_window.location.href);
-                                }
-                            }, { capture: true });
-                        }
                         //文章校正機能
                         const ext_text_review = new OpdExtTextReview();
                         ext_text_review.Init(post_column_window, ui_icon_define);
@@ -956,6 +918,15 @@ function run(settings){
                 let opd_column_auto_reload_checkbox = opd_column_div.querySelector(".opd_a_reload_bar");
                 let opd_column_auto_reload_time_reload = opd_column_div.querySelector(".opd_a_reload_time_setting");
                 let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
+                let column_content_reload = null;
+                //自動更新関連仕込み
+                if(mode != "session_set"){
+                    const column_type = this.closest("div[opd_column_type]").getAttribute("opd_column_type");
+                    if(column_type === "home" || column_type === "explore"){
+                        column_content_reload = new OpdExtAutoReload();
+                        column_content_reload.Init(this.closest("div[opd_column_type]").querySelector("iframe").contentWindow);
+                    }
+                }
                 //設定パネルイベント
                 if(mode != "session_set"){
                     opd_column_div.querySelector(".opd_settings_btn").addEventListener("click", function(){
@@ -1149,19 +1120,13 @@ function run(settings){
                             auto_reload_int = setInterval(function(){
                                 //console.log("update!")
                                 //console.log(auto_reload_target_elem.contentWindow)
-                                if(auto_reload_target_elem.contentWindow.location.pathname == "/home"){
+                                const path_name = auto_reload_target_elem.contentWindow.location.pathname;
+                                if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        auto_reload_target_elem.contentWindow.document.querySelector('[aria-selected="true"]').click();
-                                    }
-                                };
-                                if(auto_reload_target_elem.contentWindow.location.pathname == "/search"){
-                                    reload_test += 1;
-                                    //console.log(reload_test);
-                                    if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        auto_reload_target_elem.contentWindow.scrollTo(0, 300);
-                                        setTimeout(function(){
-                                            auto_reload_target_elem.contentWindow.scrollTo(0, 0);
-                                        }, 10);
+                                        if (column_content_reload){
+                                            column_content_reload.Reload(auto_reload_target_elem.contentWindow);
+                                            (function f(){auto_reload_target_elem.contentWindow.scrollTo(0,0);requestAnimationFrame(f);})();
+                                        }
                                     }
                                 };
                             }, auto_reload_load_time);
@@ -1252,17 +1217,13 @@ function run(settings){
                                     auto_reload_int = setInterval(function(){
                                         //console.log("update!")
                                         //console.log(auto_reload_target_object.contentWindow)
-                                        if(auto_reload_target_object.contentWindow.location.pathname == "/home"){
+                                        const path_name = auto_reload_target_object.contentWindow.location.pathname;
+                                        if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                auto_reload_target_object.contentWindow.document.querySelector('[aria-selected="true"]').click();
-                                            }
-                                        };
-                                        if(auto_reload_target_object.contentWindow.location.pathname == "/search"){
-                                            if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                auto_reload_target_object.contentWindow.scrollTo(0, 300);
-                                                setTimeout(function(){
-                                                    auto_reload_target_object.contentWindow.scrollTo(0, 0);
-                                                }, 10);
+                                                if (column_content_reload){
+                                                    column_content_reload.Reload(auto_reload_target_object.contentWindow);
+                                                    (function f(){auto_reload_target_object.contentWindow.scrollTo(0,0);requestAnimationFrame(f);})();
+                                                }
                                             }
                                         };
                                     }, auto_reload_time);

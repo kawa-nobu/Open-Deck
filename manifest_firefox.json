@@ -1,6 +1,6 @@
 {
     "name": "Open-Deck",
-    "version": "1.1.2",
+    "version": "1.1.2.1",
     "manifest_version": 2,
     "description": "The OpenSource Deck",
     "icons" : {
@@ -18,6 +18,7 @@
     },
     "web_accessible_resources": [
     "extensions/text_review_helper.js",
+    "extensions/auto_reload_helper.js",
     "icon.png", 
     "icon/logo_icon.svg",
     "profile_debug.html",
@@ -56,7 +57,7 @@
     ],
     "content_scripts": [{
       "matches": ["https://twitter.com/*", "https://x.com/*"],
-      "js": ["content.js", "extensions/text_review.js"]
+      "js": ["content.js", "extensions/text_review.js", "extensions/auto_reload.js"]
       }],
       "browser_action": {
         "default_popup": "popup.html",
