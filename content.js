@@ -1125,7 +1125,9 @@ function run(settings){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
                                         if (column_content_reload){
                                             column_content_reload.Reload(auto_reload_target_elem.contentWindow);
-                                            (function f(){auto_reload_target_elem.contentWindow.scrollTo(0,0);requestAnimationFrame(f);})();
+                                            setTimeout(() => {
+                                                auto_reload_target_elem.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
+                                            }, 100);
                                         }
                                     }
                                 };
@@ -1222,7 +1224,9 @@ function run(settings){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
                                                 if (column_content_reload){
                                                     column_content_reload.Reload(auto_reload_target_object.contentWindow);
-                                                    (function f(){auto_reload_target_object.contentWindow.scrollTo(0,0);requestAnimationFrame(f);})();
+                                                    setTimeout(() => {
+                                                        auto_reload_target_object.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
+                                                    }, 500);
                                                 }
                                             }
                                         };
