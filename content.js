@@ -12,6 +12,7 @@ const url_path = new URL(location.href);
 let is_shift_pressed = false;
 let profile_store;
 let last_load_profile = 0;
+let is_removed_default_style = false;
 const ui_icon_define = {
     banner_hide:"icon/banner_hide.svg",
     top_bar_hide:"icon/top_hide.svg",
@@ -1669,6 +1670,15 @@ function run(settings){
     const head_observer = new MutationObserver(function(){
         document.title = "Open-Deck";
         document.querySelector('link[rel="shortcut icon"]').href = chrome.runtime.getURL("icon.png");
+        //デフォルトのCSSがUIに影響を与えないように削除する
+        if(!is_removed_default_style){
+            document.head.querySelectorAll('style').forEach(style => {
+                if (style.textContent.includes('*, ::before, ::after')) {
+                    style.remove();
+                    is_removed_default_style = true;
+                }
+            });
+        }
         //ダークモード検出&設定
         const currentScheme = document.documentElement.style?.colorScheme;
         if(currentScheme){
