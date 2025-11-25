@@ -95,6 +95,9 @@
   "ui_settings_column_width_custom": {
     "message": "カスタム"
   },
+  "ui_settings_column_width_custom_label": {
+    "message": "カラム幅カスタム"
+  },
   "ui_settings_column_width_custom_button": {
     "message": "カスタム設定"
   },

@@ -61,24 +61,24 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             let search_limit_percentage = 99999;
             if(api_limit_obj.time_line.remaining != null){
                 timeline_limit_percentage = api_limit_obj.time_line.remaining / api_limit_obj.time_line.limit * 100;
-                api_limit_dsc_obj.time_line = `タイムライン:${api_limit_obj.time_line.remaining}/${api_limit_obj.time_line.limit}-${unix_time_mmss(api_limit_obj.time_line.reset_unix_time)}\r\n`;
+                api_limit_dsc_obj.time_line = `${i18n_message("label_api_timeline")}${api_limit_obj.time_line.remaining}/${api_limit_obj.time_line.limit}-${unix_time_mmss(api_limit_obj.time_line.reset_unix_time)}\r\n`;
             }else{
                 //初期状態
             }
             if(api_limit_obj.recommend_timeline.remaining != null){
                 recommend_timeline_limit_percentage = api_limit_obj.recommend_timeline.remaining / api_limit_obj.recommend_timeline.limit * 100;
-                api_limit_dsc_obj.recommend_timeline = `タイムライン(おすすめ):${api_limit_obj.recommend_timeline.remaining}/${api_limit_obj.recommend_timeline.limit}-${unix_time_mmss(api_limit_obj.recommend_timeline.reset_unix_time)}\r\n`;
+                api_limit_dsc_obj.recommend_timeline = `${i18n_message("label_api_recommend_timeline")}${api_limit_obj.recommend_timeline.remaining}/${api_limit_obj.recommend_timeline.limit}-${unix_time_mmss(api_limit_obj.recommend_timeline.reset_unix_time)}\r\n`;
             }else{
                 //初期状態
             }
             if(api_limit_obj.search.remaining != null){
                 search_limit_percentage = api_limit_obj.search.remaining / api_limit_obj.search.limit * 100;
-                api_limit_dsc_obj.search = `検索:${api_limit_obj.search.remaining}/${api_limit_obj.search.limit}-${unix_time_mmss(api_limit_obj.search.reset_unix_time)}`;
+                api_limit_dsc_obj.search = `${i18n_message("label_api_search")}${api_limit_obj.search.remaining}/${api_limit_obj.search.limit}-${unix_time_mmss(api_limit_obj.search.reset_unix_time)}`;
             }else{
                 //初期状態
             }
             api_linit_status_btn.textContent = `${Math.floor(Math.min(timeline_limit_percentage, recommend_timeline_limit_percentage, search_limit_percentage))}%`;
-            api_linit_status_btn.title = `API使用状況\r\n${api_limit_dsc_obj.time_line}${api_limit_dsc_obj.recommend_timeline}${api_limit_dsc_obj.search}`;
+            api_linit_status_btn.title = `${i18n_message("msg_api_limit_status_title", [`${api_limit_dsc_obj.time_line}${api_limit_dsc_obj.recommend_timeline}${api_limit_dsc_obj.search}`])}`;
         }
     }
   });
@@ -112,9 +112,9 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
                 settings_init();
             }else{
                 if(JSON.parse(value.opd_settings).last_load_profile == undefined){
-                    if(confirm("プロファイルデータが壊れています。\r\n初期化するにはOKを押してください。\r\n初期化せずに続行する場合はキャンセルを押してください。")){
+                    if(confirm(i18n_message("msg_profile_data_broken_confirm"))){
                         chrome.storage.local.remove("opd_settings", function(){
-                            alert("初期化が完了しました");
+                            alert(i18n_message("msg_profile_init_completed"));
                         });
                     }else{
                         last_load_profile = 0;
@@ -146,7 +146,7 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
                         let recovery_setting = JSON.parse(value.opd_settings);
                         recovery_setting.last_load_profile = 0;
                         chrome.storage.local.set({'opd_settings': JSON.stringify(recovery_setting)}, function(){
-                            alert("破損した設定データの自動修復を行いました\r\n再読み込みします");
+                            alert(i18n_message("msg_settings_auto_repair"));
                             last_load_profile = 0;
                             window.reload();
                         });
@@ -158,7 +158,7 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
                         let recovery_setting = JSON.parse(value.opd_settings);
                         recovery_setting.last_load_profile = 0;
                         chrome.storage.local.set({'opd_settings': JSON.stringify(recovery_setting)}, function(){
-                            alert("破損した設定データの自動修復を行いました\r\n再読み込みします");
+                            alert(i18n_message("msg_settings_auto_repair"));
                             last_load_profile = 0;
                             window.reload();
                         });
@@ -177,9 +177,9 @@ function run(settings){
     let profile_list_btn_html = "";
     //プロファイルリスト初期化
     for (let index = 0; index < profile_store.length; index++) {
-        profile_list_btn_html += `<div class="dsp_btn_parent" title="プロファイルを切り替える" id="userProfile-${index}"><div class="dsp_btn_change_profile_btn">P${index}</div></div>`;//<div class="profile_list"><input type="button" id="userProfile-${index}" value="P${index}"></div>
+        profile_list_btn_html += `<div class="dsp_btn_parent" title="${i18n_message("ui_profile_switch_title")}" id="userProfile-${index}"><div class="dsp_btn_change_profile_btn">P${index}</div></div>`;//<div class="profile_list"><input type="button" id="userProfile-${index}" value="P${index}"></div>
     }
-    profile_list_html = `<div class="profile_val_now" title="使用中のプロファイル">${last_load_profile}</div><div class="dsp_profile_list"><div id="profile_btn_list">${profile_list_btn_html}</div>`;
+    profile_list_html = `<div class="profile_val_now" title="${i18n_message("ui_profile_current_title")}">${last_load_profile}</div><div class="dsp_profile_list"><div id="profile_btn_list">${profile_list_btn_html}</div>`;
     //console.log(profile_list_btn_html)
     //CSSタグ追加
     document.querySelector("head").insertAdjacentHTML("afterbegin", `<style second_column_css></style>
@@ -618,25 +618,25 @@ function run(settings){
     }
     </style>`);
     //カラム要素作成-挿入
-    let default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="カラム設定"><input class="opd_settings_btn" type="button" value="S"></label></span><span class="dsp_column_btn"><input class="opd_banner" type="checkbox" title="バナー表示切り替え" %column_banner_ch%><label class="dsp_column_banner_btn opd_ui_icon_color"></label></span><span class="dsp_column_btn"><input class="opd_top_bar" type="checkbox" title="トップ表示切り替え" %column_top_bar_ch%><label class="dsp_column_top_btn opd_ui_icon_color"></label></span>`;
-    let post_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="カラム設定"><input class="opd_settings_btn" type="button" value="S"></label></span>`;
-    let othersns_default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="カラム設定"><input class="opd_settings_btn" type="button" value="S"></label></span>`;
-    let column_settings_panel = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">表示モード<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">すべて</option><option value="1">テキストのみ</option><option value="2">画像・動画付のみ</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div><div class="dsp_column_settings_content_div">自動更新<span><input class="opd_a_reload_bar" type="checkbox" %column_auto_reload_ch%></span></div><div class="dsp_column_settings_content_div">自動更新間隔<span><input class="opd_column_settings_input_text opd_a_reload_time_setting" type="number" value="%column_auto_reload_time%">秒</span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="設定を閉じる" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
-    let column_settings_panel_no_auto = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">表示モード<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">すべて</option><option value="1">テキストのみ</option><option value="2">画像・動画付のみ</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="設定を閉じる" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
-    let column_settings_panel_othersns = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>設定</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">カラム幅<span><select class="opd_column_size_preset"><option value="0">小</option><option value="1">中</option><option value="2">大</option><option value="3">カスタム</option></select></span></div><div class="dsp_column_settings_content_div">カラム幅カスタム<span><input type="button" class="column_width_btn" value="カスタム設定" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="設定を閉じる" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
+    let default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="${i18n_message("ui_column_settings_title")}"><input class="opd_settings_btn" type="button" value="S"></label></span><span class="dsp_column_btn"><input class="opd_banner" type="checkbox" title="${i18n_message("ui_column_banner_toggle_title")}" %column_banner_ch%><label class="dsp_column_banner_btn opd_ui_icon_color"></label></span><span class="dsp_column_btn"><input class="opd_top_bar" type="checkbox" title="${i18n_message("ui_column_top_toggle_title")}" %column_top_bar_ch%><label class="dsp_column_top_btn opd_ui_icon_color"></label></span>`;
+    let post_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="${i18n_message("ui_column_settings_title")}"><input class="opd_settings_btn" type="button" value="S"></label></span>`;
+    let othersns_default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="${i18n_message("ui_column_settings_title")}"><input class="opd_settings_btn" type="button" value="S"></label></span>`;
+    let column_settings_panel = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>${i18n_message("ui_settings_header")}</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_view_mode_label")}<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">${i18n_message("ui_settings_view_mode_all")}</option><option value="1">${i18n_message("ui_settings_view_mode_text_only")}</option><option value="2">${i18n_message("ui_settings_view_mode_media_only")}</option></select></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_column_width_label")}<span><select class="opd_column_size_preset"><option value="0">${i18n_message("ui_settings_column_width_small")}</option><option value="1">${i18n_message("ui_settings_column_width_medium")}</option><option value="2">${i18n_message("ui_settings_column_width_large")}</option><option value="3">${i18n_message("ui_settings_column_width_custom")}</option></select></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_column_width_custom_label")}<span><input type="button" class="column_width_btn" value="${i18n_message("ui_settings_column_width_custom_button")}" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_auto_reload_label")}<span><input class="opd_a_reload_bar" type="checkbox" %column_auto_reload_ch%></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_auto_reload_interval_label")}<span><input class="opd_column_settings_input_text opd_a_reload_time_setting" type="number" value="%column_auto_reload_time%">${i18n_message("ui_settings_seconds_suffix")}</span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="${i18n_message("ui_settings_close_button")}" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
+    let column_settings_panel_no_auto = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>${i18n_message("ui_settings_header")}</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_view_mode_label")}<span><select class="opd_tw_view_mode" column_tw_view_mode_val="%column_tw_view_mode%"><option value="0">${i18n_message("ui_settings_view_mode_all")}</option><option value="1">${i18n_message("ui_settings_view_mode_text_only")}</option><option value="2">${i18n_message("ui_settings_view_mode_media_only")}</option></select></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_column_width_label")}<span><select class="opd_column_size_preset"><option value="0">${i18n_message("ui_settings_column_width_small")}</option><option value="1">${i18n_message("ui_settings_column_width_medium")}</option><option value="2">${i18n_message("ui_settings_column_width_large")}</option><option value="3">${i18n_message("ui_settings_column_width_custom")}</option></select></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_column_width_custom_label")}<span><input type="button" class="column_width_btn" value="${i18n_message("ui_settings_column_width_custom_button")}" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="${i18n_message("ui_settings_close_button")}" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
+    let column_settings_panel_othersns = `<div class="dsp_column_settings_panel"><div class="dsp_column_settings_panel_content"><h2>${i18n_message("ui_settings_header")}</h2><div class="dsp_column_settings_list"><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_column_width_label")}<span><select class="opd_column_size_preset"><option value="0">${i18n_message("ui_settings_column_width_small")}</option><option value="1">${i18n_message("ui_settings_column_width_medium")}</option><option value="2">${i18n_message("ui_settings_column_width_large")}</option><option value="3">${i18n_message("ui_settings_column_width_custom")}</option></select></span></div><div class="dsp_column_settings_content_div">${i18n_message("ui_settings_column_width_custom_label")}<span><input type="button" class="column_width_btn" value="${i18n_message("ui_settings_column_width_custom_button")}" style="vertical-align: text-top;font-size: 0.8rem;"/></span></div></div><div class="dsp_column_settings_panel_close_btn_wrap"><input type="button" class="dsp_column_settings_panel_close_btn" value="${i18n_message("ui_settings_close_button")}" style="vertical-align: text-top;font-size: 0.8rem;"/></div></div></div>` ;
     let default_element = {
         /*main_bar_empty_column:{html:`<!--<section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" opd_column_width="%column_width_num%" id="main_bar_empty_column" style="height:100%;min-width: 70px;"></div></section>-->`},*/
-        empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>左のバーからカラムを追加</p></div></div></section>`},
-        post:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="post" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Post</span></div></span>${post_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/compose/post" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
-        second_empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 30rem;overflow: hidden;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_2)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>1段目のカラムが配置できます</p></div></div></section>`},
-        home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Timeline</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/home" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
-        notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notifications</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://x.com/notifications" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
-        explore:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="explore" opd_column_width="%column_width_num%" opd_explore_path="%column_save_path%" opd_explore_title="%column_save_title%" opd_pinned_path="%column_pinned_save_path%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Explore</span></div></span>${default_element_bar}<span class="dsp_column_btn"><input class="opd_pinned_btn" type="checkbox" title="ピン止め切り替え" %column_pinned_ch%><label class="dsp_column_pin_btn opd_ui_icon_color"></label></span><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com%column_save_path%" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`}
+        empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>${i18n_message("ui_empty_column_message")}</p></div></div></section>`},
+        post:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="post" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>${i18n_message("ui_column_post_title")}</span></div></span>${post_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="${i18n_message("ui_column_close_title")}"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/compose/post" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
+        second_empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 30rem;overflow: hidden;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_2)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>${i18n_message("ui_second_empty_column_message")}</p></div></div></section>`},
+        home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>${i18n_message("ui_column_timeline_title")}</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="${i18n_message("ui_column_close_title")}"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/home" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
+        notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>${i18n_message("ui_column_notifications_title")}</span></div></span>${default_element_bar}<div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="${i18n_message("ui_column_close_title")}"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://x.com/notifications" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
+        explore:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="explore" opd_column_width="%column_width_num%" opd_explore_path="%column_save_path%" opd_explore_title="%column_save_title%" opd_pinned_path="%column_pinned_save_path%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>${i18n_message("ui_column_explore_title")}</span></div></span>${default_element_bar}<span class="dsp_column_btn"><input class="opd_pinned_btn" type="checkbox" title="${i18n_message("ui_column_pin_toggle_title")}" %column_pinned_ch%><label class="dsp_column_pin_btn opd_ui_icon_color"></label></span><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="${i18n_message("ui_column_close_title")}"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com%column_save_path%" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`}
     };
     let ins_html = document.createElement("div");
     ins_html.id = "opd_main_element";
     ins_html.style = "position: fixed;z-index: 999999;top:0;width: 100%;height: 100%;background: white;display: flex;flex-direction: row;overflow: hidden;";
-    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="Open-Deck\r\nv${manifest.version}"><div class="opd_ui_logo"></div><span class="opd_version_span">${manifest.version}</span></div><hr><p class="opd_debug_menu">Debug<br><input type="button" id="init_settings" value="初期化" /><br><input type="button" id="profile_load_save" value="プロファイルローダー" /><br><input type="button" id="dnr_reload" value="dNR_Reload" /><br><input type="button" id="ext_reload" value="拡張機能再読み込み" /><br><div id="api_limit_status">API</div><hr><div class="dsp_btn_parent" id="add_post" title="${i18n_message("ui_add_post_column_title")}"><div class="dsp_btn_add_post_img"></div></div><hr><div class="dsp_btn_parent" id="add_timeline" title="タイムラインカラム追加"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="通知カラム追加"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="Explore(ユニバーサル)カラム追加"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" title="カラム段切り替え" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="プロファイル保存" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="プロファイル削除" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
+    let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" class="dsp_column_draggable_false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 60px;max-width: 60px;text-align: center;background-color: white;"><div class="main_bar_functions"><div class="opd_ui_logo_parent" title="${i18n_message("ui_sidebar_logo_title", [manifest.version])}"><div class="opd_ui_logo"></div><span class="opd_version_span">${manifest.version}</span></div><hr><p class="opd_debug_menu">${i18n_message("ui_debug_menu_label")}<br><input type="button" id="init_settings" value="${i18n_message("ui_button_init_settings")}" /><br><input type="button" id="profile_load_save" value="${i18n_message("ui_button_profile_loader")}" /><br><input type="button" id="dnr_reload" value="${i18n_message("ui_button_dnr_reload")}" /><br><input type="button" id="ext_reload" value="${i18n_message("ui_button_ext_reload")}" /><br><div id="api_limit_status">${i18n_message("ui_button_api_label")}</div><hr><div class="dsp_btn_parent" id="add_post" title="${i18n_message("ui_add_post_column_title")}"><div class="dsp_btn_add_post_img"></div></div><hr><div class="dsp_btn_parent" id="add_timeline" title="${i18n_message("ui_add_timeline_column_title")}"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent" id="add_notify" title="${i18n_message("ui_add_notification_column_title")}"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent" id="add_explore" title="${i18n_message("ui_add_explore_column_title")}"><div class="dsp_btn_add_explr_img"></div></div><hr><div class="dsp_btn_parent" title="${i18n_message("ui_toggle_second_rack_title")}" id="second_rack"><div class="dsp_btn_second_rack_img"></div></div><hr><div class="dsp_btn_parent" title="${i18n_message("ui_profile_save_title")}" id="profile_save"><div class="dsp_btn_profile_add_img"></div></div><div class="dsp_btn_parent" title="${i18n_message("ui_profile_delete_title")}" id="profile_delete"><div class="dsp_btn_profile_delete_img"></div></div>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column_draggable_false dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 60px;max-width: 60px;"></div></section>`;
     //let side_bar = `<section class="dsp_column" style="position:fixed;z-index:999;height:98%;"><div draggable="false" opd_column_type="dsp_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 100px;text-align: center;background-color: white;"><div><p style="margin-top:0;padding-top:1em;">Open-Deck<br>Prototype<br>v${manifest.version}</p><hr><p>Debug<br><input type="button" id="init_settings" value="init settings"/><br><input type="button" id="profile_load_save" value="Profile Load"/><br><input type="button" id="dnr_reload" value="dNR_Reload"/><br><input type="button" id="ext_reload" value="Ext_Reload"/></p><hr><p><input type="button" id="add_timeline" value="Add TimeLine"/> <div class="dsp_btn_parent"><div class="dsp_btn_add_tl_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_ntfc_img"></div></div><div class="dsp_btn_parent"><div class="dsp_btn_add_explr_img"></div></div> </p><p><input type="button" id="add_notify" value="Add Notification"/></p><p><input type="button" id="add_explore" value="Add Explore"/><hr><input type="button" id="second_rack" value="Second Rack"/><hr><input type="button" id="profile_save" value="Profile_Save"/><br><input type="button" id="profile_delete" value="Profile_Delete"/><br>${profile_list_html}</p></div></div></section><section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" id="main_bar_empty_column" style="height:100%;min-width: 110px;"></div></section>`;
     let main_column_html = ``;
     let second_column_html = ``;
@@ -719,7 +719,7 @@ function run(settings){
     //APIリミット表示用
     document.querySelector("#api_limit_status").addEventListener("click", function(){
         if(api_limit_obj != null){
-            alert(`現在のAPIリミット状況\r\n回数(使用回数/総使用可能数)-完全回復時間\r\n${api_limit_dsc_obj.time_line}${api_limit_dsc_obj.recommend_timeline}${api_limit_dsc_obj.search}`);
+            alert(i18n_message("msg_api_limit_status_alert", [`${api_limit_dsc_obj.time_line}${api_limit_dsc_obj.recommend_timeline}${api_limit_dsc_obj.search}`]))
         }
     });
     //Open-Deckについて表示
@@ -730,7 +730,7 @@ function run(settings){
     let debug_menu_click_counter = 0;
     document.querySelector(".opd_version_span").addEventListener("click", function(){
         if(debug_menu_click_counter >= 7){
-            alert("デバッグメニューが利用できます!");
+            alert(i18n_message("msg_debug_menu_enabled"));
             document.querySelector(".opd_debug_menu").style.display = "block";
         }else{
             debug_menu_click_counter += 1;
@@ -773,30 +773,30 @@ function run(settings){
                             preload_desc_count = 0;
                             break;
                         case "empty_column":
-                            preload_desc_array.push("<!-1段目終了-!>");
+                            preload_desc_array.push(i18n_message("msg_profile_desc_first_row_end"));
                             preload_desc_count = 0;
                             break;
                         case "second_empty_column":
-                            preload_desc_array.push("<!-2段目終了-!>");
+                            preload_desc_array.push(i18n_message("msg_profile_desc_second_row_end"));
                             preload_desc_count = 0;
                             break;
                         case "post":
-                            preload_desc_array.push(`${preload_desc_count}-ポストカラム`);
+                            preload_desc_array.push(i18n_message("msg_profile_desc_post_column", [preload_desc_count]));
                             break;
                         case "home":
-                            preload_desc_array.push(`${preload_desc_count}-タイムラインカラム`);
+                            preload_desc_array.push(i18n_message("msg_profile_desc_timeline_column", [preload_desc_count]));
                             break;
                         case "notification":
-                            preload_desc_array.push(`${preload_desc_count}-通知カラム`);
+                            preload_desc_array.push(i18n_message("msg_profile_desc_notification_column", [preload_desc_count]));
                             break;
                         case "explore":
-                            preload_desc_array.push(`${preload_desc_count}-[${preload_array[preload_index].column_save_title}]-ユニバーサル(Explore)カラム`);
+                            preload_desc_array.push(i18n_message("msg_profile_desc_explore_column", [preload_desc_count, preload_array[preload_index].column_save_title]));
                             break;
                         case "misskey":
-                            preload_desc_array.push(`Misskeyカラム`);
+                            preload_desc_array.push(i18n_message("msg_profile_desc_misskey_column"));
                             break;
                         case "bsky":
-                            preload_desc_array.push(`Blueskyカラム`);
+                            preload_desc_array.push(i18n_message("msg_profile_desc_bluesky_column"));
                             break;
                         default:
                             preload_desc_count = 0;
@@ -805,7 +805,7 @@ function run(settings){
                     preload_desc_count += 1;
                 }
                 //console.log(preload_desc_array)
-                if(confirm(`プロファイル「${index}」を読み込みますか?\r\nカラム構成\r\n${preload_desc_array.join("\r\n")}`)){
+                if(confirm(`${i18n_message("msg_profile_load_confirm", [index, preload_desc_array.join("\r\n")])}`)){
                     document.querySelector("#opd_main_element").remove();
                     last_load_profile = index;
                     chrome.storage.local.get("opd_settings", function(value){
@@ -1000,7 +1000,7 @@ function run(settings){
                     opd_column_width_btn.addEventListener("click", function(){
                         const now_width = this.closest("div[opd_column_type]").getAttribute("opd_column_width");
                         let column_width_preset  = this.closest("div[opd_column_type]").querySelector(".opd_column_size_preset");
-                        let setting_width = prompt("カラム横幅のremを半角数字で入力\r\n目安 小:15 中:20 大:30 初期値:30\r\n11以下は入力できません", now_width);
+                        let setting_width = prompt(i18n_message("msg_column_width_prompt"), now_width);
                         //console.log(setting_width);
                         if(setting_width != null){
                             const setting_width_num = Number(setting_width);
@@ -1023,7 +1023,7 @@ function run(settings){
                                         break;
                                 }
                             }else{
-                                alert("正しい値を入力してください");
+                                alert(i18n_message("msg_invalid_value_alert"));
                             }
                         }
                     });
@@ -1104,10 +1104,10 @@ function run(settings){
                             opd_column_auto_reload_time_reload.addEventListener("change", function(){
                                 const auto_reload_time = auto_reload_target_elem.closest('div[opd_column_type]').querySelector(".opd_a_reload_time_setting");
                                 if(Number(auto_reload_time.value) >= 1){
-                                    alert(`自動更新の秒数を${auto_reload_time.value}秒に設定しました`);
+                                    alert(i18n_message("msg_auto_reload_set", [auto_reload_time.value]));
                                     column_settings_save("", last_load_profile);
                                 }else{
-                                    alert(`1秒以上の秒数を入力してください`);
+                                    alert(i18n_message("msg_auto_reload_minimum_alert"));
                                     auto_reload_time.value = '10';
                                     column_settings_save("", last_load_profile);
                                 }
@@ -1190,7 +1190,7 @@ function run(settings){
                         if(mode != "session_set"){
                             opd_column_pinned_checkbox.addEventListener("click", function(){
                                 if(this.checked){
-                                    if(confirm("この場所でピン止めしますか?")){
+                                    if(confirm(i18n_message("msg_explore_pin_confirm"))){
                                         const now_path = this.closest("div[opd_column_type]").getAttribute("opd_explore_path");
                                         this.closest("div[opd_column_type]").setAttribute("opd_pinned_path",now_path);
                                         column_settings_save("", last_load_profile);
@@ -1198,7 +1198,7 @@ function run(settings){
                                         this.checked = false;
                                     }
                                 }else{
-                                    if(confirm("ピン止めを解除します")){
+                                    if(confirm(i18n_message("msg_explore_unpin_confirm"))){
                                         this.closest("div[opd_column_type]").setAttribute("opd_pinned_path","");
                                         column_settings_save("", last_load_profile);
                                         this.checked = false;
@@ -1305,7 +1305,7 @@ function run(settings){
     //メインバーイベント
     document.getElementById("init_settings").addEventListener("click", function(){
         chrome.storage.local.remove("opd_settings", function(value){
-            alert("設定を初期化しました。再読み込みしてください。");
+            alert(i18n_message("msg_settings_reset_completed"));
         });
     });
     //画像付きを開いた時の自動スクロール阻止
@@ -1319,7 +1319,7 @@ function run(settings){
             document.querySelector("#first_rack_element").style.height = "50vh";
             document.querySelector("#second_rack_element").style.height = "50vh";
             //console.log(default_element.second_empty_column)
-            //const second_rack_empty_html = `<section draggable="false" id="column_%column_num%" class="dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" style="height: calc(100% - 20px);min-width: 30rem;display: flex;align-items: center;justify-content: center;"><p>2段目<br>1段目のカラムが配置できます</p></div></section>`;
+            //const second_rack_empty_html = `<section draggable="false" id="column_%column_num%" class="dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" style="height: calc(100% - 20px);min-width: 30rem;display: flex;align-items: center;justify-content: center;"><p>2段目<br>${i18n_message("ui_second_empty_column_message")}</p></div></section>`;
             const second_rack_default_html = default_element.second_empty_column.html.replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_tw_view_mode%", "0");
             document.querySelector("#second_rack_element").insertAdjacentHTML("beforeend", second_rack_default_html);
             /*for (let index = 0; index < document.querySelectorAll('.dsp_column[draggable="true"]').length; index++) {
@@ -1335,7 +1335,7 @@ function run(settings){
             document.querySelector("#second_rack").value = "Single Rack";
             document.querySelector(".dsp_btn_second_rack_img").style.backgroundImage = `url(${chrome.runtime.getURL(ui_icon_define.column_single_rack)})`;
         }else{
-            if(confirm("1段表示にします。\r\n2段目のカラムは全て閉じられます")){
+            if(confirm(i18n_message("msg_second_rack_to_single_confirm"))){
                 document.querySelector("#second_rack_element").textContent = "";
                 document.querySelector("style[second_column_css]").textContent = ``;
                 document.querySelector("#first_rack_element").style.height = "100vh";
@@ -1357,7 +1357,7 @@ function run(settings){
     });
     //
     document.getElementById("dnr_reload").addEventListener("click", function(){
-        if(confirm("declarativeNetRequestの再読み込みします")){
+        if(confirm(i18n_message("msg_dnr_reload_confirm"))){
             chrome.runtime.sendMessage({message: "dnr_upd"}).then((value)=>{
                 if(value == true){
                     location.reload();
@@ -1366,7 +1366,7 @@ function run(settings){
         }
     });
     document.getElementById("ext_reload").addEventListener("click", function(){
-        if(confirm("拡張機能の再読み込みします")){
+        if(confirm(i18n_message("msg_extension_reload_confirm"))){
             chrome.runtime.sendMessage({message: "ext_reload"});
         }
     });
@@ -1433,7 +1433,7 @@ function run(settings){
     });
     //プロファイル保存ボタン
     document.getElementById("profile_save").addEventListener("click", function(){
-        if(confirm("現在の構成でプロファイルを作成します")){
+        if(confirm(i18n_message("msg_profile_save_confirm"))){
             let profile = column_settings_save("profile_out");
             const save_object = {name:"user_profile", profile:profile.column_settings};
             //console.log(profile)
@@ -1452,9 +1452,9 @@ function run(settings){
     });
     //プロファイル削除ボタン
     document.getElementById("profile_delete").addEventListener("click", function(){
-        const delete_num = Number(prompt("削除するプロファイル番号を半角入力"));
+        const delete_num = Number(prompt(i18n_message("msg_profile_delete_number_prompt")));
         if(last_load_profile != delete_num){
-            if(confirm(`プロファイル${delete_num}を削除しますか?\r\n※削除後、残ったプロファイル番号は0から再度割り振られます。`)){
+            if(confirm(i18n_message("msg_profile_delete_confirm", [delete_num]))){
                 let after_profile_num = null;
                 profile_store.splice(delete_num, 1);
                 //console.log(profile_store)
@@ -1492,7 +1492,7 @@ function run(settings){
                 });
             }
         }else{
-            alert("表示中のプロファイルは削除できません");
+            alert(i18n_message("msg_profile_delete_current_alert"));
         }
     });
     //カラム移動
@@ -1557,7 +1557,7 @@ function run(settings){
                     //column_dd();
                     column_settings_save("", last_load_profile);
                 }else{
-                    if(confirm("ピン止めされているカラムです\r\nカラムを閉じますか？")){
+                    if(confirm(i18n_message("msg_pinned_column_close_confirm"))){
                         this.closest(".dsp_column").remove();
                         append_object_css();
                         //column_dd();
@@ -1705,9 +1705,9 @@ function settings_init(){
     chrome.storage.local.set({'opd_profile_store': JSON.stringify(profile)}, function () {
         chrome.storage.local.set({'opd_settings': JSON.stringify(settings)}, function () {
             if(is_prototype){
-                alert("初期設定構築が完了しました。\r\nようこそ！Open-Deck試作版へ！");
+                alert(i18n_message("msg_initial_setup_completed_prototype"));
             }else{
-                alert("初期設定構築が完了しました！\r\nようこそ！Open-Deckへ！");
+                alert(i18n_message("msg_initial_setup_completed"));
             }
             
             location.reload();

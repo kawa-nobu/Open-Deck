@@ -95,14 +95,17 @@
   "ui_settings_column_width_custom": {
     "message": "Custom"
   },
+  "ui_settings_column_width_custom_label": {
+    "message": "Custom column width"
+  },
   "ui_settings_column_width_custom_button": {
-    "message": "Custom width"
+    "message": "Custom"
   },
   "ui_settings_auto_reload_label": {
-    "message": "Auto refresh"
+    "message": "Auto-load"
   },
   "ui_settings_auto_reload_interval_label": {
-    "message": "Auto refresh interval"
+    "message": "Auto-load interval"
   },
   "ui_settings_seconds_suffix": {
     "message": "sec"
@@ -168,7 +171,7 @@
     "message": "Please enter a valid value."
   },
   "msg_auto_reload_set": {
-    "message": "Auto refresh interval set to $1 seconds."
+    "message": "Auto-load interval set to $1 seconds."
   },
   "msg_auto_reload_minimum_alert": {
     "message": "Please enter a value of at least 1 second."
