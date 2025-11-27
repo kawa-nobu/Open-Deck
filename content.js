@@ -904,7 +904,8 @@ function run(settings){
                         const post_column_window = opd_column_div.querySelector("iframe").contentWindow;
                         //文章校正機能
                         const ext_text_review = new OpdExtTextReview();
-                        ext_text_review.Init(post_column_window, ui_icon_define);
+                        const ui_lang = chrome.i18n.getUILanguage();
+                        ext_text_review.Init(post_column_window, ui_icon_define, ui_lang);
                     }
                 }
             })

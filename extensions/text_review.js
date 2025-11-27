@@ -2,11 +2,13 @@
 class OpdExtTextReview {
     constructor() {
         this.opd_text_review_token = null;
-        this.Init = (column_window, icons) => {
+        this.opd_use_lang = "ja";
+        this.Init = (column_window, icons, ui_lang) => {
             //初期化
             let editable_elem = null;
             let is_textarea_empty = true;
             let review_state = false;
+            this.opd_use_lang = ui_lang.split("-")[0];
             column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_css>
                 /* Premium 勧誘要素非表示 */
                 div[aria-live="polite"][role="status"]:has(a[dir="ltr"]){
@@ -150,14 +152,14 @@ class OpdExtTextReview {
                     column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_theme_css>.opd_text_review_btn_icon{background-color:${theme_color};}.opd_text_review_btn:not([opd_text_review_is_empty]):hover{border-radius: 100px;transition-duration: 0.2s;background-color:${theme_color.replace(")", ", 0.1)")};}.opd_text_review_panel{background-color:${theme_color.replace(")", ", 0.1)")};}</style>`);
                     //校正ボタンパネル追加
                     //TODO:今後、他機能追加する際は opd_post_functions 追加処理を別の場所で1回のみ行う実装をする
-                    btnAddTarget.insertAdjacentHTML('afterend', '<div class="opd_post_functions"><div id="opd_post_text_review" class="opd_text_review_btn" title="文章校正ができます(校正ログを一切保存しません)" opd_text_review_is_empty><div class="opd_text_review_btn_icon"></div></div></div><div class="opd_text_review_panel"></div>');
+                    btnAddTarget.insertAdjacentHTML('afterend', `<div class="opd_post_functions"><div id="opd_post_text_review" class="opd_text_review_btn" title="${this.UITexts[this.opd_use_lang].textReview_buttonTitle.message}" opd_text_review_is_empty><div class="opd_text_review_btn_icon"></div></div></div><div class="opd_text_review_panel"></div>`);
                     //校正ボタン動作追加
                     column_window.document.getElementById("opd_post_text_review").addEventListener("click", async ()=>{
                         if(!review_state && editable_elem && !is_textarea_empty){
                             review_state = true;
                             const review_panel = column_window.document.querySelector('div.opd_text_review_panel');
                             review_panel.textContent = "";
-                            review_panel.insertAdjacentHTML("beforeend", `<div>文章校正 (試作版)</div><div><div class="opd_text_review_loader"></div>校正中...</div>`);
+                            review_panel.insertAdjacentHTML("beforeend", `<div>${this.UITexts[this.opd_use_lang].textReview_panelTitle.message}</div><div><div class="opd_text_review_loader"></div>${this.UITexts[this.opd_use_lang].textReview_inProgress.message}</div>`);
                             await this.Review(editable_elem.innerText.trim(), review_panel, column_window);
                             review_state = false;
                         }
@@ -175,7 +177,7 @@ class OpdExtTextReview {
             //校正に失敗したら終了
             if(!review_request){
                 panel_elem.textContent = "";
-                panel_elem.insertAdjacentHTML("beforeend", `<div>文章校正 (試作版)</div><div>校正に失敗しました</div>`);
+                panel_elem.insertAdjacentHTML("beforeend", `<div>${this.UITexts[this.opd_use_lang].textReview_panelTitle.message}</div><div>${this.UITexts[this.opd_use_lang].textReview_failed.message}</div>`);
                 return;
             }
             //校正パネルを空にする
@@ -183,7 +185,7 @@ class OpdExtTextReview {
 
             //指摘箇所がなければ終了
             if(review_request.indications.length === 0){
-                panel_elem.insertAdjacentHTML("beforeend", `<div>文章校正 (試作版)</div><div>指摘箇所はありません</div>`);
+                panel_elem.insertAdjacentHTML("beforeend", `<div>${this.UITexts[this.opd_use_lang].textReview_panelTitle.message}</div><div>${this.UITexts[this.opd_use_lang].textReview_noIssues.message}</div>`);
                 return;
             }
             //校正結果がある場合
@@ -205,7 +207,7 @@ class OpdExtTextReview {
             });
             //校正パネルへ全文指摘を表示
             const review_view = this.IndicationTexts(text, review_request.indications, indication_id);
-            panel_elem.insertAdjacentHTML("beforeend", `<div>文章校正 (試作版)</div><div class="opd_text_review_result"><div class="opd_text_review_result_preview">${review_view}</div><div class="opd_text_review_indication_switcher">${result.join("")}</div><div class="opd_text_review_indication_apply_panel"><button id="opd_text_review_apply_selected">適用</button><button id="opd_text_review_apply_all">すべて適用</button></div></div>`);
+            panel_elem.insertAdjacentHTML("beforeend", `<div>${this.UITexts[this.opd_use_lang].textReview_panelTitle.message}</div><div class="opd_text_review_result"><div class="opd_text_review_result_preview">${review_view}</div><div class="opd_text_review_indication_switcher">${result.join("")}</div><div class="opd_text_review_indication_apply_panel"><button id="opd_text_review_apply_selected">${this.UITexts[this.opd_use_lang].textReview_applySelected.message}</button><button id="opd_text_review_apply_all">${this.UITexts[this.opd_use_lang].textReview_applyAll.message}</button></div></div>`);
 
             indication_id.forEach((id, i)=>{
                 panel_elem.querySelector(`#opd_text_review_iid_${id}`).addEventListener("change", (ev)=>{
@@ -348,6 +350,54 @@ class OpdExtTextReview {
             .replace(/'/g, '&#39;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
+        }
+        this.UITexts = {
+            ja:{
+                textReview_buttonTitle: {
+                    message: "文章校正ができます(校正ログを一切保存しません)"
+                },
+                textReview_panelTitle: {
+                    message: "文章校正 (試作版)"
+                },
+                textReview_inProgress: {
+                    message: "校正中..."
+                },
+                textReview_failed: {
+                    message: "校正に失敗しました"
+                },
+                textReview_noIssues: {
+                    message: "指摘箇所はありません"
+                },
+                textReview_applySelected: {
+                    message: "適用"
+                },
+                textReview_applyAll: {
+                    message: "すべて適用"
+                }
+            },
+            en:{
+                textReview_buttonTitle: {
+                    message: "Proofread Japanese text (optimized for Japanese. no logs are saved)."
+                },
+                textReview_panelTitle: {
+                    message: "Text Review (Beta)"
+                },
+                textReview_inProgress: {
+                    message: "Reviewing..."
+                },
+                textReview_failed: {
+                    message: "Review failed."
+                },
+                textReview_noIssues: {
+                    message: "No issues found."
+                },
+                textReview_applySelected: {
+                    message: "Apply"
+                },
+                textReview_applyAll: {
+                    message: "Apply All"
+                }
+            }
         }
     }
 }
