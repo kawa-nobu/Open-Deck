@@ -922,12 +922,17 @@ function run(settings){
                 let opd_column_auto_reload_time_reload = opd_column_div.querySelector(".opd_a_reload_time_setting");
                 let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
                 let column_content_reload = null;
-                //自動更新関連仕込み
+                //カラム拡張読み込み
                 if(mode != "session_set"){
                     const column_type = this.closest("div[opd_column_type]").getAttribute("opd_column_type");
                     if(column_type === "home" || column_type === "explore"){
+                        const target_column = this.closest("div[opd_column_type]").querySelector("iframe").contentWindow;
+                        //自動更新関連仕込み
                         column_content_reload = new OpdExtAutoReload();
-                        column_content_reload.Init(this.closest("div[opd_column_type]").querySelector("iframe").contentWindow);
+                        column_content_reload.Init(target_column);
+                        //メディアビューワー関連仕込み
+                        const column_media_viewer_blocker = new OpdMediaViewerBlocker();
+                        column_media_viewer_blocker.Init(target_column);
                     }
                 }
                 //設定パネルイベント
