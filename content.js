@@ -14,6 +14,7 @@ let is_shift_pressed = false;
 let profile_store;
 let last_load_profile = 0;
 let is_removed_default_style = false;
+let media_viewer_token = [];
 const ui_icon_define = {
     banner_hide:"icon/banner_hide.svg",
     top_bar_hide:"icon/top_hide.svg",
@@ -181,6 +182,18 @@ function run(settings){
     }
     profile_list_html = `<div class="profile_val_now" title="${i18n_message("ui_profile_current_title")}">${last_load_profile}</div><div class="dsp_profile_list"><div id="profile_btn_list">${profile_list_btn_html}</div>`;
     //console.log(profile_list_btn_html)
+    //画像表示パネル
+    const media_viewer = new OpdExtMediaViewer();
+    document.addEventListener('opd_send_media_info', (e) => {
+        const detail = JSON.parse(e.detail);
+        for (let index = 0; index < media_viewer_token.length; index++) {
+            const token = media_viewer_token[index];
+            if(detail.token === token){
+                media_viewer.Preview(detail.media_info, detail.selected_index);
+            }
+            break;
+        }
+    });
     //CSSタグ追加
     document.querySelector("head").insertAdjacentHTML("afterbegin", `<style second_column_css></style>
     <style opd_default_css>
@@ -933,6 +946,7 @@ function run(settings){
                         //メディアビューワー関連仕込み
                         const column_media_viewer_blocker = new OpdMediaViewerBlocker();
                         column_media_viewer_blocker.Init(target_column);
+                        media_viewer_token.push(column_media_viewer_blocker.opd_send_media_info_token);
                     }
                 }
                 //設定パネルイベント
