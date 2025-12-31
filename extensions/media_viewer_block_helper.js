@@ -20,14 +20,22 @@
         //Propsを取得する
         for (let index = 0; index < media_details.length; index++) {
             const media = media_details[index];
-            if(img?.src.match(media.media_url_https?.replaceAll(/.jpg|.png/g, ""))){
+            if(img?.src?.match(media.media_url_https?.replaceAll(/.jpg|.png/g, ""))){
                 window.parent.document.dispatchEvent(new CustomEvent('opd_send_media_info', {
                     bubbles: true,
                     composed: true,
-                    detail: JSON.stringify({ token:opd_send_media_info_token, media_info:media, selected_index:index })
+                    detail: JSON.stringify({ token:opd_send_media_info_token, media_info:media_details, selected_index:index })
                 }));
                 break;
             }
+            /*if(media.type === "video"){
+                window.parent.document.dispatchEvent(new CustomEvent('opd_send_media_info', {
+                    bubbles: true,
+                    composed: true,
+                    detail: JSON.stringify({ token:opd_send_media_info_token, media_info:media_details, selected_index:index })
+                }));
+                break;
+            }*/
         }
     }, true);
     //ReactProps取得関数

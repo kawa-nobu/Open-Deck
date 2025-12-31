@@ -186,12 +186,14 @@ function run(settings){
     const media_viewer = new OpdExtMediaViewer();
     document.addEventListener('opd_send_media_info', (e) => {
         const detail = JSON.parse(e.detail);
+        console.log(detail)
+        console.log(media_viewer_token)
         for (let index = 0; index < media_viewer_token.length; index++) {
             const token = media_viewer_token[index];
             if(detail.token === token){
                 media_viewer.Preview(detail.media_info, detail.selected_index);
+                break;
             }
-            break;
         }
     });
     //CSSタグ追加
@@ -628,6 +630,14 @@ function run(settings){
     }
     #opd_main_element[opd-dsp-theme="dark"] .dsp_column_settings_list {
         background: #474747
+    }
+    /* メディアビューワー */
+    ::backdrop {
+        background: #474747;
+        opacity: 0.75;
+    }
+    #opd_media_viewer:focus {
+        outline: none;
     }
     </style>`);
     //カラム要素作成-挿入
