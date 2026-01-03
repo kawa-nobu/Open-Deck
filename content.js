@@ -34,7 +34,10 @@ const ui_icon_define = {
     column_second_rack:"icon/second_view.svg",
     profile_save:"icon/profile_save.svg",
     profile_delete:"icon/profile_delete.svg",
-    text_review:"icon/text_review.svg"
+    text_review:"icon/text_review.svg",
+    forward:"icon/forward.svg",
+    next:"icon/next.svg",
+    download:"icon/download.svg"
 }
 //UNIX時間分秒変換
 function unix_time_mmss(input){
@@ -638,6 +641,68 @@ function run(settings){
     }
     #opd_media_viewer:focus {
         outline: none;
+    }
+    .opd_media_viewer_func_btn{
+        border: 0;
+        background: #00000000;
+        cursor: pointer;
+        outline: none;
+    }
+    .opd_media_viewer_func_btn_circle button{
+        border: 0;
+        background: #00000000;
+        cursor: pointer;
+        outline: none;
+        border-radius: 10px;
+    }
+    button[disabled].opd_media_viewer_func_btn{
+        visibility: hidden;
+    }
+    .opd_media_viewer_func_btn:hover{
+        background: #5555558a;
+    }
+    .opd_media_viewer_func_btn_circle button:hover{
+        background: #5555558a;
+    }
+    .media_viewer_icon_close{
+        display: block;
+        background-image: url(${chrome.runtime.getURL(ui_icon_define.column_close)});
+        background-size: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 20px;
+        height: 20px;
+        padding: 5px;
+    }
+    .media_viewer_icon_forward{
+        display: block;
+        background-image: url(${chrome.runtime.getURL(ui_icon_define.forward)});
+        background-size: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+    }
+    .media_viewer_icon_next{
+        display: block;
+        background-image: url(${chrome.runtime.getURL(ui_icon_define.next)});
+        background-size: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+    }
+    .media_viewer_icon_download{
+        display: block;
+        background-image: url(${chrome.runtime.getURL(ui_icon_define.download)});
+        background-size: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
     }
     </style>`);
     //カラム要素作成-挿入
