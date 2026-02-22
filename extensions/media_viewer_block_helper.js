@@ -7,19 +7,36 @@
     ※引用を開いた際の判定と引用のメディア情報を抽出する方法を調査する
     */
     document.addEventListener("click", (e) => {
+        //引用の場合に格納される
+        const quoted = e.target.closest('div[tabindex="0"][role="link"]');
+        // 通常のメディア付きツイート
         const img = e.target.closest('img, div[data-testid="videoComponent"]');
-        let video_wraper_props = null;
         if (!img) return;
 
+        //プレイヤーが動作している場合のPropsを取得する
+        let video_wrapper_props = null;
         if(img.getAttribute("data-testid") === "videoComponent"){
-            video_wraper_props = get_props(img.querySelector('div[tabindex="0"]'), "Props");
+            video_wrapper_props = get_props(img.querySelector('div[tabindex="0"]'), "Props");
         }
 
-        const root_props = get_props(img.closest('div[aria-labelledby][id]'), "Props");//:not([data-testid="card.wrapper"])
-        const current_video_source = video_wraper_props?.children?.props?.playerState;
+        //ルートのPropsを取得
+        let root_props = get_props(img.closest('div[aria-labelledby][id]'), "Props");//:not([data-testid="card.wrapper"])
+        if(quoted){
+            root_props = get_props(quoted, "Props")
+        }
 
+        //プレイヤーが存在している場合の現在再生ソースを取得
+        const current_video_source = video_wrapper_props?.children?.props?.playerState;
+
+        //メディアソースの一覧を取得
         let media_details = root_props?.children[0]?.props?.children[0]?.props?.mediaDetails;
+
+        //引用の場合のメディアソースの一覧を取得
         let media_details_quoted = root_props?.children[2]?.props?.tweet?.extended_entities?.media;
+        if(quoted){
+            media_details_quoted = root_props?.children[0]?.[0]?.props?.children[1]?.props?.children[4]?.props?.children?.props?.mediaDetails
+        }
+
         //TwitterCardなどの場合は、一旦対象外とする
         if(!media_details && !media_details_quoted) return;
 
