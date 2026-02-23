@@ -49,8 +49,8 @@ class OpdExtMediaViewer {
 
                 if (["animated_gif","video"].includes(nextInfo.type) && current.tagName === "VIDEO") {
                     current.src = nextInfo.video_info.variants.at(-1).url;
-                    current.load?.();
-                    current.play?.().catch(() => { });
+                    current.load();
+                    current.play();
                     return;
                 }
                 if (nextInfo.type === "photo" && current.tagName === "IMG") {
@@ -64,6 +64,11 @@ class OpdExtMediaViewer {
                 if (!next_elment) return;
 
                 current.replaceWith(next_elment);
+                if (next_elment.tagName === "VIDEO") {
+                    next_elment.addEventListener("loadedmetadata", () => {
+                        next_elment.volume = 0.2;
+                    }, {once: true});
+                }
             };
 
 
@@ -90,9 +95,27 @@ class OpdExtMediaViewer {
             </div>
             `;
             media_viewer_div.appendChild(media_viewer_dialog);
-            document.body.appendChild(media_viewer_div);
-            media_viewer_dialog.addEventListener("close", () => media_viewer_div.remove());
-            media_viewer_dialog.querySelector("[data-close]")?.addEventListener("click", () => media_viewer_div.remove());
+            const append_viewer_element = document.body.appendChild(media_viewer_div);
+
+            //Videoの音量設定
+            let video_element = append_viewer_element.getElementsByTagName('video')[0];
+            if(video_element){
+                //音量の大きい動画が急に再生されるとびっくりするので、音量を下げておく
+                video_element.volume = 0.2;
+            }
+
+            function media_viewer_close(){
+                video_element = append_viewer_element.getElementsByTagName('video')[0];
+                if(video_element){
+                    //稀にビューワーを閉じた後でもVideoが再生されてしまう場合があるので念のため、Videoを止めて消す
+                    video_element.pause();
+                    video_element.remove();
+                }
+                media_viewer_div.remove();
+            }
+
+            media_viewer_dialog.addEventListener("close", () => media_viewer_close());
+            media_viewer_dialog.querySelector("[data-close]")?.addEventListener("click", () => media_viewer_close());
 
 
             this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
