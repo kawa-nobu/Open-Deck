@@ -13,7 +13,7 @@ class OpdMediaViewerBlocker {
                 column_window.document.dispatchEvent(new CustomEvent('opd_send_media_info_init', {
                     detail: JSON.stringify({ token:this.opd_send_media_info_token })
                 }));
-            }, 200);
+            }, 500);
         }
     }
 }
