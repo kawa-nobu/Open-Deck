@@ -189,8 +189,6 @@ function run(settings){
     const media_viewer = new OpdExtMediaViewer();
     document.addEventListener('opd_send_media_info', (e) => {
         const detail = JSON.parse(e.detail);
-        console.log(detail)
-        console.log(media_viewer_token)
         for (let index = 0; index < media_viewer_token.length; index++) {
             const token = media_viewer_token[index];
             if(detail.token === token){
