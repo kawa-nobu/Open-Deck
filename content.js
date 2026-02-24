@@ -567,9 +567,18 @@ function run(settings){
     /*#main_rack_element section:first-child{
         margin-left:110px
     }*/
+    :root {color-scheme: light;}
+    #opd_main_element[opd-dsp-theme="dark"] {
+        color-scheme: dark;
+    }
+    #opd_main_element[opd-dsp-theme="light"] {
+        color-scheme: light;
+    }
     @media (prefers-color-scheme: dark) {
+        :root {color-scheme: dark;}
         #main_rack_element{
             background-color: black !important;
+            scrollbar-color: auto;
         }
         .dsp_column_draggable_false, #first_rack_element, #second_rack_element, #second_rack_element, #main_bar_empty_column{
             background-color: black !important;
@@ -610,6 +619,7 @@ function run(settings){
     }
     #opd_main_element[opd-dsp-theme="dark"] .dsp_column_draggable_false, #opd_main_element[opd-dsp-theme="dark"] #first_rack_element, #opd_main_element[opd-dsp-theme="dark"] #second_rack_element, #opd_main_element[opd-dsp-theme="dark"] #second_rack_element, #opd_main_element[opd-dsp-theme="dark"] #main_bar_empty_column{
         background-color: black !important;
+        color: white;
     }
     #opd_main_element[opd-dsp-theme="dark"] .dsp_column_draggable_true, #opd_main_element[opd-dsp-theme="dark"] .dsp_column_title{
         background-color: #2e2e2e !important;
@@ -1783,10 +1793,15 @@ function run(settings){
             });
         }
         //ダークモード検出&設定
-        const currentScheme = document.documentElement.style?.colorScheme;
-        if(currentScheme){
-            document.getElementById("opd_main_element").setAttribute("opd-dsp-theme", currentScheme);
+        const color_scheme = window.matchMedia('(prefers-color-scheme: dark)');
+        function apply_ui_color(){
+            const currentScheme = color_scheme.matches ? 'dark' : 'light';
+            if(currentScheme){
+                document.getElementById("opd_main_element").setAttribute("opd-dsp-theme", currentScheme);
+            }
         }
+        apply_ui_color();
+        color_scheme.addEventListener('change', apply_ui_color);
 
     }).observe(document.querySelector("head"),{
         childList: true,
