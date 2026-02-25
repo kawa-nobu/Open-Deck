@@ -1,0 +1,239 @@
+{
+  "app_console_welcome": {
+    "message": "Open-Deckへようこそ！"
+  },
+  "ui_profile_switch_title": {
+    "message": "プロファイルを切り替える"
+  },
+  "ui_profile_current_title": {
+    "message": "使用中のプロファイル"
+  },
+  "ui_column_settings_title": {
+    "message": "カラム設定"
+  },
+  "ui_column_banner_toggle_title": {
+    "message": "バナー表示切り替え"
+  },
+  "ui_column_top_toggle_title": {
+    "message": "トップ表示切り替え"
+  },
+  "ui_column_close_title": {
+    "message": "カラムを閉じる"
+  },
+  "ui_column_pin_toggle_title": {
+    "message": "ピン止め切り替え"
+  },
+  "ui_sidebar_logo_title": {
+    "message": "Open-Deck\nv$1"
+  },
+  "ui_add_post_column_title": {
+    "message": "ポストカラム追加"
+  },
+  "ui_add_timeline_column_title": {
+    "message": "タイムラインカラム追加"
+  },
+  "ui_add_notification_column_title": {
+    "message": "通知カラム追加"
+  },
+  "ui_add_explore_column_title": {
+    "message": "Explore(ユニバーサル)カラム追加"
+  },
+  "ui_toggle_second_rack_title": {
+    "message": "カラム段切り替え"
+  },
+  "ui_profile_save_title": {
+    "message": "プロファイル保存"
+  },
+  "ui_profile_delete_title": {
+    "message": "プロファイル削除"
+  },
+  "ui_empty_column_message": {
+    "message": "左のバーからカラムを追加"
+  },
+  "ui_second_empty_column_message": {
+    "message": "1段目のカラムが配置できます"
+  },
+  "ui_column_post_title": {
+    "message": "Post"
+  },
+  "ui_column_timeline_title": {
+    "message": "Timeline"
+  },
+  "ui_column_notifications_title": {
+    "message": "Notifications"
+  },
+  "ui_column_explore_title": {
+    "message": "Explore"
+  },
+  "ui_settings_header": {
+    "message": "設定"
+  },
+  "ui_settings_view_mode_label": {
+    "message": "表示モード"
+  },
+  "ui_settings_view_mode_all": {
+    "message": "すべて"
+  },
+  "ui_settings_view_mode_text_only": {
+    "message": "テキストのみ"
+  },
+  "ui_settings_view_mode_media_only": {
+    "message": "画像・動画付のみ"
+  },
+  "ui_settings_column_width_label": {
+    "message": "カラム幅"
+  },
+  "ui_settings_column_width_small": {
+    "message": "小"
+  },
+  "ui_settings_column_width_medium": {
+    "message": "中"
+  },
+  "ui_settings_column_width_large": {
+    "message": "大"
+  },
+  "ui_settings_column_width_custom": {
+    "message": "カスタム"
+  },
+  "ui_settings_column_width_custom_label": {
+    "message": "カラム幅カスタム"
+  },
+  "ui_settings_column_width_custom_button": {
+    "message": "カスタム設定"
+  },
+  "ui_settings_auto_reload_label": {
+    "message": "自動更新"
+  },
+  "ui_settings_auto_reload_interval_label": {
+    "message": "自動更新間隔"
+  },
+  "ui_settings_seconds_suffix": {
+    "message": "秒"
+  },
+  "ui_settings_close_button": {
+    "message": "設定を閉じる"
+  },
+  "ui_debug_menu_label": {
+    "message": "Debug"
+  },
+  "ui_button_init_settings": {
+    "message": "初期化"
+  },
+  "ui_button_profile_loader": {
+    "message": "プロファイルローダー"
+  },
+  "ui_button_dnr_reload": {
+    "message": "dNR_Reload"
+  },
+  "ui_button_ext_reload": {
+    "message": "拡張機能再読み込み"
+  },
+  "ui_button_api_label": {
+    "message": "API"
+  },
+  "msg_debug_menu_enabled": {
+    "message": "デバッグメニューが利用できます!"
+  },
+  "msg_profile_data_broken_confirm": {
+    "message": "プロファイルデータが壊れています。\n初期化するにはOKを押してください。\n初期化せずに続行する場合はキャンセルを押してください。"
+  },
+  "msg_profile_init_completed": {
+    "message": "初期化が完了しました"
+  },
+  "msg_settings_auto_repair": {
+    "message": "破損した設定データの自動修復を行いました\n再読み込みします"
+  },
+  "msg_api_limit_status_alert": {
+    "message": "現在のAPIリミット状況\n回数(使用回数/総使用可能数)-完全回復時間\n$1"
+  },
+  "msg_api_limit_status_title": {
+    "message": "API使用状況\n$1"
+  },
+  "msg_profile_load_confirm": {
+    "message": "プロファイル「$1」を読み込みますか?\nカラム構成\n$2"
+  },
+  "msg_second_rack_to_single_confirm": {
+    "message": "1段表示にします。\n2段目のカラムは全て閉じられます"
+  },
+  "msg_dnr_reload_confirm": {
+    "message": "declarativeNetRequestの再読み込みします"
+  },
+  "msg_extension_reload_confirm": {
+    "message": "拡張機能の再読み込みします"
+  },
+  "msg_profile_save_confirm": {
+    "message": "現在の構成でプロファイルを作成します"
+  },
+  "msg_column_width_prompt": {
+    "message": "カラム横幅のremを半角数字で入力\n目安 小:15 中:20 大:30 初期値:30\n11以下は入力できません"
+  },
+  "msg_invalid_value_alert": {
+    "message": "正しい値を入力してください"
+  },
+  "msg_auto_reload_set": {
+    "message": "自動更新の秒数を$1秒に設定しました"
+  },
+  "msg_auto_reload_minimum_alert": {
+    "message": "1秒以上の秒数を入力してください"
+  },
+  "msg_settings_reset_completed": {
+    "message": "設定を初期化しました。再読み込みしてください。"
+  },
+  "msg_profile_delete_number_prompt": {
+    "message": "削除するプロファイル番号を半角入力"
+  },
+  "msg_profile_delete_confirm": {
+    "message": "プロファイル$1を削除しますか?\n※削除後、残ったプロファイル番号は0から再度割り振られます。"
+  },
+  "msg_profile_delete_current_alert": {
+    "message": "表示中のプロファイルは削除できません"
+  },
+  "msg_explore_pin_confirm": {
+    "message": "この場所でピン止めしますか?"
+  },
+  "msg_explore_unpin_confirm": {
+    "message": "ピン止めを解除します"
+  },
+  "msg_pinned_column_close_confirm": {
+    "message": "ピン止めされているカラムです\nカラムを閉じますか？"
+  },
+  "msg_initial_setup_completed_prototype": {
+    "message": "初期設定構築が完了しました。\nようこそ！Open-Deck試作版へ！"
+  },
+  "msg_initial_setup_completed": {
+    "message": "初期設定構築が完了しました！\nようこそ！Open-Deckへ！"
+  },
+  "msg_profile_desc_post_column": {
+    "message": "$1-ポストカラム"
+  },
+  "msg_profile_desc_timeline_column": {
+    "message": "$1-タイムラインカラム"
+  },
+  "msg_profile_desc_notification_column": {
+    "message": "$1-通知カラム"
+  },
+  "msg_profile_desc_explore_column": {
+    "message": "$1-[$2]-ユニバーサル(Explore)カラム"
+  },
+  "msg_profile_desc_misskey_column": {
+    "message": "Misskeyカラム"
+  },
+  "msg_profile_desc_bluesky_column": {
+    "message": "Blueskyカラム"
+  },
+  "msg_profile_desc_first_row_end": {
+    "message": "<!-1段目終了-!>"
+  },
+  "msg_profile_desc_second_row_end": {
+    "message": "<!-2段目終了-!>"
+  },
+  "label_api_timeline": {
+    "message": "タイムライン:"
+  },
+  "label_api_recommend_timeline": {
+    "message": "タイムライン(おすすめ):"
+  },
+  "label_api_search": {
+    "message": "検索:"
+  }
+}

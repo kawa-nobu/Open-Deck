@@ -1,0 +1,239 @@
+{
+  "app_console_welcome": {
+    "message": "Welcome to Open-Deck!"
+  },
+  "ui_profile_switch_title": {
+    "message": "Switch profile"
+  },
+  "ui_profile_current_title": {
+    "message": "Current profile"
+  },
+  "ui_column_settings_title": {
+    "message": "Column settings"
+  },
+  "ui_column_banner_toggle_title": {
+    "message": "Toggle banner visibility"
+  },
+  "ui_column_top_toggle_title": {
+    "message": "Toggle top area visibility"
+  },
+  "ui_column_close_title": {
+    "message": "Close column"
+  },
+  "ui_column_pin_toggle_title": {
+    "message": "Toggle pin"
+  },
+  "ui_sidebar_logo_title": {
+    "message": "Open-Deck\nv$1"
+  },
+  "ui_add_post_column_title": {
+    "message": "Add post column"
+  },
+  "ui_add_timeline_column_title": {
+    "message": "Add timeline column"
+  },
+  "ui_add_notification_column_title": {
+    "message": "Add notifications column"
+  },
+  "ui_add_explore_column_title": {
+    "message": "Add Explore (universal) column"
+  },
+  "ui_toggle_second_rack_title": {
+    "message": "Toggle multi-row layout"
+  },
+  "ui_profile_save_title": {
+    "message": "Save profile"
+  },
+  "ui_profile_delete_title": {
+    "message": "Delete profile"
+  },
+  "ui_empty_column_message": {
+    "message": "Add a column from the left bar"
+  },
+  "ui_second_empty_column_message": {
+    "message": "You can place first-row columns here"
+  },
+  "ui_column_post_title": {
+    "message": "Post"
+  },
+  "ui_column_timeline_title": {
+    "message": "Timeline"
+  },
+  "ui_column_notifications_title": {
+    "message": "Notifications"
+  },
+  "ui_column_explore_title": {
+    "message": "Explore"
+  },
+  "ui_settings_header": {
+    "message": "Settings"
+  },
+  "ui_settings_view_mode_label": {
+    "message": "View mode"
+  },
+  "ui_settings_view_mode_all": {
+    "message": "All"
+  },
+  "ui_settings_view_mode_text_only": {
+    "message": "Text only"
+  },
+  "ui_settings_view_mode_media_only": {
+    "message": "With media only"
+  },
+  "ui_settings_column_width_label": {
+    "message": "Column width"
+  },
+  "ui_settings_column_width_small": {
+    "message": "Small"
+  },
+  "ui_settings_column_width_medium": {
+    "message": "Medium"
+  },
+  "ui_settings_column_width_large": {
+    "message": "Large"
+  },
+  "ui_settings_column_width_custom": {
+    "message": "Custom"
+  },
+  "ui_settings_column_width_custom_label": {
+    "message": "Custom column width"
+  },
+  "ui_settings_column_width_custom_button": {
+    "message": "Custom"
+  },
+  "ui_settings_auto_reload_label": {
+    "message": "Auto-load"
+  },
+  "ui_settings_auto_reload_interval_label": {
+    "message": "Auto-load interval"
+  },
+  "ui_settings_seconds_suffix": {
+    "message": "sec"
+  },
+  "ui_settings_close_button": {
+    "message": "Close settings"
+  },
+  "ui_debug_menu_label": {
+    "message": "Debug"
+  },
+  "ui_button_init_settings": {
+    "message": "Reset"
+  },
+  "ui_button_profile_loader": {
+    "message": "Profile loader"
+  },
+  "ui_button_dnr_reload": {
+    "message": "Reload dNR"
+  },
+  "ui_button_ext_reload": {
+    "message": "Reload extension"
+  },
+  "ui_button_api_label": {
+    "message": "API"
+  },
+  "msg_debug_menu_enabled": {
+    "message": "Debug menu is now available!"
+  },
+  "msg_profile_data_broken_confirm": {
+    "message": "Profile data is corrupted.\nPress OK to initialize.\nPress Cancel to continue without initializing."
+  },
+  "msg_profile_init_completed": {
+    "message": "Initialization completed."
+  },
+  "msg_settings_auto_repair": {
+    "message": "Corrupted settings data has been repaired.\nThe page will be reloaded."
+  },
+  "msg_api_limit_status_alert": {
+    "message": "Current API limits\nUsage (used/total) - reset time\n$1"
+  },
+  "msg_api_limit_status_title": {
+    "message": "API usage\n$1"
+  },
+  "msg_profile_load_confirm": {
+    "message": "Load profile \"$1\"?\nColumn layout\n$2"
+  },
+  "msg_second_rack_to_single_confirm": {
+    "message": "Switch to a single-row layout.\nAll second-row columns will be closed."
+  },
+  "msg_dnr_reload_confirm": {
+    "message": "Reload declarativeNetRequest rules?"
+  },
+  "msg_extension_reload_confirm": {
+    "message": "Reload the extension?"
+  },
+  "msg_profile_save_confirm": {
+    "message": "Create a profile from the current layout?"
+  },
+  "msg_column_width_prompt": {
+    "message": "Enter the column width in rem (numbers only).\nGuide: Small:15 / Medium:20 / Large:30 / Default:30\nValues of 11 or less are not allowed."
+  },
+  "msg_invalid_value_alert": {
+    "message": "Please enter a valid value."
+  },
+  "msg_auto_reload_set": {
+    "message": "Auto-load interval set to $1 seconds."
+  },
+  "msg_auto_reload_minimum_alert": {
+    "message": "Please enter a value of at least 1 second."
+  },
+  "msg_settings_reset_completed": {
+    "message": "Settings have been reset. Please reload the page."
+  },
+  "msg_profile_delete_number_prompt": {
+    "message": "Enter the profile number to delete."
+  },
+  "msg_profile_delete_confirm": {
+    "message": "Delete profile $1?\nAfter deletion, remaining profiles will be renumbered starting from 0."
+  },
+  "msg_profile_delete_current_alert": {
+    "message": "The currently active profile cannot be deleted."
+  },
+  "msg_explore_pin_confirm": {
+    "message": "Pin this location?"
+  },
+  "msg_explore_unpin_confirm": {
+    "message": "Unpin this location?"
+  },
+  "msg_pinned_column_close_confirm": {
+    "message": "This column is pinned.\nClose the column?"
+  },
+  "msg_initial_setup_completed_prototype": {
+    "message": "Initial setup has completed.\nWelcome to the Open-Deck prototype!"
+  },
+  "msg_initial_setup_completed": {
+    "message": "Initial setup has completed!\nWelcome to Open-Deck!"
+  },
+  "msg_profile_desc_post_column": {
+    "message": "$1-Post column"
+  },
+  "msg_profile_desc_timeline_column": {
+    "message": "$1-Timeline column"
+  },
+  "msg_profile_desc_notification_column": {
+    "message": "$1-Notifications column"
+  },
+  "msg_profile_desc_explore_column": {
+    "message": "$1-[$2]-Universal (Explore) column"
+  },
+  "msg_profile_desc_misskey_column": {
+    "message": "Misskey column"
+  },
+  "msg_profile_desc_bluesky_column": {
+    "message": "Bluesky column"
+  },
+  "msg_profile_desc_first_row_end": {
+    "message": "<!-End of first row-!>"
+  },
+  "msg_profile_desc_second_row_end": {
+    "message": "<!-End of second row-!>"
+  },
+  "label_api_timeline": {
+    "message": "Timeline:"
+  },
+  "label_api_recommend_timeline": {
+    "message": "Timeline (For you):"
+  },
+  "label_api_search": {
+    "message": "Search:"
+  }
+}
