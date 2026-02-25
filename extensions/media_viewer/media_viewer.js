@@ -12,7 +12,7 @@ class OpdExtMediaViewer {
                 if (["animated_gif","video"].includes(info.type)) {
                     return `
                     <video data-media
-                        style="display:block;max-width:95vw;max-height:80vh;object-fit:contain;"
+                        style="display:block;max-width:95vw;max-height:75vh;object-fit:contain;"
                         src="${info.video_info.variants.at(-1).url}"
                         controls
                         autoplay
@@ -23,7 +23,7 @@ class OpdExtMediaViewer {
                 if (info.type === "photo") {
                     return `
                         <img data-media
-                            style="display:block;max-width:95vw;max-height:80vh;object-fit:contain;"
+                            style="display:block;max-width:95vw;max-height:75vh;object-fit:contain;"
                             src="${info.media_url_https + "?name=orig"}"
                         />`;
                 }
@@ -80,18 +80,20 @@ class OpdExtMediaViewer {
             });
             media_viewer_dialog.closedBy = "any";
             media_viewer_dialog.innerHTML = `
-            <div class="opd_media_viewer_func_btn_circle" style="display:flex;width:100%;justify-content:flex-end;">
-                <button type="button" data-close><span class="media_viewer_icon_close opd_ui_icon_color"></span></button>
-            </div>
+            <div style="width:100%;height:100%;">
+                <div class="opd_media_viewer_func_btn_circle" style="display:flex;width:100%;justify-content:flex-end;">
+                    <button type="button" data-close><span class="media_viewer_icon_close opd_ui_icon_color"></span></button>
+                </div>
 
-            <div style="display: flex;flex-direction: row;">
-                <button type="button" class="opd_media_viewer_func_btn" style="width: 80px;border-radius: 10px 0 0 10px;" data-media-forward><span class="media_viewer_icon_forward opd_ui_icon_color"></span></button>
-                ${mediaHTMLAt(current_media_idx)}
-                <button type="button" class="opd_media_viewer_func_btn" style="width: 80px;border-radius: 0 10px 10px 0;" data-media-next><span class="media_viewer_icon_next opd_ui_icon_color"></span></button>
-            </div>
+                <div style="display: flex;flex-direction: row;">
+                    <button type="button" class="opd_media_viewer_func_btn" style="width: 80px;border-radius: 10px 0 0 10px;" data-media-forward><span class="media_viewer_icon_forward opd_ui_icon_color"></span></button>
+                    ${mediaHTMLAt(current_media_idx)}
+                    <button type="button" class="opd_media_viewer_func_btn" style="width: 80px;border-radius: 0 10px 10px 0;" data-media-next><span class="media_viewer_icon_next opd_ui_icon_color"></span></button>
+                </div>
 
-            <div class="opd_media_viewer_func_btn_circle" style="width:100%;display:flex;justify-content:center;">
-                <button type="button" data-media-download><span class="media_viewer_icon_download opd_ui_icon_color"></span></button>
+                <div class="opd_media_viewer_func_btn_circle" style="width:100%;display:flex;justify-content:center;">
+                    <button type="button" data-media-download><span class="media_viewer_icon_download opd_ui_icon_color"></span></button>
+                </div>
             </div>
             `;
             media_viewer_div.appendChild(media_viewer_dialog);
