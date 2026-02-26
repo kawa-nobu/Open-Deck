@@ -9,6 +9,8 @@ if(is_prototype){
 }
 //
 const url_path = new URL(location.href);
+let is_added_system_color_mode = false;
+let apply_ui_color = null;
 const i18n_message = chrome.i18n.getMessage;
 let is_shift_pressed = false;
 let profile_store;
@@ -565,85 +567,64 @@ function run(settings){
     /*#main_rack_element section:first-child{
         margin-left:110px
     }*/
-    :root {color-scheme: light;}
-    #opd_main_element[opd-dsp-theme="dark"] {
+    /*:root {color-scheme: light;}*/
+    /*#opd_main_element[opd-dsp-theme="dark"] {
         color-scheme: dark;
-    }
+    }*/
     #opd_main_element[opd-dsp-theme="light"] {
         color-scheme: light;
     }
-    @media (prefers-color-scheme: dark) {
-        :root {color-scheme: dark;}
-        #main_rack_element{
+    /*ダークモード検出時*/
+    #opd_main_element[opd-dsp-theme="dark"] {
+        color-scheme: dark;
+
+        & #main_rack_element {
             background-color: black !important;
             scrollbar-color: auto;
         }
-        .dsp_column_draggable_false, #first_rack_element, #second_rack_element, #second_rack_element, #main_bar_empty_column{
+
+        & .dsp_column_draggable_false,
+        & #first_rack_element,
+        & #second_rack_element,
+        & #main_bar_empty_column {
             background-color: black !important;
+            color: white;
         }
-        .dsp_column_draggable_true, .dsp_column_title{
+
+        & .dsp_column_draggable_true,
+        & .dsp_column_title {
             background-color: #2e2e2e !important;
         }
-        .dsp_btn_add_post_img, .dsp_btn_add_tl_img, .dsp_btn_add_ntfc_img, .dsp_btn_add_explr_img, .dsp_btn_second_rack_img, .dsp_btn_profile_add_img, .dsp_btn_profile_delete_img, .dsp_column_move_icon, .opd_ui_icon_color{
+
+        & .dsp_btn_add_post_img,
+        & .dsp_btn_add_tl_img,
+        & .dsp_btn_add_ntfc_img,
+        & .dsp_btn_add_explr_img,
+        & .dsp_btn_second_rack_img,
+        & .dsp_btn_profile_add_img,
+        & .dsp_btn_profile_delete_img,
+        & .dsp_column_move_icon,
+        & .opd_ui_icon_color {
             filter: brightness(0) saturate(100%) invert(48%) sepia(0%) saturate(93%) hue-rotate(266deg) brightness(93%) contrast(86%);
         }
-        #api_limit_status:hover {
+
+        & #api_limit_status:hover,
+        & .dsp_btn_parent:hover,
+        & .dsp_column_btn:hover,
+        & .profile_val_now:hover {
             background: #555555;
         }
-        .dsp_btn_parent:hover{
-            background: #555555;
-        }
-        .dsp_column_btn:hover {
-            background: #555555;
-        }
-        .profile_val_now:hover {
-            background: #555555;
-        }
-        .dsp_column_settings_panel {
+
+        & .dsp_column_settings_panel {
             background: #2e2e2e;
             border: 1px solid #5d5d5d;
         }
-        .dsp_column_settings_list {
-            background: #474747
+
+        & .dsp_column_settings_list {
+            background: #474747;
         }
-        
     }
-    /*ダークモード検出時*/
-    #opd_main_element[opd-dsp-theme="dark"]{
-        
-    }
-    #opd_main_element[opd-dsp-theme="dark"] #main_rack_element{
-        background-color: black !important;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_draggable_false, #opd_main_element[opd-dsp-theme="dark"] #first_rack_element, #opd_main_element[opd-dsp-theme="dark"] #second_rack_element, #opd_main_element[opd-dsp-theme="dark"] #second_rack_element, #opd_main_element[opd-dsp-theme="dark"] #main_bar_empty_column{
-        background-color: black !important;
-        color: white;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_draggable_true, #opd_main_element[opd-dsp-theme="dark"] .dsp_column_title{
-        background-color: #2e2e2e !important;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_post_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_tl_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_ntfc_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_add_explr_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_second_rack_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_profile_add_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_profile_delete_img, #opd_main_element[opd-dsp-theme="dark"] .dsp_column_move_icon, #opd_main_element[opd-dsp-theme="dark"] .opd_ui_icon_color{
-        filter: brightness(0) saturate(100%) invert(48%) sepia(0%) saturate(93%) hue-rotate(266deg) brightness(93%) contrast(86%);
-    }
-    #opd_main_element[opd-dsp-theme="dark"] #api_limit_status:hover {
-        background: #555555;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_btn_parent:hover{
-        background: #555555;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_btn:hover {
-        background: #555555;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .profile_val_now:hover {
-        background: #555555;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_settings_panel {
-        background: #2e2e2e;
-        border: 1px solid #5d5d5d;
-    }
-    #opd_main_element[opd-dsp-theme="dark"] .dsp_column_settings_list {
-        background: #474747
-    }
+
     /* メディアビューワー */
     ::backdrop {
         background: #474747;
@@ -1784,28 +1765,81 @@ function run(settings){
         //デフォルトのCSSがUIに影響を与えないように削除する
         if(!is_removed_default_style){
             document.head.querySelectorAll('style').forEach(style => {
-                if (style.textContent.includes('*, ::before, ::after')) {
+                if(style.textContent.includes('*, ::before, ::after')){
                     style.remove();
                     is_removed_default_style = true;
                 }
             });
         }
+
         //ダークモード検出&設定
         const color_scheme = window.matchMedia('(prefers-color-scheme: dark)');
-        function apply_ui_color(){
-            const currentScheme = color_scheme.matches ? 'dark' : 'light';
-            if(currentScheme){
-                document.getElementById("opd_main_element").setAttribute("opd-dsp-theme", currentScheme);
+        const main_element = document.getElementById("opd_main_element");
+        if(!main_element) return;
+
+        const color_mode = get_cookie_color_mode();
+
+        switch (color_mode){
+            case "system": {
+                apply_ui_color = () => {
+                    const currentScheme = color_scheme.matches ? "dark" : "light";
+                    main_element.setAttribute("opd-dsp-theme", currentScheme);
+                };
+        
+                // 初回反映
+                apply_ui_color();
+        
+                // system 指定時のみ、OS側のカラーモード変更に追従
+                if(!is_added_system_color_mode){
+                    color_scheme.addEventListener("change", apply_ui_color);
+                    is_added_system_color_mode = true;
+                    }
+                break;
             }
+            case "light":
+                // system の監視が残ってたら解除
+                if(is_added_system_color_mode && apply_ui_color){
+                    color_scheme.removeEventListener("change", apply_ui_color);
+                    is_added_system_color_mode = false;
+                }
+                main_element.setAttribute("opd-dsp-theme", "light");
+                break;
+
+            case "dark":
+                if(is_added_system_color_mode && apply_ui_color){
+                    color_scheme.removeEventListener("change", apply_ui_color);
+                    is_added_system_color_mode = false;
+                }
+                main_element.setAttribute("opd-dsp-theme", "dark");
+                break;
+                
+            default:
+                break;
         }
-        apply_ui_color();
-        color_scheme.addEventListener('change', apply_ui_color);
 
     }).observe(document.querySelector("head"),{
         childList: true,
         characterData: true,
         subtree: false
-    })
+    });
+}
+//Cookieからカラーモードを取得する
+function get_cookie_color_mode() {
+    const cookie = document.cookie.split(/;\s*/).find(c => c.startsWith('night_mode='));
+
+    //night_mode が存在しない場合は system を返す
+    if(!cookie) return "system";
+
+    const color_mode_number = Number(cookie.split('=')[1]);
+
+    // 数値として正常でない場合は system を返す
+    if(!Number.isInteger(color_mode_number)) return "system";
+
+    //カラーモードが 0 以下の場合は light を返す
+    if(color_mode_number <= 0) return "light";
+
+    //カラーモードが 1 以上の場合は dark を返す
+    return "dark";
 }
 //設定初期化
 function settings_init(){
