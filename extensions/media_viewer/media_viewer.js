@@ -12,7 +12,7 @@ class OpdExtMediaViewer {
                 if (["animated_gif","video"].includes(info.type)) {
                     return `
                     <video data-media
-                        style="display:block;max-width:95vw;max-height:75vh;object-fit:contain;"
+                        style="width:auto;height:auto;max-width:calc(100% - 160px);max-height:100%;object-fit:contain;"
                         src="${info.video_info.variants.at(-1).url}"
                         controls
                         autoplay
@@ -23,7 +23,7 @@ class OpdExtMediaViewer {
                 if (info.type === "photo") {
                     return `
                         <img data-media
-                            style="display:block;max-width:95vw;max-height:75vh;object-fit:contain;"
+                            style="width:auto;height:auto;max-width:calc(100% - 160px);max-height:100%;object-fit:contain;"
                             src="${info.media_url_https + "?name=orig"}"
                         />`;
                 }
@@ -74,25 +74,23 @@ class OpdExtMediaViewer {
 
             Object.assign(media_viewer_dialog, {
                 id: "opd_media_viewer",
-                style: "z-index:999999;border:none;background:none;padding:0;" +
-                "display:flex;flex-direction:column;align-items:center;gap:12px;" +
-                "max-width:95vw;max-height:95vh;"
+                style: "z-index:999999;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:80vw;height:80vh;overflow:hidden;"
             });
             media_viewer_dialog.closedBy = "any";
             media_viewer_dialog.innerHTML = `
-            <div style="width:100%;height:100%;">
+            <div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;align-items:center;">
                 <div class="opd_media_viewer_func_btn_circle" style="display:flex;width:100%;justify-content:flex-end;">
-                    <button type="button" data-close><span class="media_viewer_icon_close opd_ui_icon_color"></span></button>
+                    <button type="button" data-close><span class="media_viewer_icon_close opd_media_viewer_func_btn_icon_color"></span></button>
                 </div>
 
-                <div style="display: flex;flex-direction: row;">
-                    <button type="button" class="opd_media_viewer_func_btn" style="width: 80px;border-radius: 10px 0 0 10px;" data-media-forward><span class="media_viewer_icon_forward opd_ui_icon_color"></span></button>
+                <div style="display:flex;flex-direction:row;flex:1;min-height:0;overflow:hidden;align-items:center;width:fit-content;">
+                    <button type="button" class="opd_media_viewer_func_btn" style="width:80px;border-radius:10px 0 0 10px;" data-media-forward><span class="media_viewer_icon_forward opd_media_viewer_func_btn_icon_color"></span></button>
                     ${mediaHTMLAt(current_media_idx)}
-                    <button type="button" class="opd_media_viewer_func_btn" style="width: 80px;border-radius: 0 10px 10px 0;" data-media-next><span class="media_viewer_icon_next opd_ui_icon_color"></span></button>
+                    <button type="button" class="opd_media_viewer_func_btn" style="width:80px;border-radius:0 10px 10px 0;" data-media-next><span class="media_viewer_icon_next opd_media_viewer_func_btn_icon_color"></span></button>
                 </div>
 
                 <div class="opd_media_viewer_func_btn_circle" style="width:100%;display:flex;justify-content:center;">
-                    <button type="button" data-media-download><span class="media_viewer_icon_download opd_ui_icon_color"></span></button>
+                    <button type="button" data-media-download><span class="media_viewer_icon_download opd_media_viewer_func_btn_icon_color"></span></button>
                 </div>
             </div>
             `;

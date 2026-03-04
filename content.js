@@ -627,8 +627,7 @@ function run(settings){
 
     /* メディアビューワー */
     ::backdrop {
-        background: #474747;
-        opacity: 0.75;
+        background: rgba(0, 0, 0, 0.9);
     }
     #opd_media_viewer:focus {
         outline: none;
@@ -649,11 +648,14 @@ function run(settings){
     button[disabled].opd_media_viewer_func_btn{
         visibility: hidden;
     }
+    .opd_media_viewer_func_btn_icon_color{
+        filter: brightness(0) saturate(100%) invert(96%) sepia(6%) saturate(0%) hue-rotate(285deg) brightness(115%) contrast(100%);
+    }
     .opd_media_viewer_func_btn:hover{
-        background: #5555558a;
+        background: #2f2f2fa3;
     }
     .opd_media_viewer_func_btn_circle button:hover{
-        background: #5555558a;
+        background: #2f2f2fa3;
     }
     .media_viewer_icon_close{
         display: block;
