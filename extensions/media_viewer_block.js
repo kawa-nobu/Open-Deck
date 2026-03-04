@@ -6,14 +6,17 @@ class OpdMediaViewerBlocker {
             //ヘルパースクリプト追加
             const helper_script = column_window.document.createElement('script');
             helper_script.src = chrome.runtime.getURL("extensions/media_viewer_block_helper.js");
-            column_window.document.head.appendChild(helper_script);
 
             this.opd_send_media_info_token = crypto.randomUUID();
-            setTimeout(() => {
+            helper_script.addEventListener('load', () => {
                 column_window.document.dispatchEvent(new CustomEvent('opd_send_media_info_init', {
-                    detail: JSON.stringify({ token:this.opd_send_media_info_token })
+                    bubbles: true,
+                    composed: true,
+                    detail: JSON.stringify({ token: this.opd_send_media_info_token })
                 }));
-            }, 500);
+            });
+
+            column_window.document.head.appendChild(helper_script);
         }
     }
 }

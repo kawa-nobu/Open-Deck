@@ -93,7 +93,7 @@
         return propsKey ? elem[propsKey] : null;
     }
     //機能動作用のトークンを設定
-    window.addEventListener('opd_send_media_info_init', (e)=>{
+    document.addEventListener('opd_send_media_info_init', (e)=>{
         const detail = JSON.parse(e.detail);
         opd_send_media_info_token = detail.token;
     }, true);
