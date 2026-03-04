@@ -74,7 +74,7 @@ class OpdExtMediaViewer {
 
             Object.assign(media_viewer_dialog, {
                 id: "opd_media_viewer",
-                style: "z-index:999999;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:80vw;height:80vh;overflow:hidden;"
+                style: "z-index:999999;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:85vw;height:85vh;overflow:hidden;"
             });
             media_viewer_dialog.closedBy = "any";
             media_viewer_dialog.innerHTML = `
@@ -116,6 +116,15 @@ class OpdExtMediaViewer {
 
             media_viewer_dialog.addEventListener("close", () => media_viewer_close());
             media_viewer_dialog.querySelector("[data-close]")?.addEventListener("click", () => media_viewer_close());
+
+            //背景クリックで閉じやすくする
+            media_viewer_dialog.addEventListener("click", (event)=>{
+                const tag_name = event.target.tagName;
+                const allowed_tag = ["IMG", "VIDEO", "SPAN", "BUTTON"];
+                if(!allowed_tag.includes(tag_name)){
+                    media_viewer_close();
+                }
+            })
 
 
             this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
