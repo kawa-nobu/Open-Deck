@@ -157,6 +157,17 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
                             window.reload();
                         });
                     }
+
+                    //Updateされたときに設定のバージョンを上げる
+                    if(ext_update_flag){
+                        const setting = JSON.parse(value.opd_settings);
+                        setting.version = manifest.version;
+                        chrome.storage.local.set({'opd_settings': JSON.stringify(setting)}, function(){
+                            if(confirm(i18n_message("app_update"))){
+                                open(`https://github.com/kawa-nobu/Open-Deck/releases/tag/v${manifest.version}`, '_blank', 'popup');
+                            }
+                        });
+                    }
                     ext_settings = {column_settings:profile_store[last_load_profile].profile};
                 }else{
                     //ext_settings = JSON.parse(value.opd_settings);
