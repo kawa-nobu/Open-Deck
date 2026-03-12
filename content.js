@@ -649,6 +649,15 @@ function run(settings){
         cursor: pointer;
         outline: none;
     }
+    .opd_media_viewer_func_btn.media_switch_btn{
+        width: 80px;
+        height: 80px;
+        margin: 10px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .opd_media_viewer_func_btn_circle button{
         border: 0;
         background: #00000000;
@@ -674,8 +683,8 @@ function run(settings){
         background-size: 20px;
         background-repeat: no-repeat;
         background-position: center;
-        width: 20px;
-        height: 20px;
+        width: 40px;
+        height: 40px;
         padding: 5px;
     }
     .media_viewer_icon_forward{

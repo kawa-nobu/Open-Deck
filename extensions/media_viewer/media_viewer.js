@@ -84,12 +84,12 @@ class OpdExtMediaViewer {
                 </div>
 
                 <div style="display:flex;flex-direction:row;flex:1;min-height:0;overflow:hidden;align-items:center;width:fit-content;">
-                    <button type="button" class="opd_media_viewer_func_btn" style="width:80px;border-radius:10px 0 0 10px;" data-media-forward><span class="media_viewer_icon_forward opd_media_viewer_func_btn_icon_color"></span></button>
+                    <button type="button" class="opd_media_viewer_func_btn media_switch_btn" data-media-forward><span class="media_viewer_icon_forward opd_media_viewer_func_btn_icon_color"></span></button>
                     ${mediaHTMLAt(current_media_idx)}
-                    <button type="button" class="opd_media_viewer_func_btn" style="width:80px;border-radius:0 10px 10px 0;" data-media-next><span class="media_viewer_icon_next opd_media_viewer_func_btn_icon_color"></span></button>
+                    <button type="button" class="opd_media_viewer_func_btn media_switch_btn" data-media-next><span class="media_viewer_icon_next opd_media_viewer_func_btn_icon_color"></span></button>
                 </div>
 
-                <div class="opd_media_viewer_func_btn_circle" style="width:100%;display:flex;justify-content:center;">
+                <div class="opd_media_viewer_func_btn_circle" style="width:100%;margin-top:10px;display:flex;justify-content:center;">
                     <button type="button" data-media-download><span class="media_viewer_icon_download opd_media_viewer_func_btn_icon_color"></span></button>
                 </div>
             </div>
