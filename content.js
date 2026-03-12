@@ -157,6 +157,17 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
                             window.reload();
                         });
                     }
+
+                    //Updateされたときに設定のバージョンを上げる
+                    if(ext_update_flag){
+                        const setting = JSON.parse(value.opd_settings);
+                        setting.version = manifest.version;
+                        chrome.storage.local.set({'opd_settings': JSON.stringify(setting)}, function(){
+                            if(confirm(i18n_message("app_update"))){
+                                open(`https://github.com/kawa-nobu/Open-Deck/releases/tag/v${manifest.version}`, '_blank', 'popup');
+                            }
+                        });
+                    }
                     ext_settings = {column_settings:profile_store[last_load_profile].profile};
                 }else{
                     //ext_settings = JSON.parse(value.opd_settings);
@@ -627,8 +638,7 @@ function run(settings){
 
     /* メディアビューワー */
     ::backdrop {
-        background: #474747;
-        opacity: 0.75;
+        background: rgba(0, 0, 0, 0.9);
     }
     #opd_media_viewer:focus {
         outline: none;
@@ -638,6 +648,15 @@ function run(settings){
         background: #00000000;
         cursor: pointer;
         outline: none;
+    }
+    .opd_media_viewer_func_btn.media_switch_btn{
+        width: 80px;
+        height: 80px;
+        margin: 10px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .opd_media_viewer_func_btn_circle button{
         border: 0;
@@ -649,11 +668,14 @@ function run(settings){
     button[disabled].opd_media_viewer_func_btn{
         visibility: hidden;
     }
+    .opd_media_viewer_func_btn_icon_color{
+        filter: brightness(0) saturate(100%) invert(96%) sepia(6%) saturate(0%) hue-rotate(285deg) brightness(115%) contrast(100%);
+    }
     .opd_media_viewer_func_btn:hover{
-        background: #5555558a;
+        background: #2f2f2fa3;
     }
     .opd_media_viewer_func_btn_circle button:hover{
-        background: #5555558a;
+        background: #2f2f2fa3;
     }
     .media_viewer_icon_close{
         display: block;
@@ -661,8 +683,8 @@ function run(settings){
         background-size: 20px;
         background-repeat: no-repeat;
         background-position: center;
-        width: 20px;
-        height: 20px;
+        width: 40px;
+        height: 40px;
         padding: 5px;
     }
     .media_viewer_icon_forward{

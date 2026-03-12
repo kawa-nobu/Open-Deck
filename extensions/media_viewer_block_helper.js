@@ -1,12 +1,16 @@
 //メディアビューワー停止用
 (() => {
     let opd_send_media_info_token = null;
+    let is_alt_pressed = false;
     //カラム側の画像表示を停止させて、表示画像などの情報をOPD側に渡す
     /*
     TODO:ツイートページのツイートに画像や動画付きの引用が付いていて、引用のメディアをクリックした際に元のメディアが表示される問題を修正する。
     ※引用を開いた際の判定と引用のメディア情報を抽出する方法を調査する
     */
     document.addEventListener("click", (e) => {
+        //Alt(Option)キーが押されている場合はメディアビューワーを使用しないようにする
+        if(is_alt_pressed) return;
+
         //引用の場合に格納される
         const quoted = e.target.closest('div[tabindex="0"][role="link"]');
         // 通常のメディア付きツイート
@@ -93,8 +97,26 @@
         return propsKey ? elem[propsKey] : null;
     }
     //機能動作用のトークンを設定
-    window.addEventListener('opd_send_media_info_init', (e)=>{
+    document.addEventListener('opd_send_media_info_init', (e)=>{
         const detail = JSON.parse(e.detail);
         opd_send_media_info_token = detail.token;
     }, true);
+    /*ショートカットキーとしてAlt(Option)キーの動作を設定*/
+    document.addEventListener('opd_media_viewer_shotcut', (e)=>{
+        //カラムが非アクティブの場合
+        const detail = JSON.parse(e.detail);
+
+        if(detail.token !== opd_send_media_info_token) return;
+
+        is_alt_pressed = detail.keys.alt;
+    }, true);
+    //カラムがアクティブの場合
+    document.addEventListener('keydown', (event) => {
+        console.log("shift_down")
+        if (event.key === 'Alt') is_alt_pressed = true;
+    });
+    document.addEventListener('keyup', (event) => {
+        console.log("shift_up")
+        if (event.key === 'Alt') is_alt_pressed = false;
+    });
 })();

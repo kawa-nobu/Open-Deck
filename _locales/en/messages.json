@@ -2,6 +2,9 @@
   "app_console_welcome": {
     "message": "Welcome to Open-Deck!"
   },
+  "app_update": {
+    "message": "Open-Deck has been updated. View release notes?"
+  },
   "ui_profile_switch_title": {
     "message": "Switch profile"
   },

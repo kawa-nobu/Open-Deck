@@ -2,6 +2,9 @@
   "app_console_welcome": {
     "message": "Open-Deckへようこそ！"
   },
+  "app_update": {
+    "message": "Open-Deckが更新されました！更新内容を確認しますか？"
+  },
   "ui_profile_switch_title": {
     "message": "プロファイルを切り替える"
   },
