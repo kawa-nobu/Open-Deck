@@ -931,6 +931,10 @@ function run(settings){
         }else{
             column_object = document.querySelectorAll('.dsp_column:not([opd_column_type="dsp_column"], [opd_column_type="empty_column"], [opd_column_type="main_bar_empty_column"]) iframe');
         }
+
+        //カラム読み込み失敗検出
+        watch_load_column(column_object);
+
         for (let index = 0; index < column_object.length; index++) {
             column_object[index].removeAttribute("opd_init_webview");
             //バナー/表示モード変更
@@ -1862,6 +1866,35 @@ function get_cookie_color_mode() {
 
     //カラーモードが 1 以上の場合は dark を返す
     return "dark";
+}
+//カラム読み込み失敗検出
+function watch_load_column(column_frames, max_retries = 5){
+    const cleanups = [];
+    column_frames.forEach(column => {
+        let count = 0;
+
+        const reLoad = () => {
+            if (++count >= max_retries) return;
+            setTimeout(() => { column.src = column.src }, 500);
+        };
+
+        const onLoad = () => {
+            try {
+                column.contentWindow.document.querySelector('head');
+            } catch {
+                reLoad();
+            }
+        };
+
+        column.addEventListener('load', onLoad);
+        column.addEventListener('error', reLoad);
+        cleanups.push(() => {
+            column.removeEventListener('load', onLoad);
+            column.removeEventListener('error', reLoad);
+        });
+    });
+
+    setTimeout(() => cleanups.forEach(fn => fn()), max_retries * 500 + 1000);
 }
 //設定初期化
 function settings_init(){
