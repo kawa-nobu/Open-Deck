@@ -17,11 +17,12 @@
   "background" : {"service_worker" : "background.js"},
   "content_scripts": [{
     "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
-    "js": ["content.js", "extensions/utils_helper.js", "extensions/text_review.js", "extensions/auto_reload.js", "extensions/media_viewer_block.js", "extensions/media_viewer/media_viewer.js"]
+    "js": ["content.js", "extensions/utils.js", "extensions/text_review.js", "extensions/auto_reload.js", "extensions/media_viewer_block.js", "extensions/media_viewer/media_viewer.js"]
   }],
   "web_accessible_resources" : [{
     "matches" : ["https://*.twitter.com/*", "https://*.x.com/*"],
     "resources" : [
+    "extensions/utils_helper.js",
     "extensions/text_review_helper.js",
     "extensions/auto_reload_helper.js",
     "extensions/media_viewer_block_helper.js",
