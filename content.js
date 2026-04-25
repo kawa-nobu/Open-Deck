@@ -1004,14 +1004,6 @@ function run(settings){
                             break;
                     }
                     //console.log(opd_column_div.querySelector(".opd_banner").checked)
-                    //ポストカラムの動作
-                    if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") === "post"){
-                        const post_column_window = opd_column_div.querySelector("iframe").contentWindow;
-                        //文章校正機能
-                        const ext_text_review = new OpdExtTextReview();
-                        const ui_lang = chrome.i18n.getUILanguage();
-                        ext_text_review.Init(post_column_window, ui_icon_define, ui_lang);
-                    }
                 }
             })
             //各カラム読み込み後の動作(init)
@@ -1027,21 +1019,12 @@ function run(settings){
                 let opd_column_auto_reload_time_reload = opd_column_div.querySelector(".opd_a_reload_time_setting");
                 let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
                 let opd_column_scroll_to_top = opd_column_div.querySelector(".opd_column_scroll_to_top");
-                let column_content_reload = null;
+
                 //カラム拡張読み込み
                 if(mode != "session_set"){
-                    const column_type = this.closest("div[opd_column_type]").getAttribute("opd_column_type");
-                    if(column_type === "home" || column_type === "explore"){
-                        const target_column = this.closest("div[opd_column_type]").querySelector("iframe").contentWindow;
-                        //自動更新関連仕込み
-                        column_content_reload = new OpdExtAutoReload();
-                        column_content_reload.Init(target_column);
-                        //メディアビューワー関連仕込み
-                        const column_media_viewer_blocker = new OpdMediaViewerBlocker();
-                        column_media_viewer_blocker.Init(target_column);
-                        media_viewer_token.push(column_media_viewer_blocker.opd_send_media_info_token);
-                    }
+                    reinit_column_extensions(this.closest("div[opd_column_type]"));
                 }
+
                 //設定パネルイベント
                 if(mode != "session_set"){
                     opd_column_div.querySelector(".opd_settings_btn").addEventListener("click", function(){
@@ -1238,8 +1221,8 @@ function run(settings){
                                 const path_name = auto_reload_target_elem.contentWindow.location.pathname;
                                 if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        if (column_content_reload){
-                                            column_content_reload.Reload(auto_reload_target_elem.contentWindow);
+                                        if (auto_reload_target_elem.opd_auto_reload){
+                                            auto_reload_target_elem.opd_auto_reload.Reload(auto_reload_target_elem.contentWindow);
                                             setTimeout(() => {
                                                 auto_reload_target_elem.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
                                             }, 100);
@@ -1337,8 +1320,8 @@ function run(settings){
                                         const path_name = auto_reload_target_object.contentWindow.location.pathname;
                                         if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                if (column_content_reload){
-                                                    column_content_reload.Reload(auto_reload_target_object.contentWindow);
+                                                if (auto_reload_target_object.opd_auto_reload){
+                                                    auto_reload_target_object.opd_auto_reload.Reload(auto_reload_target_object.contentWindow);
                                                     setTimeout(() => {
                                                         auto_reload_target_object.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
                                                     }, 500);
@@ -1612,6 +1595,49 @@ function run(settings){
             alert(i18n_message("msg_profile_delete_current_alert"));
         }
     });
+    //カラム拡張機能の初期化
+    function reinit_column_extensions(column_div){
+        const column_frame = column_div?.querySelector("iframe");
+        if(!column_frame) return;
+        const column_type = column_div.getAttribute("opd_column_type");
+
+        let initialized = false;
+        const doInit = () => {
+            if(initialized) return;
+            const target_window = column_frame.contentWindow;
+
+            if(target_window && (!target_window.document || !target_window.document.head)) return;
+            initialized = true;
+
+            //ユーティリティ仕込み
+            const opd_utils = new OpdUtils();
+            opd_utils.Init(target_window);
+
+            //文章校正機能を組み込む
+            if(column_type === "post"){
+                const ext_text_review = new OpdExtTextReview();
+                const ui_lang = chrome.i18n.getUILanguage();
+                ext_text_review.Init(target_window, ui_icon_define, ui_lang);
+            }
+
+            //自動更新とメディアビューワーを仕込む
+            if(column_type === "home" || column_type === "explore"){
+                const auto_reload = new OpdExtAutoReload();
+                auto_reload.Init(target_window);
+                //カラムフレームに紐付けて、自動更新部分で参照できるようにする
+                column_frame.opd_auto_reload = auto_reload;
+
+                const blocker = new OpdMediaViewerBlocker();
+                blocker.Init(target_window);
+                media_viewer_token.push(blocker.opd_send_media_info_token);
+            }
+        };
+
+        column_frame.addEventListener("load", doInit, { once: true });
+
+        //loadが発火しない場合にフォールバックする
+        setTimeout(doInit, 500);
+    }
     //カラム移動
     function column_dd(){
         let column_class = document.querySelectorAll(".dsp_column");
@@ -1655,6 +1681,9 @@ function run(settings){
                     this.style.borderLeft = '';
                     //append_object_css();
                     //column_dd();
+
+                    reinit_column_extensions(dr_elem.querySelector("div[opd_column_type]"));
+
                     column_settings_save("", last_load_profile);
                 }else{
                     this.style.borderLeft = '';
