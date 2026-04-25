@@ -1609,11 +1609,11 @@ function run(settings){
             if(target_window && (!target_window.document || !target_window.document.head)) return;
             initialized = true;
 
-            //ユーティリティ仕込み
+            //ユーティリティを仕込む
             const opd_utils = new OpdUtils();
             opd_utils.Init(target_window);
 
-            //文章校正機能を組み込む
+            //文章校正機能を仕込む
             if(column_type === "post"){
                 const ext_text_review = new OpdExtTextReview();
                 const ui_lang = chrome.i18n.getUILanguage();
