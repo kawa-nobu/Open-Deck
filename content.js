@@ -1595,7 +1595,7 @@ function run(settings){
             alert(i18n_message("msg_profile_delete_current_alert"));
         }
     });
-    //カラム拡張機能の初期化
+    //カラム拡張機能の初期化(カラム拡張機能追加はここで行います)
     function reinit_column_extensions(column_div){
         const column_frame = column_div?.querySelector("iframe");
         if(!column_frame) return;
