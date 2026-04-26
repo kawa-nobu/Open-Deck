@@ -17,7 +17,10 @@ let profile_store;
 let last_load_profile = 0;
 let is_removed_default_style = false;
 let media_viewer_token = [];
-const column_auto_update_state = {date:0, is_stop:false};
+const column_auto_update_state = {
+    text_focus: {date: 0, active: false},
+    media_viewer: {active: false},
+};
 const ui_icon_define = {
     banner_hide:"icon/banner_hide.svg",
     top_bar_hide:"icon/top_hide.svg",
@@ -202,13 +205,11 @@ function run(settings){
     //カラム全体のテキストフォーカスの状態で自動更新を制御できるようにする
     window.addEventListener('opd_post_focus', (e) => {
         if(e.detail){
-            console.log("focus", e.detail)
-            column_auto_update_state.date = Date.now();
-            column_auto_update_state.is_stop = true;
-
+            column_auto_update_state.text_focus.date = Date.now();
+            column_auto_update_state.text_focus.active = true;
         }else{
-            column_auto_update_state.date = 0;
-            column_auto_update_state.is_stop = false;
+            column_auto_update_state.text_focus.date = 0;
+            column_auto_update_state.text_focus.active = false;
         }
     });
     //画像表示パネル
@@ -218,7 +219,13 @@ function run(settings){
         for (let index = 0; index < media_viewer_token.length; index++) {
             const token = media_viewer_token[index];
             if(detail.token === token){
-                media_viewer.Preview(detail.media_info, detail.selected_index);
+                //ビューワーを閉じた際のコールバック関数
+                function viewer_close(){
+                    column_auto_update_state.media_viewer.active = false;
+                }
+                
+                column_auto_update_state.media_viewer.active = true;
+                media_viewer.Preview(detail.media_info, detail.selected_index, viewer_close);
                 break;
             }
         }
@@ -1235,7 +1242,7 @@ function run(settings){
                                 if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
                                         //カラムの自動更新が全体的に許可されていない場合は自動更新を無効化する
-                                        if (auto_reload_target_elem.opd_auto_reload && !is_auto_update()){
+                                        if (auto_reload_target_elem.opd_auto_reload && is_auto_update()){
                                             auto_reload_target_elem.opd_auto_reload.Reload(auto_reload_target_elem.contentWindow);
                                             setTimeout(() => {
                                                 auto_reload_target_elem.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
@@ -1335,7 +1342,7 @@ function run(settings){
                                         if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
                                                 //カラムの自動更新が全体的に許可されていない場合は自動更新を無効化する
-                                                if (auto_reload_target_object.opd_auto_reload && !is_auto_update()){
+                                                if (auto_reload_target_object.opd_auto_reload && is_auto_update()){
                                                     auto_reload_target_object.opd_auto_reload.Reload(auto_reload_target_object.contentWindow);
                                                     setTimeout(() => {
                                                         auto_reload_target_object.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
@@ -1810,18 +1817,26 @@ function run(settings){
         }
     }
     //自動更新許可を取得する関数
-    function is_auto_update(){
-        console.log(column_auto_update_state)
-        if(!column_auto_update_state.is_stop) return false;
-
-        //フォーカスが一定時間以上継続している場合は更新不良とみなして状態をリセットする
-        /*const FOCUS_STALE_MS = 5 * 60 * 1000;
-        if (Date.now() - column_auto_update_state.date > FOCUS_STALE_MS) {
-            column_auto_update_state.date = 0;
-            column_auto_update_state.is_stop = false;
+    function is_auto_update(stale_check = false){
+        //テキスト入力フォーカス中
+        if(column_auto_update_state.text_focus.active){
+            if (stale_check){
+                //一定時間以上継続している場合は更新不良とみなしてリセット
+                const FOCUS_STALE_MS = 5 * 60 * 1000;
+                if(Date.now() - column_auto_update_state.text_focus.date > FOCUS_STALE_MS){
+                    column_auto_update_state.text_focus.date = 0;
+                    column_auto_update_state.text_focus.active = false;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }
+        //メディアビューワー表示中
+        if(column_auto_update_state.media_viewer.active){
             return false;
-        }*/
-
+        }
         return true;
     }
     //ランダムID作成
