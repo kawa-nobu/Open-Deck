@@ -17,7 +17,7 @@ let profile_store;
 let last_load_profile = 0;
 let is_removed_default_style = false;
 let media_viewer_token = [];
-const colum_text_focus = {date:0, is_focus:false};
+const column_auto_update_state = {date:0, is_stop:false};
 const ui_icon_define = {
     banner_hide:"icon/banner_hide.svg",
     top_bar_hide:"icon/top_hide.svg",
@@ -199,16 +199,16 @@ function run(settings){
     }
     profile_list_html = `<div class="profile_val_now" title="${i18n_message("ui_profile_current_title")}">${last_load_profile}</div><div class="dsp_profile_list"><div id="profile_btn_list">${profile_list_btn_html}</div>`;
     //console.log(profile_list_btn_html)
-    //カラム全体のテキストフォーカスの状態
+    //カラム全体のテキストフォーカスの状態で自動更新を制御できるようにする
     window.addEventListener('opd_post_focus', (e) => {
         if(e.detail){
             console.log("focus", e.detail)
-            colum_text_focus.date = Date.now();
-            colum_text_focus.is_focus = true;
+            column_auto_update_state.date = Date.now();
+            column_auto_update_state.is_stop = true;
 
         }else{
-            colum_text_focus.date = 0;
-            colum_text_focus.is_focus = false;
+            column_auto_update_state.date = 0;
+            column_auto_update_state.is_stop = false;
         }
     });
     //画像表示パネル
@@ -1234,8 +1234,8 @@ function run(settings){
                                 const path_name = auto_reload_target_elem.contentWindow.location.pathname;
                                 if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        //他カラムでテキスト編集中の場合は上部移動を無効化する
-                                        if (auto_reload_target_elem.opd_auto_reload && !is_focus()){
+                                        //カラムの自動更新が全体的に許可されていない場合は自動更新を無効化する
+                                        if (auto_reload_target_elem.opd_auto_reload && !is_auto_update()){
                                             auto_reload_target_elem.opd_auto_reload.Reload(auto_reload_target_elem.contentWindow);
                                             setTimeout(() => {
                                                 auto_reload_target_elem.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
@@ -1334,8 +1334,8 @@ function run(settings){
                                         const path_name = auto_reload_target_object.contentWindow.location.pathname;
                                         if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                //他カラムでテキスト編集中の場合は上部移動を無効化する
-                                                if (auto_reload_target_object.opd_auto_reload && !is_focus()){
+                                                //カラムの自動更新が全体的に許可されていない場合は自動更新を無効化する
+                                                if (auto_reload_target_object.opd_auto_reload && !is_auto_update()){
                                                     auto_reload_target_object.opd_auto_reload.Reload(auto_reload_target_object.contentWindow);
                                                     setTimeout(() => {
                                                         auto_reload_target_object.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
@@ -1809,16 +1809,16 @@ function run(settings){
             });
         }
     }
-    //カラム全体のフォーカス状態を取得する関数
-    function is_focus(){
-        console.log(colum_text_focus)
-        if(!colum_text_focus.is_focus) return false;
+    //自動更新許可を取得する関数
+    function is_auto_update(){
+        console.log(column_auto_update_state)
+        if(!column_auto_update_state.is_stop) return false;
 
         //フォーカスが一定時間以上継続している場合は更新不良とみなして状態をリセットする
         /*const FOCUS_STALE_MS = 5 * 60 * 1000;
-        if (Date.now() - colum_text_focus.date > FOCUS_STALE_MS) {
-            colum_text_focus.date = 0;
-            colum_text_focus.is_focus = false;
+        if (Date.now() - column_auto_update_state.date > FOCUS_STALE_MS) {
+            column_auto_update_state.date = 0;
+            column_auto_update_state.is_stop = false;
             return false;
         }*/
 
