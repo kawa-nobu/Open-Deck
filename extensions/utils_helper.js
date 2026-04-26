@@ -6,14 +6,12 @@
         //フォーカスされた時
         window.addEventListener('focusin', (e) => {
             if (e.target.getAttribute('contenteditable') === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                console.log("focus")
-                window.dispatchEvent(new CustomEvent('opd_post_focus', {detail: true}));
+                window.parent.dispatchEvent(new CustomEvent('opd_post_focus', {detail: true}));
             }
         });
         //フォーカスが外れた時
         window.addEventListener('focusout', (e) => {
-            console.log("focus-out")
-            window.dispatchEvent(new CustomEvent('opd_post_focus', {detail: false}));
+            window.parent.dispatchEvent(new CustomEvent('opd_post_focus', {detail: false}));
         });
     }
 
