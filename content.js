@@ -748,7 +748,7 @@ function run(settings){
     let default_element = {
         /*main_bar_empty_column:{html:`<!--<section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" opd_column_width="%column_width_num%" id="main_bar_empty_column" style="height:100%;min-width: 70px;"></div></section>-->`},*/
         empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>左のバーからカラムを追加</p></div></div></section>`},
-        post:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="post" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Post</span></div></span>${post_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/compose/post" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
+        post:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="post" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Post</span></div></span>${post_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/intent/tweet" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
         second_empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 30rem;overflow: hidden;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_2)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>1段目のカラムが配置できます</p></div></div></section>`},
         home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Timeline</span></div></span>${default_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/home" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
         notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notifications</span></div></span>${default_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://x.com/notifications" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
@@ -837,6 +837,25 @@ function run(settings){
     ins_html.innerHTML = `${side_bar}<div id="main_rack_element" style=""><div id="first_rack_element" style="height: 100%;display:flex;flex-direction:row;">${main_column_html}</div><div id="second_rack_element" style="display:flex;flex-direction:row;">${second_column_html}</div></div>`;
     //HTML挿入
     document.body.insertAdjacentElement("afterbegin", ins_html);
+
+    //favicon・タイトルを設定
+    set_title_favicon()
+
+    //react-rootを監視しマスク処理をする
+    observe_when_ready(
+        () => document.getElementById("react-root"),
+        document.body,
+        main_dsp,
+        { childList: true, characterData: true, subtree: false }
+    );
+
+    //headを監視しカラーモード機能やCSSを設定・変更する
+    observe_when_ready(
+        () => document.querySelector("head"),
+        document.documentElement,
+        head_observer_callback,
+        { childList: true, subtree: false }
+    );
     //APIリミット表示用
     document.querySelector("#api_limit_status").addEventListener("click", function(){
         if(api_limit_obj != null){
@@ -1669,7 +1688,7 @@ function run(settings){
         let column_class = document.querySelectorAll(".dsp_column");
         let column_copy_source = null;
         for (let index = 0; index < column_class.length; index++) {
-            //既にD&Dが登録済みのカラムはスキップ
+            //既にイベントが登録済みのカラムはスキップ
             if(column_class[index].dataset.opd_dd_initialized === "1") continue;
             column_class[index].dataset.opd_dd_initialized = "1";
         
@@ -1851,83 +1870,170 @@ function run(settings){
     function create_random_id(){
         return Math.random().toString(32).substring(2);
     }
-    //メインX動作マスク
-    function main_dsp(){
-        document.getElementById("react-root").style.visibility = "hidden";
-        document.getElementById("react-root").style.overflow = "hidden";
-    }
-    const target_elem = document.getElementById("react-root");
-    const observer = new MutationObserver(main_dsp);
-    observer.observe(target_elem,{
-        childList: true,
-        characterData: true,
-        subtree: false
-    });
-    //title変更監視
-    const head_observer = new MutationObserver(function(){
-        document.title = "Open-Deck";
-        document.querySelector('link[rel="shortcut icon"]').href = chrome.runtime.getURL("icon.png");
-        //デフォルトのCSSがUIに影響を与えないように削除する
-        if(!is_removed_default_style){
-            document.head.querySelectorAll('style').forEach(style => {
-                if(style.textContent.includes('*, ::before, ::after')){
-                    style.remove();
-                    is_removed_default_style = true;
-                }
-            });
-        }
-
-        //ダークモード検出&設定
-        const color_scheme = window.matchMedia('(prefers-color-scheme: dark)');
-        const main_element = document.getElementById("opd_main_element");
-        if(!main_element) return;
-
-        const color_mode = get_cookie_color_mode();
-
-        switch (color_mode){
-            case "system": {
-                apply_ui_color = () => {
-                    const currentScheme = color_scheme.matches ? "dark" : "light";
-                    main_element.setAttribute("opd-dsp-theme", currentScheme);
-                };
-        
-                // 初回反映
-                apply_ui_color();
-        
-                // system 指定時のみ、OS側のカラーモード変更に追従
-                if(!is_added_system_color_mode){
-                    color_scheme.addEventListener("change", apply_ui_color);
-                    is_added_system_color_mode = true;
-                    }
-                break;
-            }
-            case "light":
-                // system の監視が残ってたら解除
-                if(is_added_system_color_mode && apply_ui_color){
-                    color_scheme.removeEventListener("change", apply_ui_color);
-                    is_added_system_color_mode = false;
-                }
-                main_element.setAttribute("opd-dsp-theme", "light");
-                break;
-
-            case "dark":
-                if(is_added_system_color_mode && apply_ui_color){
-                    color_scheme.removeEventListener("change", apply_ui_color);
-                    is_added_system_color_mode = false;
-                }
-                main_element.setAttribute("opd-dsp-theme", "dark");
-                break;
-                
-            default:
-                break;
-        }
-
-    }).observe(document.querySelector("head"),{
-        childList: true,
-        characterData: true,
-        subtree: false
-    });
 }
+
+//MutationObserverを仕掛ける
+function observe_when_ready(get_target, watch_root, observer_callback, observer_options){
+    const target = get_target();
+    if(target){
+        //既に存在していたらすぐに仕掛ける
+        observer_callback(target);
+        new MutationObserver(() => observer_callback(target)).observe(target, observer_options);
+        return;
+    }
+
+    if(!watch_root) return;
+
+    const wait_observer = new MutationObserver(() => {
+        const target_retry = get_target();
+        if(target_retry){
+            wait_observer.disconnect();
+            observer_callback(target_retry);
+            new MutationObserver(() => observer_callback(target_retry)).observe(target_retry, observer_options);
+        }
+    });
+    wait_observer.observe(watch_root, { childList: true });
+}
+
+//カラー・CSS周りを設定する
+function head_observer_callback(head_elem){
+    //デフォルトのCSSがUIに影響を与えないように削除する
+    if(!is_removed_default_style){
+        head_elem.querySelectorAll('style').forEach(style => {
+            if(style.textContent.includes('*, ::before, ::after')){
+                style.remove();
+                is_removed_default_style = true;
+            }
+        });
+    }
+
+    //ダークモード検出&設定
+    const color_scheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const main_element = document.getElementById("opd_main_element");
+    if(!main_element) return;
+
+    const color_mode = get_cookie_color_mode();
+    switch (color_mode){
+        case "system": {
+            apply_ui_color = () => {
+                const currentScheme = color_scheme.matches ? "dark" : "light";
+                main_element.setAttribute("opd-dsp-theme", currentScheme);
+            };
+            apply_ui_color();
+            if(!is_added_system_color_mode){
+                color_scheme.addEventListener("change", apply_ui_color);
+                is_added_system_color_mode = true;
+            }
+            break;
+        }
+        case "light":
+            if(is_added_system_color_mode && apply_ui_color){
+                color_scheme.removeEventListener("change", apply_ui_color);
+                is_added_system_color_mode = false;
+            }
+            main_element.setAttribute("opd-dsp-theme", "light");
+            break;
+        case "dark":
+            if(is_added_system_color_mode && apply_ui_color){
+                color_scheme.removeEventListener("change", apply_ui_color);
+                is_added_system_color_mode = false;
+            }
+            main_element.setAttribute("opd-dsp-theme", "dark");
+            break;
+        default:
+            break;
+    }
+}
+
+//メインX動作マスク
+function main_dsp(react_root){
+    if(!react_root) return;
+    react_root.style.visibility = "hidden";
+    react_root.style.overflow = "hidden";
+}
+
+//タイトルやfaviconを設定する
+function set_title_favicon(){
+    const OPD_TITLE = "Open-Deck";
+    const OPD_FAVICON_URL = chrome.runtime.getURL("icon.png");
+
+    //タイトルを設定する
+    document.head.querySelectorAll("title").forEach(elem => {
+        if(elem.dataset.opd !== "1") elem.remove();
+    });
+    let opd_title = document.head.querySelector('title[data-opd="1"]');
+    if(!opd_title){
+        opd_title = document.createElement("title");
+        opd_title.dataset.opd = "1";
+        opd_title.textContent = OPD_TITLE;
+        document.head.appendChild(opd_title);
+    }
+
+    //titleを監視
+    const title_observer = new MutationObserver(() => {
+        //自分の title の中身が変わっていたら戻す
+        if(opd_title.textContent !== OPD_TITLE){
+            opd_title.textContent = OPD_TITLE;
+        }
+        document.head.querySelectorAll("title").forEach(elem => {
+            if(elem.dataset.opd !== "1") elem.remove();
+        });
+    });
+    title_observer.observe(opd_title, {
+        childList: true,
+        characterData: true,
+        subtree: true
+    });
+    //headも監視
+    const head_title_observer = new MutationObserver(mutations => {
+        for(const m of mutations){
+            for(const node of m.addedNodes){
+                if(node.tagName === "TITLE" && node.dataset.opd !== "1"){
+                    node.remove();
+                }
+            }
+        }
+    });
+    head_title_observer.observe(document.head, { childList: true });
+
+    //faviconを設定する
+    document.head.querySelectorAll('link[rel="shortcut icon"], link[rel="icon"]').forEach(l => {
+        if(l.dataset.opd !== "1") l.remove();
+    });
+    let opd_favicon = document.head.querySelector('link[data-opd="1"]');
+    if(!opd_favicon){
+        opd_favicon = document.createElement("link");
+        opd_favicon.rel = "shortcut icon";
+        opd_favicon.href = OPD_FAVICON_URL;
+        opd_favicon.dataset.opd = "1";
+        document.head.appendChild(opd_favicon);
+    }
+
+    //favicon監視
+    const favicon_observer = new MutationObserver(() => {
+        if(opd_favicon.getAttribute("href") !== OPD_FAVICON_URL){
+            opd_favicon.setAttribute("href", OPD_FAVICON_URL);
+        }
+    });
+    favicon_observer.observe(opd_favicon, {
+        attributes: true,
+        attributeFilter: ["href", "rel"]
+    });
+    //head自体も監視
+    const head_favicon_observer = new MutationObserver(mutations => {
+        for(const m of mutations){
+            for(const node of m.addedNodes){
+                if(node.tagName === "LINK"
+                    && (node.rel === "shortcut icon" || node.rel === "icon")
+                    && node.dataset.opd !== "1"){
+                    node.remove();
+                }
+            }
+        }
+    });
+    head_favicon_observer.observe(document.head, { childList: true });
+}
+
 //Cookieからカラーモードを取得する
 function get_cookie_color_mode() {
     const cookie = document.cookie.split(/;\s*/).find(c => c.startsWith('night_mode='));
