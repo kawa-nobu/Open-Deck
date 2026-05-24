@@ -2,14 +2,24 @@ const EXTENSION_DOMAIN = new URL(chrome.runtime.getURL('')).hostname;
 
 //インストール時にあらかじめDNRを設定しておく
 chrome.runtime.onInstalled.addListener(() => {
-    update_dnr();
+    (async () => {
+        await update_dnr();
+    })();
 })
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
         if(request.message == "dnr_upd"){
-            update_dnr();
-            sendResponse(true);
+            (async () => {
+                try {
+                    await update_dnr();
+                    console.log("dnr_update_ok");
+                    sendResponse(true);
+                } catch(e) {
+                    console.error("dnr update failed->", e);
+                    sendResponse(false);
+                }
+            })();
         }
         if(request.message == "text_review"){
             const api_url = "https://opd.kwdev-sys.com/api/opd/text_review/review";
@@ -24,11 +34,13 @@ chrome.runtime.onMessage.addListener(
                     if(!res.ok){
                         console.error(`ReviewFetchError->Code:${res.status}->Text:${res.statusText}`);
                         sendResponse(false);
+                        return;
                     }
                     sendResponse(await res.json());
                 }catch(error){
                     console.error("Fetch failed:", error);
                     sendResponse(false);
+                    return;
                 }
             })();
         }
@@ -155,10 +167,9 @@ function update_dnr(){
             }
         },
     ];
-    chrome.declarativeNetRequest.updateDynamicRules({
+    
+    return chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: [1],
         addRules: dnr_rules,
-    }, function(){
-        console.log("dnr_update_ok");
     });
 }
