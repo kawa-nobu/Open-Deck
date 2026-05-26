@@ -204,7 +204,8 @@ function run(settings){
     //console.log(profile_list_btn_html)
     //カラム全体のテキストフォーカスの状態で自動更新を制御できるようにする
     window.addEventListener('opd_post_focus', (e) => {
-        if(e.detail){
+        const detail = JSON.parse(e.detail);
+        if(detail){
             column_auto_update_state.text_focus.date = Date.now();
             column_auto_update_state.text_focus.active = true;
         }else{
