@@ -16,7 +16,9 @@
                 e.stopImmediatePropagation();
             
                 const target = e.target.closest('a[href]')
-                target.click();
+                if (target){
+                    target.click();
+                }
             }
             return;
         }
