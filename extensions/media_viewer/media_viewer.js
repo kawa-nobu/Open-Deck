@@ -1,7 +1,7 @@
 // メディアビューワー
 class OpdExtMediaViewer {
     constructor() {
-        this.Preview = (media_info, pre_index) => {
+        this.Preview = (media_info, pre_index, callback=()=>{}) => {
             let current_media_idx = pre_index;
             const media_viewer_div = document.createElement("div");
             const media_viewer_dialog = document.createElement("dialog");
@@ -112,6 +112,9 @@ class OpdExtMediaViewer {
                     video_element.remove();
                 }
                 media_viewer_div.remove();
+
+                //callbackを実行する
+                callback();
             }
 
             media_viewer_dialog.addEventListener("close", () => media_viewer_close());

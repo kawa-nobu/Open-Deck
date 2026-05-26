@@ -1,50 +1,25 @@
+const EXTENSION_DOMAIN = new URL(chrome.runtime.getURL('')).hostname;
+
+//インストール時にあらかじめDNRを設定しておく
+chrome.runtime.onInstalled.addListener(() => {
+    (async () => {
+        await update_dnr();
+    })();
+})
+
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse){
         if(request.message == "dnr_upd"){
-            /*chrome.declarativeNetRequest.updateEnabledRulesets(({disableRulesetIds: ["ruleset_1"]}));
-            chrome.declarativeNetRequest.updateEnabledRulesets(({enableRulesetIds: ["ruleset_1"]}));*/
-            const dnr_rules = [
-                {
-                    id : 1,
-                    priority: 1,
-                    action: {
-                        type: "modifyHeaders",
-                        responseHeaders: [
-                            {
-                                header: "Content-Security-Policy",
-                                operation: "remove"
-                            },
-                            {
-                                header: "X-Frame-Options",
-                                operation: "remove"
-                            }
-                        ]
-                    },
-                    condition : {
-                        urlFilter : "x.com",
-                        resourceTypes: ["main_frame",
-                        "sub_frame",
-                        "stylesheet",
-                        "script",
-                        "image",
-                        "font",
-                        "object",
-                        "xmlhttprequest",
-                        "ping",
-                        "csp_report",
-                        "media",
-                        "websocket",
-                        "other"]
-                    }
+            (async () => {
+                try {
+                    await update_dnr();
+                    console.log("dnr_update_ok");
+                    sendResponse(true);
+                } catch(e) {
+                    console.error("dnr update failed->", e);
+                    sendResponse(false);
                 }
-            ];
-            chrome.declarativeNetRequest.updateSessionRules({//updateDynamicRules
-                removeRuleIds: [1],
-                addRules: dnr_rules,
-            }, function(){
-                console.log("dnr_update_ok");
-                sendResponse(true);
-            });
+            })();
         }
         if(request.message == "text_review"){
             const api_url = "https://opd.kwdev-sys.com/api/opd/text_review/review";
@@ -59,11 +34,13 @@ chrome.runtime.onMessage.addListener(
                     if(!res.ok){
                         console.error(`ReviewFetchError->Code:${res.status}->Text:${res.statusText}`);
                         sendResponse(false);
+                        return;
                     }
                     sendResponse(await res.json());
                 }catch(error){
                     console.error("Fetch failed:", error);
                     sendResponse(false);
+                    return;
                 }
             })();
         }
@@ -152,4 +129,47 @@ chrome.webRequest.onHeadersReceived.addListener(function (resp) {
       }
     },{urls: ['*://x.com/i/api/*']},['responseHeaders']
   );
-//
+
+function update_dnr(){
+    const dnr_rules = [
+        {
+            id : 1,
+            priority: 1,
+            action: {
+                type: "modifyHeaders",
+                responseHeaders: [
+                    {
+                        header: "Content-Security-Policy",
+                        operation: "remove"
+                    },
+                    {
+                        header: "X-Frame-Options",
+                        operation: "remove"
+                    }
+                ]
+            },
+            condition : {
+                requestDomains: ["x.com", "twitter.com"],
+                initiatorDomains: [EXTENSION_DOMAIN, "x.com", "twitter.com"],
+                resourceTypes: ["main_frame",
+                "sub_frame",
+                "stylesheet",
+                "script",
+                "image",
+                "font",
+                "object",
+                "xmlhttprequest",
+                "ping",
+                "csp_report",
+                "media",
+                "websocket",
+                "other"]
+            }
+        },
+    ];
+    
+    return chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: [1],
+        addRules: dnr_rules,
+    });
+}

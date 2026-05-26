@@ -2,14 +2,14 @@
 (() => {
     const isAllowed = (u) => {
         const url = new URL(u, location.href);
-        return url.origin === location.origin && url.pathname.startsWith("/compose/post");
+        return url.origin === location.origin && url.pathname.startsWith("/intent/tweet");
     };
     //GIF ボタンを消す
     document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
     new MutationObserver(function(){
         const back_button = document.querySelector('main button[data-testid="app-bar-back"]');
         if(!back_button) return;
-        if(location.pathname === "/compose/post"){
+        if(location.pathname === "/intent/tweet"){
             back_button.style.display = "none";
         }else{
             back_button.style.display = "block";

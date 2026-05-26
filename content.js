@@ -17,6 +17,10 @@ let profile_store;
 let last_load_profile = 0;
 let is_removed_default_style = false;
 let media_viewer_token = [];
+const column_auto_update_state = {
+    text_focus: {date: 0, active: false},
+    media_viewer: {active: false},
+};
 const ui_icon_define = {
     banner_hide:"icon/banner_hide.svg",
     top_bar_hide:"icon/top_hide.svg",
@@ -198,6 +202,17 @@ function run(settings){
     }
     profile_list_html = `<div class="profile_val_now" title="${i18n_message("ui_profile_current_title")}">${last_load_profile}</div><div class="dsp_profile_list"><div id="profile_btn_list">${profile_list_btn_html}</div>`;
     //console.log(profile_list_btn_html)
+    //カラム全体のテキストフォーカスの状態で自動更新を制御できるようにする
+    window.addEventListener('opd_post_focus', (e) => {
+        const detail = JSON.parse(e.detail);
+        if(detail){
+            column_auto_update_state.text_focus.date = Date.now();
+            column_auto_update_state.text_focus.active = true;
+        }else{
+            column_auto_update_state.text_focus.date = 0;
+            column_auto_update_state.text_focus.active = false;
+        }
+    });
     //画像表示パネル
     const media_viewer = new OpdExtMediaViewer();
     document.addEventListener('opd_send_media_info', (e) => {
@@ -205,7 +220,13 @@ function run(settings){
         for (let index = 0; index < media_viewer_token.length; index++) {
             const token = media_viewer_token[index];
             if(detail.token === token){
-                media_viewer.Preview(detail.media_info, detail.selected_index);
+                //ビューワーを閉じた際のコールバック関数
+                function viewer_close(){
+                    column_auto_update_state.media_viewer.active = false;
+                }
+                
+                column_auto_update_state.media_viewer.active = true;
+                media_viewer.Preview(detail.media_info, detail.selected_index, viewer_close);
                 break;
             }
         }
@@ -728,7 +749,7 @@ function run(settings){
     let default_element = {
         /*main_bar_empty_column:{html:`<!--<section draggable="false" class="dsp_column"><div opd_column_type="main_bar_empty_column" opd_column_width="%column_width_num%" id="main_bar_empty_column" style="height:100%;min-width: 70px;"></div></section>-->`},*/
         empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_emptycolumn"><div opd_column_type="empty_column" opd_column_width="%column_width_num%" style="height: 100%;min-width: 30rem;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_1)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>左のバーからカラムを追加</p></div></div></section>`},
-        post:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="post" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Post</span></div></span>${post_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/compose/post" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
+        post:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="post" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Post</span></div></span>${post_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/intent/tweet" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
         second_empty_column:{html:`<section draggable="false" id="column_%column_num%" class="dsp_column_draggable_false dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" opd_column_width="%column_width_num%" style="height:100%;min-width: 30rem;overflow: hidden;display: flex;align-items: center;justify-content: center;"><div><img src="${chrome.runtime.getURL(ui_icon_define.column_add_2)}" style="filter: brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(13%) hue-rotate(335deg) brightness(89%) contrast(79%);"><p>1段目のカラムが配置できます</p></div></div></section>`},
         home:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="home" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Timeline</span></div></span>${default_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel}<iframe auto_reload_mouse_hover="false" allow="fullscreen" src="https://x.com/home" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
         notification:{html:`<section draggable="true" id="column_%column_num%" class="dsp_column_draggable_true dsp_column"><div opd_column_type="notification" opd_column_width="%column_width_num%" style="height: 100%;width: %column_width_num%rem;min-width: 1rem;"><div class="column_bar" style="height: max-content;"><span class="dsp_column_title"><div class="dsp_column_move_icon_parent"><span class="dsp_column_move_icon"></span><span>Notifications</span></div></span>${default_element_bar}<div class="dsp_column_empty_area opd_column_scroll_to_top"></div><div class="dsp_column_close_btn_wrap"><span class="dsp_column_btn"><label class="dsp_column_close_btn opd_ui_icon_color" title="カラムを閉じる"><input type="button" class="column_close_btn" value="X"/></label></span></div></div>${column_settings_panel_no_auto}<iframe allow="fullscreen" src="https://x.com/notifications" type="text/html" style="width: 100%;height: 100%;" opd_init_webview></iframe></div></section>`},
@@ -817,6 +838,25 @@ function run(settings){
     ins_html.innerHTML = `${side_bar}<div id="main_rack_element" style=""><div id="first_rack_element" style="height: 100%;display:flex;flex-direction:row;">${main_column_html}</div><div id="second_rack_element" style="display:flex;flex-direction:row;">${second_column_html}</div></div>`;
     //HTML挿入
     document.body.insertAdjacentElement("afterbegin", ins_html);
+
+    //favicon・タイトルを設定
+    set_title_favicon()
+
+    //react-rootを監視しマスク処理をする
+    observe_when_ready(
+        () => document.getElementById("react-root"),
+        document.body,
+        main_dsp,
+        { childList: true, characterData: true, subtree: false }
+    );
+
+    //headを監視しカラーモード機能やCSSを設定・変更する
+    observe_when_ready(
+        () => document.querySelector("head"),
+        document.documentElement,
+        head_observer_callback,
+        { childList: true, subtree: false }
+    );
     //APIリミット表示用
     document.querySelector("#api_limit_status").addEventListener("click", function(){
         if(api_limit_obj != null){
@@ -931,6 +971,10 @@ function run(settings){
         }else{
             column_object = document.querySelectorAll('.dsp_column:not([opd_column_type="dsp_column"], [opd_column_type="empty_column"], [opd_column_type="main_bar_empty_column"]) iframe');
         }
+
+        //カラム読み込み失敗検出
+        watch_load_column(column_object);
+
         for (let index = 0; index < column_object.length; index++) {
             column_object[index].removeAttribute("opd_init_webview");
             //バナー/表示モード変更
@@ -1000,14 +1044,6 @@ function run(settings){
                             break;
                     }
                     //console.log(opd_column_div.querySelector(".opd_banner").checked)
-                    //ポストカラムの動作
-                    if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") === "post"){
-                        const post_column_window = opd_column_div.querySelector("iframe").contentWindow;
-                        //文章校正機能
-                        const ext_text_review = new OpdExtTextReview();
-                        const ui_lang = chrome.i18n.getUILanguage();
-                        ext_text_review.Init(post_column_window, ui_icon_define, ui_lang);
-                    }
                 }
             })
             //各カラム読み込み後の動作(init)
@@ -1023,21 +1059,13 @@ function run(settings){
                 let opd_column_auto_reload_time_reload = opd_column_div.querySelector(".opd_a_reload_time_setting");
                 let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
                 let opd_column_scroll_to_top = opd_column_div.querySelector(".opd_column_scroll_to_top");
-                let column_content_reload = null;
+
                 //カラム拡張読み込み
                 if(mode != "session_set"){
-                    const column_type = this.closest("div[opd_column_type]").getAttribute("opd_column_type");
-                    if(column_type === "home" || column_type === "explore"){
-                        const target_column = this.closest("div[opd_column_type]").querySelector("iframe").contentWindow;
-                        //自動更新関連仕込み
-                        column_content_reload = new OpdExtAutoReload();
-                        column_content_reload.Init(target_column);
-                        //メディアビューワー関連仕込み
-                        const column_media_viewer_blocker = new OpdMediaViewerBlocker();
-                        column_media_viewer_blocker.Init(target_column);
-                        media_viewer_token.push(column_media_viewer_blocker.opd_send_media_info_token);
-                    }
+                    this.opd_ext_initialized = false;
+                    reinit_column_extensions(this.closest("div[opd_column_type]"));
                 }
+
                 //設定パネルイベント
                 if(mode != "session_set"){
                     opd_column_div.querySelector(".opd_settings_btn").addEventListener("click", function(){
@@ -1234,8 +1262,9 @@ function run(settings){
                                 const path_name = auto_reload_target_elem.contentWindow.location.pathname;
                                 if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
-                                        if (column_content_reload){
-                                            column_content_reload.Reload(auto_reload_target_elem.contentWindow);
+                                        //カラムの自動更新が全体的に許可されていない場合は自動更新を無効化する
+                                        if (auto_reload_target_elem.opd_auto_reload && is_auto_update()){
+                                            auto_reload_target_elem.opd_auto_reload.Reload(auto_reload_target_elem.contentWindow);
                                             setTimeout(() => {
                                                 auto_reload_target_elem.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
                                             }, 100);
@@ -1333,8 +1362,9 @@ function run(settings){
                                         const path_name = auto_reload_target_object.contentWindow.location.pathname;
                                         if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
-                                                if (column_content_reload){
-                                                    column_content_reload.Reload(auto_reload_target_object.contentWindow);
+                                                //カラムの自動更新が全体的に許可されていない場合は自動更新を無効化する
+                                                if (auto_reload_target_object.opd_auto_reload && is_auto_update()){
+                                                    auto_reload_target_object.opd_auto_reload.Reload(auto_reload_target_object.contentWindow);
                                                     setTimeout(() => {
                                                         auto_reload_target_object.contentWindow.scrollTo({ top: 0, behavior: 'auto' });
                                                     }, 500);
@@ -1597,22 +1627,72 @@ function run(settings){
                             document.querySelector(".profile_val_now").textContent = after_profile_num;
                             document.querySelector("#profile_btn_list").innerHTML = profile_list_btn_html;
                             create_profile_list_btn();
-                            });
                         });
-                    //last_load_profile
-                    //
-                    //.aaaa
+                    });
                 });
             }
         }else{
             alert(i18n_message("msg_profile_delete_current_alert"));
         }
     });
+    //カラム拡張機能の初期化(カラム拡張機能追加はここで行います)
+    function reinit_column_extensions(column_div){
+        const column_frame = column_div?.querySelector("iframe");
+        if(!column_frame) return;
+        const column_type = column_div.getAttribute("opd_column_type");
+
+        if(column_frame.opd_ext_initialized) return;
+
+        let initialized = false;
+        const doInit = () => {
+            if(initialized) return;
+            const target_window = column_frame.contentWindow;
+
+            if(target_window && (!target_window.document || !target_window.document.head)) return;
+            initialized = true;
+
+            column_frame.opd_ext_initialized = true;
+
+            //ユーティリティを仕込む
+            const opd_utils = new OpdUtils();
+            opd_utils.Init(target_window);
+
+            //文章校正機能を仕込む
+            if(column_type === "post"){
+                const ext_text_review = new OpdExtTextReview();
+                const ui_lang = chrome.i18n.getUILanguage();
+                ext_text_review.Init(target_window, ui_icon_define, ui_lang);
+            }
+
+            //自動更新とメディアビューワーを仕込む
+            if(column_type === "home" || column_type === "explore"){
+                const auto_reload = new OpdExtAutoReload();
+                auto_reload.Init(target_window);
+                //カラムフレームに紐付けて、自動更新部分で参照できるようにする
+                column_frame.opd_auto_reload = auto_reload;
+
+                const blocker = new OpdMediaViewerBlocker();
+                blocker.Init(target_window);
+                media_viewer_token.push(blocker.opd_send_media_info_token);
+            }
+        };
+
+        if(column_frame.contentDocument?.readyState === "complete"){
+            doInit();
+        }else{
+            column_frame.addEventListener("load", doInit, { once: true });
+        }
+    }
+
     //カラム移動
     function column_dd(){
         let column_class = document.querySelectorAll(".dsp_column");
         let column_copy_source = null;
         for (let index = 0; index < column_class.length; index++) {
+            //既にイベントが登録済みのカラムはスキップ
+            if(column_class[index].dataset.opd_dd_initialized === "1") continue;
+            column_class[index].dataset.opd_dd_initialized = "1";
+        
             column_class[index].addEventListener("dragstart", function(ev){
                 //console.log(this)
                 column_copy_source = this;
@@ -1627,53 +1707,53 @@ function run(settings){
             });
             column_class[index].addEventListener("drop", function(ev){
                 ev.preventDefault();
-                //移動時初期表示設定
-                //bn_twview_mode(this.querySelector("iframe"));
-                //exploreのURLセット
-                //console.log(column_class[index])
-                //移動セット
                 const dt_id = ev.dataTransfer.getData('text/plain');
                 const dr_elem = document.getElementById(dt_id);
                 if(dr_elem != null){
                     if(dr_elem?.querySelector("div")?.getAttribute("opd_column_type") == 'explore'){
-                        // && dr_elem.querySelector("div").querySelector("iframe").src != `https://x.com${dr_elem.querySelector("div").getAttribute("opd_explore_path")}`
-                        //console.log(dr_elem.querySelector("div").getAttribute("opd_explore_path"))
-                        //console.log(dr_elem.querySelector("div").getAttribute("opd_pinned_path"))
                         if(dr_elem.querySelector("div").getAttribute("opd_pinned_path") != ""){
-                            //console.log("Pinned")
                             dr_elem.querySelector("div").querySelector("iframe").src = `https://x.com${dr_elem.querySelector("div").getAttribute("opd_pinned_path")}`;
                         }else{
-                           //console.log("Exp_save")
                             dr_elem.querySelector("div").querySelector("iframe").src = `https://x.com${dr_elem.querySelector("div").getAttribute("opd_explore_path")}`;
                         }
                     }
                     this.parentNode.insertBefore(dr_elem, this);
                     this.style.borderLeft = '';
-                    //append_object_css();
-                    //column_dd();
+
+                    //ロード完了を待って拡張機能を再初期化する
+                    const moved_column_div = dr_elem.querySelector("div[opd_column_type]");
+                    const moved_iframe = moved_column_div?.querySelector("iframe");
+                    if(moved_iframe){
+                        moved_iframe.opd_ext_initialized = false;
+                        moved_iframe.addEventListener("load", () => {
+                            reinit_column_extensions(moved_column_div);
+                        }, { once: true });
+                    }
+
                     column_settings_save("", last_load_profile);
                 }else{
                     this.style.borderLeft = '';
                 }
-                
             })
         }
     }
     //カラム終了
     function column_close(){
-        for (let index = 0; index < document.querySelectorAll(".column_close_btn").length; index++) {
-            document.querySelectorAll(".column_close_btn")[index].addEventListener("click", function(){
+        const close_btns = document.querySelectorAll(".column_close_btn");
+        for (let index = 0; index < close_btns.length; index++) {
+            //既にイベントが登録済みのカラムはスキップ
+            if(close_btns[index].dataset.opd_close_initialized === "1") continue;
+                close_btns[index].dataset.opd_close_initialized = "1";
+                close_btns[index].addEventListener("click", function(){
                 const pin_checkbox = this.closest(".dsp_column").querySelector(".opd_pinned_btn")?.checked;
                 if(pin_checkbox == false || pin_checkbox == undefined){
                     this.closest(".dsp_column").remove();
                     append_object_css();
-                    //column_dd();
                     column_settings_save("", last_load_profile);
                 }else{
                     if(confirm(i18n_message("msg_pinned_column_close_confirm"))){
                         this.closest(".dsp_column").remove();
                         append_object_css();
-                        //column_dd();
                         column_settings_save("", last_load_profile);
                     }
                 }
@@ -1764,87 +1844,197 @@ function run(settings){
             });
         }
     }
+    //自動更新許可を取得する関数
+    function is_auto_update(stale_check = false){
+        //テキスト入力フォーカス中
+        if(column_auto_update_state.text_focus.active){
+            if (stale_check){
+                //一定時間以上継続している場合は更新不良とみなしてリセット
+                const FOCUS_STALE_MS = 5 * 60 * 1000;
+                if(Date.now() - column_auto_update_state.text_focus.date > FOCUS_STALE_MS){
+                    column_auto_update_state.text_focus.date = 0;
+                    column_auto_update_state.text_focus.active = false;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }
+        //メディアビューワー表示中
+        if(column_auto_update_state.media_viewer.active){
+            return false;
+        }
+        return true;
+    }
     //ランダムID作成
     function create_random_id(){
         return Math.random().toString(32).substring(2);
     }
-    //メインX動作マスク
-    function main_dsp(){
-        document.getElementById("react-root").style.visibility = "hidden";
-        document.getElementById("react-root").style.overflow = "hidden";
-    }
-    const target_elem = document.getElementById("react-root");
-    const observer = new MutationObserver(main_dsp);
-    observer.observe(target_elem,{
-        childList: true,
-        characterData: true,
-        subtree: false
-    });
-    //title変更監視
-    const head_observer = new MutationObserver(function(){
-        document.title = "Open-Deck";
-        document.querySelector('link[rel="shortcut icon"]').href = chrome.runtime.getURL("icon.png");
-        //デフォルトのCSSがUIに影響を与えないように削除する
-        if(!is_removed_default_style){
-            document.head.querySelectorAll('style').forEach(style => {
-                if(style.textContent.includes('*, ::before, ::after')){
-                    style.remove();
-                    is_removed_default_style = true;
-                }
-            });
-        }
-
-        //ダークモード検出&設定
-        const color_scheme = window.matchMedia('(prefers-color-scheme: dark)');
-        const main_element = document.getElementById("opd_main_element");
-        if(!main_element) return;
-
-        const color_mode = get_cookie_color_mode();
-
-        switch (color_mode){
-            case "system": {
-                apply_ui_color = () => {
-                    const currentScheme = color_scheme.matches ? "dark" : "light";
-                    main_element.setAttribute("opd-dsp-theme", currentScheme);
-                };
-        
-                // 初回反映
-                apply_ui_color();
-        
-                // system 指定時のみ、OS側のカラーモード変更に追従
-                if(!is_added_system_color_mode){
-                    color_scheme.addEventListener("change", apply_ui_color);
-                    is_added_system_color_mode = true;
-                    }
-                break;
-            }
-            case "light":
-                // system の監視が残ってたら解除
-                if(is_added_system_color_mode && apply_ui_color){
-                    color_scheme.removeEventListener("change", apply_ui_color);
-                    is_added_system_color_mode = false;
-                }
-                main_element.setAttribute("opd-dsp-theme", "light");
-                break;
-
-            case "dark":
-                if(is_added_system_color_mode && apply_ui_color){
-                    color_scheme.removeEventListener("change", apply_ui_color);
-                    is_added_system_color_mode = false;
-                }
-                main_element.setAttribute("opd-dsp-theme", "dark");
-                break;
-                
-            default:
-                break;
-        }
-
-    }).observe(document.querySelector("head"),{
-        childList: true,
-        characterData: true,
-        subtree: false
-    });
 }
+
+//MutationObserverを仕掛ける
+function observe_when_ready(get_target, watch_root, observer_callback, observer_options){
+    const target = get_target();
+    if(target){
+        //既に存在していたらすぐに仕掛ける
+        observer_callback(target);
+        new MutationObserver(() => observer_callback(target)).observe(target, observer_options);
+        return;
+    }
+
+    if(!watch_root) return;
+
+    const wait_observer = new MutationObserver(() => {
+        const target_retry = get_target();
+        if(target_retry){
+            wait_observer.disconnect();
+            observer_callback(target_retry);
+            new MutationObserver(() => observer_callback(target_retry)).observe(target_retry, observer_options);
+        }
+    });
+    wait_observer.observe(watch_root, { childList: true });
+}
+
+//カラー・CSS周りを設定する
+function head_observer_callback(head_elem){
+    //デフォルトのCSSがUIに影響を与えないように削除する
+    if(!is_removed_default_style){
+        head_elem.querySelectorAll('style').forEach(style => {
+            if(style.textContent.includes('*, ::before, ::after')){
+                style.remove();
+                is_removed_default_style = true;
+            }
+        });
+    }
+
+    //ダークモード検出&設定
+    const color_scheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const main_element = document.getElementById("opd_main_element");
+    if(!main_element) return;
+
+    const color_mode = get_cookie_color_mode();
+    switch (color_mode){
+        case "system": {
+            apply_ui_color = () => {
+                const currentScheme = color_scheme.matches ? "dark" : "light";
+                main_element.setAttribute("opd-dsp-theme", currentScheme);
+            };
+            apply_ui_color();
+            if(!is_added_system_color_mode){
+                color_scheme.addEventListener("change", apply_ui_color);
+                is_added_system_color_mode = true;
+            }
+            break;
+        }
+        case "light":
+            if(is_added_system_color_mode && apply_ui_color){
+                color_scheme.removeEventListener("change", apply_ui_color);
+                is_added_system_color_mode = false;
+            }
+            main_element.setAttribute("opd-dsp-theme", "light");
+            break;
+        case "dark":
+            if(is_added_system_color_mode && apply_ui_color){
+                color_scheme.removeEventListener("change", apply_ui_color);
+                is_added_system_color_mode = false;
+            }
+            main_element.setAttribute("opd-dsp-theme", "dark");
+            break;
+        default:
+            break;
+    }
+}
+
+//メインX動作マスク
+function main_dsp(react_root){
+    if(!react_root) return;
+    react_root.style.visibility = "hidden";
+    react_root.style.overflow = "hidden";
+}
+
+//タイトルやfaviconを設定する
+function set_title_favicon(){
+    const OPD_TITLE = "Open-Deck";
+    const OPD_FAVICON_URL = chrome.runtime.getURL("icon.png");
+
+    //タイトルを設定する
+    document.head.querySelectorAll("title").forEach(elem => {
+        if(elem.dataset.opd !== "1") elem.remove();
+    });
+    let opd_title = document.head.querySelector('title[data-opd="1"]');
+    if(!opd_title){
+        opd_title = document.createElement("title");
+        opd_title.dataset.opd = "1";
+        opd_title.textContent = OPD_TITLE;
+        document.head.appendChild(opd_title);
+    }
+
+    //titleを監視
+    const title_observer = new MutationObserver(() => {
+        //自分の title の中身が変わっていたら戻す
+        if(opd_title.textContent !== OPD_TITLE){
+            opd_title.textContent = OPD_TITLE;
+        }
+        document.head.querySelectorAll("title").forEach(elem => {
+            if(elem.dataset.opd !== "1") elem.remove();
+        });
+    });
+    title_observer.observe(opd_title, {
+        childList: true,
+        characterData: true,
+        subtree: true
+    });
+    //headも監視
+    const head_title_observer = new MutationObserver(mutations => {
+        for(const m of mutations){
+            for(const node of m.addedNodes){
+                if(node.tagName === "TITLE" && node.dataset.opd !== "1"){
+                    node.remove();
+                }
+            }
+        }
+    });
+    head_title_observer.observe(document.head, { childList: true });
+
+    //faviconを設定する
+    document.head.querySelectorAll('link[rel="shortcut icon"], link[rel="icon"]').forEach(l => {
+        if(l.dataset.opd !== "1") l.remove();
+    });
+    let opd_favicon = document.head.querySelector('link[data-opd="1"]');
+    if(!opd_favicon){
+        opd_favicon = document.createElement("link");
+        opd_favicon.rel = "shortcut icon";
+        opd_favicon.href = OPD_FAVICON_URL;
+        opd_favicon.dataset.opd = "1";
+        document.head.appendChild(opd_favicon);
+    }
+
+    //favicon監視
+    const favicon_observer = new MutationObserver(() => {
+        if(opd_favicon.getAttribute("href") !== OPD_FAVICON_URL){
+            opd_favicon.setAttribute("href", OPD_FAVICON_URL);
+        }
+    });
+    favicon_observer.observe(opd_favicon, {
+        attributes: true,
+        attributeFilter: ["href", "rel"]
+    });
+    //head自体も監視
+    const head_favicon_observer = new MutationObserver(mutations => {
+        for(const m of mutations){
+            for(const node of m.addedNodes){
+                if(node.tagName === "LINK"
+                    && (node.rel === "shortcut icon" || node.rel === "icon")
+                    && node.dataset.opd !== "1"){
+                    node.remove();
+                }
+            }
+        }
+    });
+    head_favicon_observer.observe(document.head, { childList: true });
+}
+
 //Cookieからカラーモードを取得する
 function get_cookie_color_mode() {
     const cookie = document.cookie.split(/;\s*/).find(c => c.startsWith('night_mode='));
@@ -1862,6 +2052,35 @@ function get_cookie_color_mode() {
 
     //カラーモードが 1 以上の場合は dark を返す
     return "dark";
+}
+//カラム読み込み失敗検出
+function watch_load_column(column_frames, max_retries = 5){
+    const cleanups = [];
+    column_frames.forEach(column => {
+        let count = 0;
+
+        const reLoad = () => {
+            if (++count >= max_retries) return;
+            setTimeout(() => { column.src = column.src }, 500);
+        };
+
+        const onLoad = () => {
+            try {
+                column.contentWindow.document.querySelector('head');
+            } catch {
+                reLoad();
+            }
+        };
+
+        column.addEventListener('load', onLoad);
+        column.addEventListener('error', reLoad);
+        cleanups.push(() => {
+            column.removeEventListener('load', onLoad);
+            column.removeEventListener('error', reLoad);
+        });
+    });
+
+    setTimeout(() => cleanups.forEach(fn => fn()), max_retries * 500 + 1000);
 }
 //設定初期化
 function settings_init(){
