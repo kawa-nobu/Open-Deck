@@ -1,9 +1,5 @@
 // 文章校正機能で使用する、カスタムな文字置換イベントを作成する
 (() => {
-    const isAllowed = (u) => {
-        const url = new URL(u, location.href);
-        return url.origin === location.origin && url.pathname.startsWith("/intent/tweet");
-    };
     //GIF ボタンを消す
     document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
     new MutationObserver(function(){
@@ -15,35 +11,44 @@
             back_button.style.display = "block";
         }
     }).observe(document, {childList: true, subtree: true});
-    
-    (function() {
-        //投稿後の遷移メッセージを無効化する
-        const native_add_evt = EventTarget.prototype.addEventListener;
-        native_add_evt.call(window, 'beforeunload', function (e){
-            // 既存イベントをストップさせる
-            e.stopImmediatePropagation();
-        }, {capture: true});
-        
-        //以後追加されるイベントを阻止する
-        EventTarget.prototype.addEventListener = function (type, listener, options){
-            if(String(type).toLowerCase() === 'beforeunload'){
+
+    //homeへの遷移を内部で変更させる処理
+    const push = getProps(document.querySelector('#react-root > div'))?.children.props.children.props.history.push;
+    if (!push) return console.error('push is not found');
+
+    let instance = null;
+
+    function intercept() {
+        const target_element = document.querySelector('button[data-testid="unsentButton"]')?.closest("div");
+        if (!target_element) return;
+
+        let fiber = getFiber(target_element);
+
+        if (!fiber) return;
+
+        while (fiber) {
+            if (fiber.stateNode?._handleCloseComposer) {
+                // インスタンスが変わってなければスキップ
+                if (fiber.stateNode === instance) return;
+
+                //変わっていれば再び注入する
+                instance = fiber.stateNode;
+
+                //クローズ処理を再びツイート画面へ遷移するように上書きする
+                instance._handleCloseComposer = () => push("/compose/post");
                 return;
             }
-            return native_add_evt.call(this, type, listener, options);
-        };
-        
-        //投稿後は home に戻ってほしくないので遷移を阻止する
-        const originalPushState = history.pushState;
-        history.pushState = function(state, title, url) {
-            const dest = url ? new URL(url, location.href).href : location.href;
-            if (!isAllowed(dest)){
-                //home への遷移を阻止
-                location.replace(location.href);
-                return;
-            }
-            return originalPushState.apply(this, arguments);
-        };
-    })();
+            //returnで走査する
+            fiber = fiber.return;
+        }
+    }
+
+    //常に状態を監視する
+    const observer = new MutationObserver(intercept);
+    observer.observe(document.querySelector('#react-root'), { childList: true, subtree: true });
+
+    //初期実行
+    intercept();
 
     //校正周りの処理
     let target_editor_elem = null;
@@ -119,4 +124,16 @@
 
     //テキストを貼り付けさせるイベントを作成する
     window.addEventListener('opd_text_review_apply', handler, true);
+
+    //ReactProps取得
+    function getProps(elem){
+        const propsKey = Object.getOwnPropertyNames(elem).find(k => k.includes(`__reactProps$`));
+        return propsKey ? elem[propsKey] : null;
+    }
+
+    //ReactFiber取得
+    function getFiber(elem) {
+        const fiberKey = Object.getOwnPropertyNames(elem).find(k => k.includes('__reactFiber$'));
+        return fiberKey ? elem[fiberKey] : null;
+    }
 })();
