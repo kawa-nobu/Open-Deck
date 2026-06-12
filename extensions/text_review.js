@@ -3,7 +3,8 @@ class OpdExtTextReview {
     constructor() {
         this.opd_text_review_token = null;
         this.opd_use_lang = "ja";
-        this.Init = (column_window, icons, ui_lang) => {
+        this.Init = (column_frame, icons, ui_lang) => {
+            const column_window = column_frame.contentWindow;
             //初期化
             let editable_elem = null;
             let is_textarea_empty = true;
