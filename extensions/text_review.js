@@ -19,6 +19,8 @@ class OpdExtTextReview {
                     display: none !important;
                 }
                 .opd_post_functions{
+                    display: flex;
+                    flex-direction: row;
                     margin-left: -8px;
                 }
                 .opd_text_review_loader {
@@ -36,7 +38,7 @@ class OpdExtTextReview {
                         transform: rotate(360deg);
                     }
                 }
-                .opd_text_review_btn{
+                .opd_function_btn{
                     width:34px;
                     height:34px;
                     margin:0 4px;
@@ -51,7 +53,13 @@ class OpdExtTextReview {
                     width: 18px;
                     height: 18px;
                 }
-                #opd_post_text_review[opd_text_review_is_empty]{
+                .opd_hashtag_restore_btn_icon{
+                    display: block;
+                    mask: url(${chrome.runtime.getURL(icons.hashtag_restore)}) no-repeat center;
+                    width: 18px;
+                    height: 18px;
+                }
+                .opd_function_btn[disabled]{
                 opacity: 0.5;
                 }
                 .opd_text_review_panel{
@@ -109,6 +117,14 @@ class OpdExtTextReview {
                     opacity: 0.8;
                 }
             </style>`);
+            //機能のボタン類を束ねる
+            const function_btns = [
+                //文章校正機能
+                `<div id="opd_post_text_review" class="opd_function_btn" title="${this.UITexts[this.opd_use_lang].textReview_buttonTitle.message}" disabled><div class="opd_functions_btn_icon_color opd_text_review_btn_icon"></div></div>`,
+                //ハッシュタグ埋め込み機能
+                `<div id="opd_hashtag_restore" class="opd_function_btn" title="${this.UITexts[this.opd_use_lang].hashTagRestore_buttonTitle.message}" disabled><div class="opd_functions_btn_icon_color opd_hashtag_restore_btn_icon"></div></div>`,
+            ]
+
             //ヘルパースクリプト追加
             const helper_script = column_window.document.createElement('script');
             helper_script.src = chrome.runtime.getURL("extensions/text_review_helper.js");
@@ -131,9 +147,9 @@ class OpdExtTextReview {
                         const editor_observer = new MutationObserver((mutations, obs) => {
                             is_textarea_empty = editable_elem.innerText.trim() === '';
                             if(is_textarea_empty){
-                                column_window.document.getElementById("opd_post_text_review").setAttribute("opd_text_review_is_empty", "");
+                                column_window.document.getElementById("opd_post_text_review").setAttribute("disabled", "");
                             }else{
-                                column_window.document.getElementById("opd_post_text_review").removeAttribute("opd_text_review_is_empty");
+                                column_window.document.getElementById("opd_post_text_review").removeAttribute("disabled");
                             }
                         }).observe(editable_elem, {
                             childList: true,
@@ -165,12 +181,13 @@ class OpdExtTextReview {
                 if (btnAddTarget && !function_panel) {
                     //テーマカラー取得&ボタンカラー設定
                     const theme_color = this.CssChecker(getComputedStyle(column_window.document.querySelector('div[data-testid="progressBar-bar"]')).backgroundColor);
-                    column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_theme_css>.opd_text_review_btn_icon{background-color:${theme_color};}.opd_text_review_btn:not([opd_text_review_is_empty]):hover{border-radius: 100px;transition-duration: 0.2s;background-color:${theme_color.replace(")", ", 0.1)")};}.opd_text_review_panel{background-color:${theme_color.replace(")", ", 0.1)")};}</style>`);
+                    column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_theme_css>.opd_functions_btn_icon_color{background-color:${theme_color};}.opd_function_btn:not([disabled]):hover{border-radius: 100px;transition-duration: 0.2s;background-color:${theme_color.replace(")", ", 0.1)")};}.opd_text_review_panel{background-color:${theme_color.replace(")", ", 0.1)")};}</style>`);
                     //校正ボタンパネル追加
-                    //TODO:今後、他機能追加する際は opd_post_functions 追加処理を別の場所で1回のみ行う実装をする
-                    btnAddTarget.insertAdjacentHTML('afterend', `<div class="opd_post_functions"><div id="opd_post_text_review" class="opd_text_review_btn" title="${this.UITexts[this.opd_use_lang].textReview_buttonTitle.message}" opd_text_review_is_empty><div class="opd_text_review_btn_icon"></div></div></div><div class="opd_text_review_panel"></div>`);
+                    btnAddTarget.insertAdjacentHTML('afterend', `<div class="opd_post_functions">${function_btns.join("")}</div><div class="opd_text_review_panel"></div>`);
                     //校正ボタン動作追加
                     column_window.document.getElementById("opd_post_text_review").addEventListener("click", async ()=>{
+                        editable_elem = column_window.document.querySelector('div[contenteditable="true"][data-testid*="tweetTextarea"]');
+                        console.log(!review_state, editable_elem, !is_textarea_empty)
                         if(!review_state && editable_elem && !is_textarea_empty){
                             review_state = true;
                             const review_panel = column_window.document.querySelector('div.opd_text_review_panel');
@@ -389,7 +406,11 @@ class OpdExtTextReview {
                 },
                 textReview_applyAll: {
                     message: "すべて適用"
-                }
+                },
+                //ハッシュタグ埋め込み機能
+                hashTagRestore_buttonTitle: {
+                    message: "ハッシュタグ埋め込み"
+                },
             },
             en:{
                 textReview_buttonTitle: {
@@ -412,7 +433,11 @@ class OpdExtTextReview {
                 },
                 textReview_applyAll: {
                     message: "Apply All"
-                }
+                },
+                //ハッシュタグ埋め込み機能
+                hashTagRestore_buttonTitle: {
+                    message: "Restore hashtag"
+                },
             }
         }
     }
