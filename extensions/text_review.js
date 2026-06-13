@@ -150,10 +150,12 @@ class OpdExtTextReview {
                 const allow_back_btn_path = ["/unsent"];
                 const current_path = column_window.location.pathname;
                 const target_btn = column_window.document.querySelector('button[data-testid="app-bar-back"]');
-                if(!allow_back_btn_path.some(path => current_path.includes(path)) && target_btn){
-                    target_btn.setAttribute("opd_hide","");
-                }else{
-                    target_btn.removeAttribute("opd_hide");
+                if(target_btn){
+                    if(!allow_back_btn_path.some(path => current_path.includes(path))){
+                        target_btn.setAttribute("opd_hide","");
+                    }else{
+                        target_btn.removeAttribute("opd_hide");
+                    }
                 }
 
                 //文章校正ボタンを仕込む
