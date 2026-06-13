@@ -15,7 +15,7 @@ class OpdExtTextReview {
                 div[aria-live="polite"][role="status"]:has(a[dir="ltr"]){
                     display: none;
                 }
-                button[data-testid="app-bar-back"]{
+                [opd_hide]{
                     display: none !important;
                 }
                 .opd_post_functions{
@@ -146,6 +146,16 @@ class OpdExtTextReview {
                 }
             });
             const observer = new MutationObserver((mutations, obs) => {
+                //戻るボタンの表示を制御する
+                const allow_back_btn_path = ["/unsent"];
+                const current_path = column_window.location.pathname;
+                const target_btn = column_window.document.querySelector('button[data-testid="app-bar-back"]');
+                if(!allow_back_btn_path.some(path => current_path.includes(path)) && target_btn){
+                    target_btn.setAttribute("opd_hide","");
+                }else{
+                    target_btn.removeAttribute("opd_hide");
+                }
+
                 //文章校正ボタンを仕込む
                 //既存のボタン類のパネルに組み込むと、他のボタンが表示されなくなる現象があるので仕方なく文字数カウンタの下に配置している
                 const btnAddTarget = column_window.document.querySelector('div[data-testid="toolBar"]');
