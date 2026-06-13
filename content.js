@@ -43,7 +43,8 @@ const ui_icon_define = {
     text_review:"icon/text_review.svg",
     forward:"icon/forward.svg",
     next:"icon/next.svg",
-    download:"icon/download.svg"
+    download:"icon/download.svg",
+    hashtag_restore:"icon/hashtag_restore.svg",
 }
 //UNIX時間分秒変換
 function unix_time_mmss(input){

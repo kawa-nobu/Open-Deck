@@ -53,7 +53,8 @@
     "icon/profile_delete.svg",
     "icon/forward.svg",
     "icon/next.svg",
-    "icon/download.svg"]
+    "icon/download.svg",
+    "icon/hashtag_restore.svg"]
   }],
   "action": {
     "default_popup": "popup.html",
