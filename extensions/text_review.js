@@ -15,6 +15,9 @@ class OpdExtTextReview {
                 div[aria-live="polite"][role="status"]:has(a[dir="ltr"]){
                     display: none;
                 }
+                button[data-testid="app-bar-back"]{
+                    display: none !important;
+                }
                 .opd_post_functions{
                     margin-left: -8px;
                 }
