@@ -122,7 +122,7 @@ class OpdExtTextReview {
                 //文章校正機能
                 `<div id="opd_post_text_review" class="opd_function_btn" title="${this.UITexts[this.opd_use_lang].textReview_buttonTitle.message}" disabled><div class="opd_functions_btn_icon_color opd_text_review_btn_icon"></div></div>`,
                 //ハッシュタグ埋め込み機能
-                `<div id="opd_hashtag_restore" class="opd_function_btn" title="${this.UITexts[this.opd_use_lang].hashTagRestore_buttonTitle.message}" disabled><div class="opd_functions_btn_icon_color opd_hashtag_restore_btn_icon"></div></div>`,
+                `<div id="opd_hashtag_restore" class="opd_function_btn" title="${this.UITexts[this.opd_use_lang].hashTagRestore_buttonTitle.message}" _disabled><div class="opd_functions_btn_icon_color opd_hashtag_restore_btn_icon"></div></div>`,
             ]
 
             //ヘルパースクリプト追加
@@ -196,6 +196,15 @@ class OpdExtTextReview {
                             await this.Review(editable_elem.innerText.trim(), review_panel, column_window);
                             review_state = false;
                         }
+                    });
+
+                    //ハッシュタグ埋め込み機能動作追加
+                    column_window.document.getElementById("opd_hashtag_restore").addEventListener("click", async ()=>{
+                        column_window.document.dispatchEvent(new CustomEvent('opd_text_hashtag_restore', {
+                            bubbles: true,
+                            composed: true,
+                            detail: JSON.stringify({ is_firefox: this.IsFirefox() })
+                        }));
                     });
                 }
             }).observe(column_window.document, {
@@ -409,7 +418,7 @@ class OpdExtTextReview {
                 },
                 //ハッシュタグ埋め込み機能
                 hashTagRestore_buttonTitle: {
-                    message: "ハッシュタグ埋め込み"
+                    message: "ハッシュタグ埋め込み (試作版)"
                 },
             },
             en:{
@@ -436,7 +445,7 @@ class OpdExtTextReview {
                 },
                 //ハッシュタグ埋め込み機能
                 hashTagRestore_buttonTitle: {
-                    message: "Restore hashtag"
+                    message: "Restore hashtag (Beta)"
                 },
             }
         }
