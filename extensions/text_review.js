@@ -187,7 +187,6 @@ class OpdExtTextReview {
                     //校正ボタン動作追加
                     column_window.document.getElementById("opd_post_text_review").addEventListener("click", async ()=>{
                         editable_elem = column_window.document.querySelector('div[contenteditable="true"][data-testid*="tweetTextarea"]');
-                        console.log(!review_state, editable_elem, !is_textarea_empty)
                         if(!review_state && editable_elem && !is_textarea_empty){
                             review_state = true;
                             const review_panel = column_window.document.querySelector('div.opd_text_review_panel');
@@ -199,7 +198,20 @@ class OpdExtTextReview {
                     });
 
                     //ハッシュタグ埋め込み機能動作追加
-                    column_window.document.getElementById("opd_hashtag_restore").addEventListener("click", async ()=>{
+                    column_window.document.getElementById("opd_hashtag_restore").addEventListener("click", async (e)=>{
+                        if(e.target.closest("div.opd_function_btn")?.hasAttribute("disabled")) return;
+
+                        //Altキーが押されている場合はタグの記録を削除
+                        if(e.altKey){
+                            if(!confirm(this.UITexts[this.opd_use_lang].hashTagRestore_deleteSaveTagsConfirm.message)) return;
+
+                            column_window.document.dispatchEvent(new CustomEvent('opd_text_hashtag_restore_tag_delete', {
+                                bubbles: true,
+                                composed: true,
+                            }));
+                            return;
+                        }
+
                         column_window.document.dispatchEvent(new CustomEvent('opd_text_hashtag_restore', {
                             bubbles: true,
                             composed: true,
@@ -418,7 +430,10 @@ class OpdExtTextReview {
                 },
                 //ハッシュタグ埋め込み機能
                 hashTagRestore_buttonTitle: {
-                    message: "ハッシュタグ埋め込み (試作版)"
+                    message: "ハッシュタグ埋め込み (試作版)&#13;&#10;Altキーを押しながらクリックでタグの記録を削除します"
+                },
+                hashTagRestore_deleteSaveTagsConfirm: {
+                    message: "保存されたハッシュタグを削除しますか？"
                 },
             },
             en:{
@@ -445,7 +460,10 @@ class OpdExtTextReview {
                 },
                 //ハッシュタグ埋め込み機能
                 hashTagRestore_buttonTitle: {
-                    message: "Restore hashtag (Beta)"
+                    message: "Embed hashtags (beta)&#13;&#10;Alt-click to clear the saved hashtags"
+                },
+                hashTagRestore_deleteSaveTagsConfirm: {
+                    message: "Delete the saved hashtags?"
                 },
             }
         }

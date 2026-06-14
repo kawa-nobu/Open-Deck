@@ -150,6 +150,9 @@
     //TODO:ハッシュタグをOpen-Deck側のストレージで保持するようにする
     function saveHashtags(){
         const hashtags = getEditorHashtags();
+        //ハッシュタグがない場合は何もしない
+        if(!hashtags.length) return;
+
         localStorage.setItem("opd_post_hashtags", JSON.stringify(hashtags));
     }
 
@@ -174,6 +177,16 @@
 
         //ハッシュタグをエディタへ挿入する
         setEditorText(active_editor, editor_text + hashtag_text, detail.is_firefox);
+    }
+
+    //保存されたハッシュタグを削除する
+    function deleteStorageHashtags(){
+        localStorage.removeItem("opd_post_hashtags");
+
+        const hashtag_restore_btn = document.getElementById("opd_hashtag_restore");
+        if(!hashtag_restore_btn) return;
+
+        hashtag_restore_btn.setAttribute("disabled", "");
     }
 
     async function text_all_select(target){
@@ -239,6 +252,9 @@
 
     //ハッシュタグ埋め込み機能のイベントを作成する
     window.addEventListener('opd_text_hashtag_restore', restoreHashtags, true);
+
+    //ハッシュタグ埋め込み機能のタグ記録を削除する
+    window.addEventListener('opd_text_hashtag_restore_tag_delete', deleteStorageHashtags, true);
 
     //ReactProps取得
     function getProps(elem){
