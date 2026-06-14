@@ -19,6 +19,24 @@
     let instance = null;
 
     function intercept() {
+        //ハッシュタグ埋め込み機能の状態を制御する
+        const hashtag_restore_btn = document.getElementById("opd_hashtag_restore");
+        if (hashtag_restore_btn && hashtag_restore_btn.dataset.opd_hashtag_init !== "1"){
+            hashtag_restore_btn.dataset.opd_hashtag_init = "1";
+
+            //ハッシュタグを取得する
+            const ls_hashtags = localStorage.getItem("opd_post_hashtags");
+            const hashtags = ls_hashtags ? JSON.parse(ls_hashtags) : [];
+
+            //ハッシュタグがあれば有効化、無ければ無効化
+            if(hashtags.length){
+                hashtag_restore_btn.removeAttribute("disabled");
+            }else{
+                hashtag_restore_btn.setAttribute("disabled", "");
+            }
+        }
+
+        //投稿後の画面遷移問題を解消する
         const target_element = document.querySelector('button[data-testid="unsentButton"]')?.closest("div");
         if (!target_element) return;
 
@@ -137,6 +155,10 @@
 
     //保存されたハッシュタグをテキストエディタへ挿入する
     const restoreHashtags = async(e) => {
+        const hashtag_restore_btn = document.getElementById("opd_hashtag_restore");
+        //無効の場合は何もしない
+        if(!hashtag_restore_btn || hashtag_restore_btn.hasAttribute("disabled")) return;
+
         const detail = JSON.parse(e.detail);
 
         const ls_hashtags = localStorage.getItem("opd_post_hashtags");
