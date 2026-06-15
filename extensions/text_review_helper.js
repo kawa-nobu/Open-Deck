@@ -112,9 +112,8 @@
                 //内部関数を使って校正文章を擬似的にペーストさせる
                 editor?._onPaste(evt, editor);
             }else{
-                //execCommand は非推奨だが、Firefox では仕方なく使う様にする
-                //文字を置換する
-                document.execCommand('insertText', false, detail.text);
+                //ハッシュタグが含まれていると、execCommandでは動作が崩れるのでこうする
+                setEditorText(target_editor_elem, detail.text);
             }
         }
     };
@@ -176,7 +175,7 @@
         const hashtag_text = " " + hashtags.map(tag => "#" + tag).join(" ");
 
         //ハッシュタグをエディタへ挿入する
-        setEditorText(active_editor, editor_text + hashtag_text, detail.is_firefox);
+        setEditorText(active_editor, editor_text + hashtag_text);
     }
 
     //保存されたハッシュタグを削除する
@@ -207,39 +206,24 @@
         return true;
     }
 
-    async function setEditorText(target_editor_elem, text, is_firefox){
-    //X側のテキストエディタの内部関数を利用してテキストを正しく入力させる
-    if(target_editor_elem && target_editor_elem.isContentEditable){
-        //文字を全て選択する
-        text_all_select(target_editor_elem);
-        //選択が終わるまで待機
-        await new Promise(resolve => setTimeout(resolve, 30));
+    function setEditorText(target_editor_elem, text){
+        //エディタと内部状態を取得
+        const editor = getDraftEditorInstance(target_editor_elem);
+        const editor_state = editor?._latestEditorState ?? editor?.props?.editorState;
+        const on_change = editor?.props?.onChange;
+        if(!editor_state || typeof on_change !== "function") return false;
 
-        //Firefox では DataTransfer や ClipboardEvent 使えないので動作を分ける
-        if (!is_firefox) {
-            //ReactPropsを入手する
-            const propsKey = Object.getOwnPropertyNames(target_editor_elem).find(k => k.includes('__reactProps$'));
-            const props = propsKey ? target_editor_elem[propsKey] : null;
-            const editor = props?.children?.props?.editor ?? props?.children?.[0]?.props?.editor ?? null;
+        //取得した状態からクラスを取得する
+        const EditorState  = editor_state.constructor;
+        const ContentState = editor_state.getCurrentContent().constructor;
 
-            //テキストの DataTransfer を作成
-            const dt = new DataTransfer();
-            dt.setData('text/plain', text);
-
-            //クリップボードのペーストのイベントを作成する
-            const evt = new ClipboardEvent('paste', {
-                bubbles: true,
-                cancelable: true,
-                clipboardData: dt
-            });
-            //内部関数を使って擬似的にペーストさせる
-            editor?._onPaste(evt, editor);
-        }else{
-            //execCommand は非推奨だが、Firefox では仕方なく使う
-            document.execCommand('insertText', false, text);
-        }
+        //新しい状態を作ってエディタのonChangeに渡す
+        const new_state = EditorState.moveFocusToEnd(
+            EditorState.createWithContent(ContentState.createFromText(text), editor_state.getDecorator())
+        );
+        on_change(new_state);
+        return true;
     }
-}
 
     //テキスト貼り付けの認証トークン受付イベントを作成する
     window.addEventListener('opd_text_review_init', (e)=>{
