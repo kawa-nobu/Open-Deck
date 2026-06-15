@@ -43,7 +43,8 @@ const ui_icon_define = {
     text_review:"icon/text_review.svg",
     forward:"icon/forward.svg",
     next:"icon/next.svg",
-    download:"icon/download.svg"
+    download:"icon/download.svg",
+    hashtag_restore:"icon/hashtag_restore.svg",
 }
 //UNIX時間分秒変換
 function unix_time_mmss(input){
@@ -977,6 +978,12 @@ function run(settings){
 
         for (let index = 0; index < column_object.length; index++) {
             column_object[index].removeAttribute("opd_init_webview");
+
+            //カラム拡張読み込み
+            if(mode != "session_set"){
+                reinit_column_extensions(column_object[index].closest("div[opd_column_type]"));
+            }
+
             //バナー/表示モード変更
             column_object[index].addEventListener("load", function(){
                 console.log(this.getAttribute("opd_iframe_width_only"))
@@ -1059,12 +1066,6 @@ function run(settings){
                 let opd_column_auto_reload_time_reload = opd_column_div.querySelector(".opd_a_reload_time_setting");
                 let opd_column_tw_view_mode_opt = opd_column_div.querySelector(".opd_tw_view_mode");
                 let opd_column_scroll_to_top = opd_column_div.querySelector(".opd_column_scroll_to_top");
-
-                //カラム拡張読み込み
-                if(mode != "session_set"){
-                    this.opd_ext_initialized = false;
-                    reinit_column_extensions(this.closest("div[opd_column_type]"));
-                }
 
                 //設定パネルイベント
                 if(mode != "session_set"){
@@ -1635,53 +1636,40 @@ function run(settings){
             alert(i18n_message("msg_profile_delete_current_alert"));
         }
     });
-    //カラム拡張機能の初期化(カラム拡張機能追加はここで行います)
+    //カラム拡張機能の初期化(カラム拡張機能の追加はここで行います)
     function reinit_column_extensions(column_div){
         const column_frame = column_div?.querySelector("iframe");
         if(!column_frame) return;
         const column_type = column_div.getAttribute("opd_column_type");
 
-        if(column_frame.opd_ext_initialized) return;
-
-        let initialized = false;
-        const doInit = () => {
-            if(initialized) return;
-            const target_window = column_frame.contentWindow;
-
-            if(target_window && (!target_window.document || !target_window.document.head)) return;
-            initialized = true;
-
-            column_frame.opd_ext_initialized = true;
-
-            //ユーティリティを仕込む
+        const ext_load = () => {
+            //TODO:今後を見据えてカラム拡張を容易に組み込めるようにする
             const opd_utils = new OpdUtils();
-            opd_utils.Init(target_window);
+            opd_utils.Init(column_frame);
 
-            //文章校正機能を仕込む
             if(column_type === "post"){
                 const ext_text_review = new OpdExtTextReview();
                 const ui_lang = chrome.i18n.getUILanguage();
-                ext_text_review.Init(target_window, ui_icon_define, ui_lang);
+                ext_text_review.Init(column_frame, ui_icon_define, ui_lang);
             }
 
-            //自動更新とメディアビューワーを仕込む
             if(column_type === "home" || column_type === "explore"){
                 const auto_reload = new OpdExtAutoReload();
-                auto_reload.Init(target_window);
-                //カラムフレームに紐付けて、自動更新部分で参照できるようにする
+                auto_reload.Init(column_frame);
                 column_frame.opd_auto_reload = auto_reload;
 
                 const blocker = new OpdMediaViewerBlocker();
-                blocker.Init(target_window);
+                blocker.Init(column_frame);
                 media_viewer_token.push(blocker.opd_send_media_info_token);
             }
         };
 
-        if(column_frame.contentDocument?.readyState === "complete"){
-            doInit();
-        }else{
-            column_frame.addEventListener("load", doInit, { once: true });
-        }
+        //拡張が追加済なら追加しない
+        if(column_frame.opd_extension_loader_added) return;
+        column_frame.opd_extension_loader_added = true;
+
+        //拡張を追加する
+        column_frame.addEventListener("load", ext_load);
     }
 
     //カラム移動
@@ -1719,17 +1707,6 @@ function run(settings){
                     }
                     this.parentNode.insertBefore(dr_elem, this);
                     this.style.borderLeft = '';
-
-                    //ロード完了を待って拡張機能を再初期化する
-                    const moved_column_div = dr_elem.querySelector("div[opd_column_type]");
-                    const moved_iframe = moved_column_div?.querySelector("iframe");
-                    if(moved_iframe){
-                        moved_iframe.opd_ext_initialized = false;
-                        moved_iframe.addEventListener("load", () => {
-                            reinit_column_extensions(moved_column_div);
-                        }, { once: true });
-                    }
-
                     column_settings_save("", last_load_profile);
                 }else{
                     this.style.borderLeft = '';

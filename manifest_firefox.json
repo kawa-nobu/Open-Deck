@@ -1,6 +1,6 @@
 {
     "name": "Open-Deck",
-    "version": "1.1.3.3",
+    "version": "1.1.3.4",
     "manifest_version": 2,
     "description": "The OpenSource Deck",
     "default_locale": "ja",
@@ -48,7 +48,8 @@
     "icon/profile_delete.svg",
     "icon/forward.svg",
     "icon/next.svg",
-    "icon/download.svg"
+    "icon/download.svg",
+    "icon/hashtag_restore.svg"
     ],
     "background" : {
       "scripts": ["background.js"]

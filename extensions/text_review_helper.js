@@ -1,9 +1,5 @@
 // 文章校正機能で使用する、カスタムな文字置換イベントを作成する
 (() => {
-    const isAllowed = (u) => {
-        const url = new URL(u, location.href);
-        return url.origin === location.origin && url.pathname.startsWith("/intent/tweet");
-    };
     //GIF ボタンを消す
     document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_post_css>main button[data-testid="gifSearchButton"]{display:none;}div[data-testid="twc-cc-mask"]{display:none;}</style>`);
     new MutationObserver(function(){
@@ -15,35 +11,65 @@
             back_button.style.display = "block";
         }
     }).observe(document, {childList: true, subtree: true});
-    
-    (function() {
-        //投稿後の遷移メッセージを無効化する
-        const native_add_evt = EventTarget.prototype.addEventListener;
-        native_add_evt.call(window, 'beforeunload', function (e){
-            // 既存イベントをストップさせる
-            e.stopImmediatePropagation();
-        }, {capture: true});
-        
-        //以後追加されるイベントを阻止する
-        EventTarget.prototype.addEventListener = function (type, listener, options){
-            if(String(type).toLowerCase() === 'beforeunload'){
+
+    //homeへの遷移を内部で変更させる処理
+    const push = getProps(document.querySelector('#react-root > div'))?.children.props.children.props.history.push;
+    if (!push) return console.error('push is not found');
+
+    let instance = null;
+
+    function intercept() {
+        //ハッシュタグ埋め込み機能の状態を制御する
+        const hashtag_restore_btn = document.getElementById("opd_hashtag_restore");
+        if (hashtag_restore_btn && hashtag_restore_btn.dataset.opd_hashtag_init !== "1"){
+            hashtag_restore_btn.dataset.opd_hashtag_init = "1";
+
+            //ハッシュタグを取得する
+            const ls_hashtags = localStorage.getItem("opd_post_hashtags");
+            const hashtags = ls_hashtags ? JSON.parse(ls_hashtags) : [];
+
+            //ハッシュタグがあれば有効化、無ければ無効化
+            if(hashtags.length){
+                hashtag_restore_btn.removeAttribute("disabled");
+            }else{
+                hashtag_restore_btn.setAttribute("disabled", "");
+            }
+        }
+
+        //投稿後の画面遷移問題を解消する
+        const target_element = document.querySelector('button[data-testid="unsentButton"]')?.closest("div");
+        if (!target_element) return;
+
+        let fiber = getFiber(target_element);
+
+        if (!fiber) return;
+
+        while (fiber) {
+            if (fiber.stateNode?._handleCloseComposer) {
+                // インスタンスが変わってなければスキップ
+                if (fiber.stateNode === instance) return;
+
+                //変わっていれば再び注入する
+                instance = fiber.stateNode;
+
+                //クローズ処理を再びツイート画面へ遷移するように上書きする
+                instance._handleCloseComposer = () => {
+                    saveHashtags();
+                    push("/compose/post");
+                };
                 return;
             }
-            return native_add_evt.call(this, type, listener, options);
-        };
-        
-        //投稿後は home に戻ってほしくないので遷移を阻止する
-        const originalPushState = history.pushState;
-        history.pushState = function(state, title, url) {
-            const dest = url ? new URL(url, location.href).href : location.href;
-            if (!isAllowed(dest)){
-                //home への遷移を阻止
-                location.replace(location.href);
-                return;
-            }
-            return originalPushState.apply(this, arguments);
-        };
-    })();
+            //returnで走査する
+            fiber = fiber.return;
+        }
+    }
+
+    //常に状態を監視する
+    const observer = new MutationObserver(intercept);
+    observer.observe(document.querySelector('#react-root'), { childList: true, subtree: true });
+
+    //初期実行
+    intercept();
 
     //校正周りの処理
     let target_editor_elem = null;
@@ -86,12 +112,81 @@
                 //内部関数を使って校正文章を擬似的にペーストさせる
                 editor?._onPaste(evt, editor);
             }else{
-                //execCommand は非推奨だが、Firefox では仕方なく使う様にする
-                //文字を置換する
-                document.execCommand('insertText', false, detail.text);
+                //ハッシュタグが含まれていると、execCommandでは動作が崩れるのでこうする
+                setEditorText(target_editor_elem, detail.text);
             }
         }
     };
+
+    //組み込みエディタからテキストを取得する
+    function getEditorText(editor){
+        //エディタの内部インスタンスを取得する
+        const instance = getDraftEditorInstance(editor);
+
+        //エディタの状態を取得して入力されているテキストを取得する
+        const editor_state = instance._latestEditorState;
+        const content = editor_state.getCurrentContent();
+        return content.getPlainText("\n");
+    }
+
+    //組み込みエディタからハッシュタグを取得
+    function getEditorHashtags(){
+        const target_editors = document.querySelectorAll('div[contenteditable="true"][data-testid*="tweetTextarea"]');
+
+        //複数ツイートも考慮してすべてのエディタからハッシュタグを取得して返す
+        const tags = [];
+        target_editors.forEach((editor)=>{
+            //エディタのテキストを取得する
+            const text = getEditorText(editor);
+            //入力されているハッシュタグを抽出して追加する
+            const editor_tags = [...text.matchAll(/#([\p{L}\p{N}_]+)/gu)].map(m => m[1])
+            tags.push(...editor_tags);
+        });
+        return tags;
+    }
+
+    //ハッシュタグをローカルストレージに保存させる
+    //TODO:ハッシュタグをOpen-Deck側のストレージで保持するようにする
+    function saveHashtags(){
+        const hashtags = getEditorHashtags();
+        //ハッシュタグがない場合は何もしない
+        if(!hashtags.length) return;
+
+        localStorage.setItem("opd_post_hashtags", JSON.stringify(hashtags));
+    }
+
+    //保存されたハッシュタグをテキストエディタへ挿入する
+    const restoreHashtags = async(e) => {
+        const hashtag_restore_btn = document.getElementById("opd_hashtag_restore");
+        //無効の場合は何もしない
+        if(!hashtag_restore_btn || hashtag_restore_btn.hasAttribute("disabled")) return;
+
+        const detail = JSON.parse(e.detail);
+
+        const ls_hashtags = localStorage.getItem("opd_post_hashtags");
+        if(!ls_hashtags) return;
+
+        const hashtags = JSON.parse(ls_hashtags);
+
+        const active_editor = document.querySelector('[data-testid="toolBar"]')?.closest('div:has(.public-DraftEditor-content)')?.querySelector('.public-DraftEditor-content[contenteditable="true"]');
+
+        //現在のテキストを取得して保存されたハッシュタグを付与する
+        const editor_text = getEditorText(active_editor)
+        const hashtag_text = " " + hashtags.map(tag => "#" + tag).join(" ");
+
+        //ハッシュタグをエディタへ挿入する
+        setEditorText(active_editor, editor_text + hashtag_text);
+    }
+
+    //保存されたハッシュタグを削除する
+    function deleteStorageHashtags(){
+        localStorage.removeItem("opd_post_hashtags");
+
+        const hashtag_restore_btn = document.getElementById("opd_hashtag_restore");
+        if(!hashtag_restore_btn) return;
+
+        hashtag_restore_btn.setAttribute("disabled", "");
+    }
 
     async function text_all_select(target){
         //テキスト全選択させる関数
@@ -111,6 +206,25 @@
         return true;
     }
 
+    function setEditorText(target_editor_elem, text){
+        //エディタと内部状態を取得
+        const editor = getDraftEditorInstance(target_editor_elem);
+        const editor_state = editor?._latestEditorState ?? editor?.props?.editorState;
+        const on_change = editor?.props?.onChange;
+        if(!editor_state || typeof on_change !== "function") return false;
+
+        //取得した状態からクラスを取得する
+        const EditorState  = editor_state.constructor;
+        const ContentState = editor_state.getCurrentContent().constructor;
+
+        //新しい状態を作ってエディタのonChangeに渡す
+        const new_state = EditorState.moveFocusToEnd(
+            EditorState.createWithContent(ContentState.createFromText(text), editor_state.getDecorator())
+        );
+        on_change(new_state);
+        return true;
+    }
+
     //テキスト貼り付けの認証トークン受付イベントを作成する
     window.addEventListener('opd_text_review_init', (e)=>{
         const detail = JSON.parse(e.detail);
@@ -119,4 +233,35 @@
 
     //テキストを貼り付けさせるイベントを作成する
     window.addEventListener('opd_text_review_apply', handler, true);
+
+    //ハッシュタグ埋め込み機能のイベントを作成する
+    window.addEventListener('opd_text_hashtag_restore', restoreHashtags, true);
+
+    //ハッシュタグ埋め込み機能のタグ記録を削除する
+    window.addEventListener('opd_text_hashtag_restore_tag_delete', deleteStorageHashtags, true);
+
+    //ReactProps取得
+    function getProps(elem){
+        const propsKey = Object.getOwnPropertyNames(elem).find(k => k.includes(`__reactProps$`));
+        return propsKey ? elem[propsKey] : null;
+    }
+
+    //ReactFiber取得
+    function getFiber(elem) {
+        const fiberKey = Object.getOwnPropertyNames(elem).find(k => k.includes('__reactFiber$'));
+        return fiberKey ? elem[fiberKey] : null;
+    }
+
+    //組み込みエディタ取得
+    function getDraftEditorInstance(text_area){
+        let target_element = text_area;
+        while (target_element) {
+            const props = getProps(target_element);
+            const editor = props?.children?.props?.editor ?? props?.children?.[0]?.props?.editor;
+            if (editor) {
+                return editor;
+            }
+            target_element = target_element.parentElement;
+        }
+    }
 })();
