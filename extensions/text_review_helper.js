@@ -12,9 +12,22 @@
         }
     }).observe(document, {childList: true, subtree: true});
 
-    //homeへの遷移を内部で変更させる処理
-    const push = getProps(document.querySelector('#react-root > div'))?.children.props.children.props.history.push;
-    if (!push) return console.error('push is not found');
+    //pushを取得
+    let push = tryGetPush();
+
+    //pushの存在をチェックし、存在していればその他の機能を初期化する
+    if (push) {
+        onReady();
+    }else{
+        const waitObserver = new MutationObserver(() => {
+            push = tryGetPush();
+            if (push) {
+                waitObserver.disconnect();
+                onReady();
+            }
+        });
+        waitObserver.observe(document, { childList: true, subtree: true });
+    }
 
     let instance = null;
 
@@ -63,13 +76,6 @@
             fiber = fiber.return;
         }
     }
-
-    //常に状態を監視する
-    const observer = new MutationObserver(intercept);
-    observer.observe(document.querySelector('#react-root'), { childList: true, subtree: true });
-
-    //初期実行
-    intercept();
 
     //校正周りの処理
     let target_editor_elem = null;
@@ -263,5 +269,21 @@
             }
             target_element = target_element.parentElement;
         }
+    }
+
+    //push取得
+    function tryGetPush(){
+        const root = document.querySelector('#react-root > div');
+        if (!root) return null;
+        return getProps(root)?.children?.props?.children?.props?.history?.push ?? null;
+    }
+
+    //pushの取得後に実行
+    function onReady(){
+        const observer = new MutationObserver(intercept);
+        observer.observe(document.querySelector('#react-root'), {
+            childList: true, subtree: true
+        });
+        intercept();
     }
 })();
