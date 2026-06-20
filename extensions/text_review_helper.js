@@ -12,6 +12,7 @@
         }
     }).observe(document, {childList: true, subtree: true});
 
+    let instance = null;
     //pushを取得
     let push = tryGetPush();
 
@@ -29,7 +30,6 @@
         waitObserver.observe(document, { childList: true, subtree: true });
     }
 
-    let instance = null;
 
     function intercept() {
         //ハッシュタグ埋め込み機能の状態を制御する
