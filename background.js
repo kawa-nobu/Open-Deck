@@ -122,19 +122,7 @@ function update_dnr(){
             condition : {
                 requestDomains: ["x.com", "twitter.com"],
                 initiatorDomains: [EXTENSION_DOMAIN, "x.com", "twitter.com"],
-                resourceTypes: ["main_frame",
-                "sub_frame",
-                "stylesheet",
-                "script",
-                "image",
-                "font",
-                "object",
-                "xmlhttprequest",
-                "ping",
-                "csp_report",
-                "media",
-                "websocket",
-                "other"]
+                resourceTypes: ["main_frame", "sub_frame", "xmlhttprequest", "script", "stylesheet"]
             }
         },
     ];
