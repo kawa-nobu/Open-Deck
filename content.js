@@ -656,6 +656,31 @@ function run(settings){
         & .dsp_column_settings_list {
             background: #474747;
         }
+        
+        & .dsp_column_title {
+            background-color: transparent !important;
+        }
+
+        /* 焼付き軽減 */
+        & div[opd_column_type="dsp_column"] {
+            filter: brightness(0.7);
+            transition: filter 0.3s;
+            &:hover {
+                filter: brightness(1);
+            }
+        }
+
+        & .column_bar {
+            filter: brightness(0.85);
+            transition: filter 0.3s;
+            &:hover {
+                filter: brightness(1);
+            }
+        }
+
+        & #main_bar_empty_column, div[opd_column_type="empty_column"], div[opd_column_type="second_empty_column"] {
+            filter: brightness(0.7);
+        }
     }
 
     /* メディアビューワー */

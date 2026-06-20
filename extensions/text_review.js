@@ -132,11 +132,12 @@ class OpdExtTextReview {
 
             //貼り付け認証トークンを追加する
             this.opd_text_review_token = crypto.randomUUID();
-            setTimeout(() => {
+
+            helper_script.addEventListener("load", ()=>{
                 column_window.document.dispatchEvent(new CustomEvent('opd_text_review_init', {
                     detail: JSON.stringify({ token:this.opd_text_review_token })
                 }));
-            }, 10);
+            });
             
             column_window.document.addEventListener("focusin", (ev) => {
                 //テキストエリアフォーカスタイミングで文字有無のカウンタを仕込む

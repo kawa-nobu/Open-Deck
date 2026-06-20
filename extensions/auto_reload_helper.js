@@ -3,6 +3,20 @@
     let path_old = null;
     let opd_reload_token = null;
     let reload_func = ()=>{};
+
+    // 自動更新時にフォーカスされる問題があるので、scrollIntoViewとfocusを無効化する
+    const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = function(options) {
+        //上へのスクロールはOpen-Deck側で制御するので無効化する
+        return;
+    };
+
+    const originalFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(options) {
+        //自動更新が必要なカラム内ではフォーカスが不要なので無効化する
+        return originalFocus.call(this, Object.assign({}, options, { preventScroll: true }));
+    };
+
     // URLで画面の遷移を監視する
     new MutationObserver(function(){
         const path_search = `${location.pathname}${location.search}`;

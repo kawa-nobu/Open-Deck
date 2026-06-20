@@ -10,11 +10,11 @@ class OpdExtAutoReload {
             column_window.document.head.appendChild(helper_script);
 
             this.opd_reload_token = crypto.randomUUID();
-            setTimeout(() => {
+            helper_script.addEventListener('load', () => {
                 column_window.document.dispatchEvent(new CustomEvent('opd_column_reload_init', {
                     detail: JSON.stringify({ token:this.opd_reload_token })
                 }));
-            }, 10);
+            });
         }
         this.Reload = (column_window)=>{
             if (!this.opd_reload_token) return false;
