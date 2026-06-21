@@ -5,7 +5,7 @@
     let reload_func = ()=>{};
     let isFocusDisabled = false;
     
-    // ユーザー操作でフォーカス無効化を解除する
+    //ユーザー操作でフォーカス無効化を解除する
     ['mousedown', 'keydown', 'touchstart'].forEach(type => {
         document.addEventListener(type, () => {
             isFocusDisabled = false;
@@ -13,24 +13,23 @@
     });
 
     // 自動更新時にフォーカスされる問題があるので、scrollIntoViewとfocusを一時的に無効化する
-    const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
     HTMLElement.prototype.scrollIntoView = function(options) {
         //フォーカス無効化が有効だった場合はフォーカスを無視する
         if (isFocusDisabled) return;
 
-        // カラム側のスクロールが親の横スクロールにも伝搬する問題を以下で対処する
-        // 直近のスクロール可能な親要素を探す
+        //カラム側のスクロールが親の横スクロールにも伝搬する問題を以下で対処する
+        //直近のスクロール可能な親要素を探す
         let parent = this.parentElement;
         while (parent && !/(auto|scroll)/.test(getComputedStyle(parent).overflow)) {
             parent = parent.parentElement;
         }
         if (!parent) return;
 
-        // 対象要素とスクロール親の位置差分を取得してスクロールする
+        //対象要素とスクロール親の位置差分を取得してスクロールする
         const client_rect = this.getBoundingClientRect();
         const parent_client_rect = parent.getBoundingClientRect();
 
-        // はみ出し量を算出
+        //はみ出し量を算出
         const delta = (start, end, pStart, pEnd) =>
             start < pStart ? start - pStart : end > pEnd ? end - pEnd : 0;
 
