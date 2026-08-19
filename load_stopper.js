@@ -3,6 +3,8 @@
 window.stop()を使うと、onloadイベントがブラウザプロセスへ飛ばなくなり、
 ブラウザ側がfavicon更新を破棄して差し替わらないので、
 使わない方法を採用した。
+faviconはChromiumが初期headロード時、
+Firefoxはロード完了後を見るため、二重で設定している。
 */
 (() => {
   if (location.pathname !== "/run-opdeck") return;
@@ -38,6 +40,12 @@ window.stop()を使うと、onloadイベントがブラウザプロセスへ飛�
         //テキストノードやコメントは対象外とする
         if (node.nodeType !== Node.ELEMENT_NODE) continue;
 
+        //元ページのlinkは不要なので消す
+        if (node.tagName === "LINK" && node.dataset.opd !== "1") {
+          node.remove();
+          continue;
+        }
+
         //scriptを除去して元のスクリプト実行を阻止する
         if (node.tagName === "SCRIPT") {
           node.remove();
@@ -63,4 +71,11 @@ window.stop()を使うと、onloadイベントがブラウザプロセスへ飛�
   document.addEventListener("DOMContentLoaded", () => observer.disconnect(), {
     once: true,
   });
+
+  //Firefox対策(Firefoxは先読み時点でfaviconを確定する様なので、ロード完了後に作り直して差し替える)
+  addEventListener("load", () => {
+    const new_icon = link.cloneNode();
+    link.remove();
+    document.head.appendChild(new_icon);
+  }, { once: true });
 })();
