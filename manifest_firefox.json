@@ -1,74 +1,85 @@
 {
-    "name": "Open-Deck",
-    "version": "1.1.3.7",
-    "manifest_version": 2,
-    "description": "The OpenSource Deck",
-    "default_locale": "ja",
-    "icons" : {
-      "128" : "icon.png"
+  "name": "Open-Deck",
+  "version": "1.1.3.7",
+  "manifest_version": 2,
+  "description": "The OpenSource Deck",
+  "default_locale": "ja",
+  "icons": {
+    "128": "icon.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "opd_release@kwdev",
+      "strict_min_version": "115.0"
     },
-    "browser_specific_settings": {
-      "gecko": {
-        "id": "opd_release@kwdev",
-        "strict_min_version": "115.0"
-      },
-      "gecko_android": {
-        "id": "opd_release@kwdev",
-        "strict_min_version": "115.0"
-      }
-    },
-    "web_accessible_resources": [
+    "gecko_android": {
+      "id": "opd_release@kwdev",
+      "strict_min_version": "115.0"
+    }
+  },
+  "web_accessible_resources": [
     "extensions/utils_helper.js",
     "extensions/text_review_helper.js",
     "extensions/auto_reload_helper.js",
     "extensions/media_viewer_block_helper.js",
     "extensions/media_viewer/media_viewer.js",
-    "icon.png", 
+    "icon.png",
     "icon/logo_icon.svg",
     "profile_debug.html",
     "about_opd.html",
     "icon/settings.svg",
-    "icon/banner_hide.svg", 
-    "icon/top_hide.svg", 
-    "icon/pin.svg", 
-    "icon/pinned.svg", 
+    "icon/banner_hide.svg",
+    "icon/top_hide.svg",
+    "icon/pin.svg",
+    "icon/pinned.svg",
     "icon/post.svg",
     "icon/text_review.svg",
     "icon/column_move.svg",
     "icon/column_close.svg",
-    "icon/column_w_size.svg", 
-    "icon/column_add_1st.svg", 
-    "icon/column_add_2nd.svg", 
-    "icon/tl_column.svg", 
-    "icon/notice_column.svg", 
-    "icon/exp_column.svg", 
-    "icon/single_view.svg", 
-    "icon/second_view.svg", 
-    "icon/profile_save.svg", 
+    "icon/column_w_size.svg",
+    "icon/column_add_1st.svg",
+    "icon/column_add_2nd.svg",
+    "icon/tl_column.svg",
+    "icon/notice_column.svg",
+    "icon/exp_column.svg",
+    "icon/single_view.svg",
+    "icon/second_view.svg",
+    "icon/profile_save.svg",
     "icon/profile_delete.svg",
     "icon/forward.svg",
     "icon/next.svg",
     "icon/download.svg",
     "icon/hashtag_restore.svg"
-    ],
-    "background" : {
-      "scripts": ["background.js"]
-    },
-    "permissions" : [
-      "storage",
-      "webRequest",
-      "declarativeNetRequest",
-       "*://*.twitter.com/*",
-       "*://*.x.com/*",
-       "*://*.twimg.com/*",
-       "*://*.kwdev-sys.com/*"
-    ],
-    "content_scripts": [{
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": [
+    "storage",
+    "webRequest",
+    "declarativeNetRequest",
+    "*://*.twitter.com/*",
+    "*://*.x.com/*",
+    "*://*.twimg.com/*",
+    "*://*.kwdev-sys.com/*"
+  ],
+  "content_scripts": [
+    {
       "matches": ["https://twitter.com/*", "https://x.com/*"],
-      "js": ["content.js", "extensions/utils.js", "extensions/text_review.js", "extensions/auto_reload.js", "extensions/media_viewer_block.js", "extensions/media_viewer/media_viewer.js"]
-      }],
-      "browser_action": {
-        "default_popup": "popup.html",
-        "default_icon": "icon.png"
-      }
+      "js": [
+        "load_stopper.js",
+        "content.js",
+        "extensions/utils.js",
+        "extensions/text_review.js",
+        "extensions/auto_reload.js",
+        "extensions/media_viewer_block.js",
+        "extensions/media_viewer/media_viewer.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  }
 }
