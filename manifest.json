@@ -19,6 +19,7 @@
     {
       "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
       "js": [
+        "load_stopper.js",
         "content.js",
         "extensions/utils.js",
         "extensions/text_review.js",
@@ -26,11 +27,6 @@
         "extensions/media_viewer_block.js",
         "extensions/media_viewer/media_viewer.js"
       ],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
-      "js": ["load_stopper.js"],
       "run_at": "document_start"
     }
   ],
