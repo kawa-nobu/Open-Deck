@@ -865,9 +865,6 @@ function run(settings){
     //HTML挿入
     document.body.insertAdjacentElement("afterbegin", ins_html);
 
-    //favicon・タイトルを設定
-    set_title_favicon()
-
     //react-rootを監視しマスク処理をする
     observe_when_ready(
         () => document.getElementById("react-root"),
@@ -1955,87 +1952,6 @@ function main_dsp(react_root){
     react_root.style.overflow = "hidden";
 }
 
-//タイトルやfaviconを設定する
-function set_title_favicon(){
-    const OPD_TITLE = "Open-Deck";
-    const OPD_FAVICON_URL = chrome.runtime.getURL("icon.png");
-
-    //タイトルを設定する
-    document.head.querySelectorAll("title").forEach(elem => {
-        if(elem.dataset.opd !== "1") elem.remove();
-    });
-    let opd_title = document.head.querySelector('title[data-opd="1"]');
-    if(!opd_title){
-        opd_title = document.createElement("title");
-        opd_title.dataset.opd = "1";
-        opd_title.textContent = OPD_TITLE;
-        document.head.appendChild(opd_title);
-    }
-
-    //titleを監視
-    const title_observer = new MutationObserver(() => {
-        //自分の title の中身が変わっていたら戻す
-        if(opd_title.textContent !== OPD_TITLE){
-            opd_title.textContent = OPD_TITLE;
-        }
-        document.head.querySelectorAll("title").forEach(elem => {
-            if(elem.dataset.opd !== "1") elem.remove();
-        });
-    });
-    title_observer.observe(opd_title, {
-        childList: true,
-        characterData: true,
-        subtree: true
-    });
-    //headも監視
-    const head_title_observer = new MutationObserver(mutations => {
-        for(const m of mutations){
-            for(const node of m.addedNodes){
-                if(node.tagName === "TITLE" && node.dataset.opd !== "1"){
-                    node.remove();
-                }
-            }
-        }
-    });
-    head_title_observer.observe(document.head, { childList: true });
-
-    //faviconを設定する
-    document.head.querySelectorAll('link[rel="shortcut icon"], link[rel="icon"]').forEach(l => {
-        if(l.dataset.opd !== "1") l.remove();
-    });
-    let opd_favicon = document.head.querySelector('link[data-opd="1"]');
-    if(!opd_favicon){
-        opd_favicon = document.createElement("link");
-        opd_favicon.rel = "shortcut icon";
-        opd_favicon.href = OPD_FAVICON_URL;
-        opd_favicon.dataset.opd = "1";
-        document.head.appendChild(opd_favicon);
-    }
-
-    //favicon監視
-    const favicon_observer = new MutationObserver(() => {
-        if(opd_favicon.getAttribute("href") !== OPD_FAVICON_URL){
-            opd_favicon.setAttribute("href", OPD_FAVICON_URL);
-        }
-    });
-    favicon_observer.observe(opd_favicon, {
-        attributes: true,
-        attributeFilter: ["href", "rel"]
-    });
-    //head自体も監視
-    const head_favicon_observer = new MutationObserver(mutations => {
-        for(const m of mutations){
-            for(const node of m.addedNodes){
-                if(node.tagName === "LINK"
-                    && (node.rel === "shortcut icon" || node.rel === "icon")
-                    && node.dataset.opd !== "1"){
-                    node.remove();
-                }
-            }
-        }
-    });
-    head_favicon_observer.observe(document.head, { childList: true });
-}
 
 //Cookieからカラーモードを取得する
 function get_cookie_color_mode() {
