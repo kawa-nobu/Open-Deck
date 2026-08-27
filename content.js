@@ -301,18 +301,22 @@ function run(settings){
         background-color: #d5d5d5;
     }
     #main_rack_element{
+        display: flex;
+        flex-direction: column;
         position: fixed;
-        left:60px;
-        height:100vh;
-        max-width:calc(100vw - 60px);
-        width:calc(100vw - 60px);
-        overflow:scroll hidden;
+        inset: 0 0 0 60px;
+        overflow: scroll hidden;
     }
-    #first_rack_element{
-        /*overflow: hidden;*/
-    }
-    #second_rack_element{
-        /*overflow: hidden;*/
+    #first_rack_element,
+    #second_rack_element {
+        height: auto !important;
+        flex: 1 1 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: row;
+        width: max-content;
+        min-width: 100%;
+        overflow: hidden;
     }
     .dsp_column_emptycolumn p{
         text-align: center;
@@ -906,8 +910,8 @@ function run(settings){
     //2段目が存在する場合の処理
     if(first_column_end == true && second_column_end == true){
         second_rack_mode = true;
-        document.querySelector("#first_rack_element").style.height = "50vh";
-        document.querySelector("#second_rack_element").style.height = "50vh";
+        //document.querySelector("#first_rack_element").style.height = "50vh";
+        document.querySelector("#second_rack_element").style.flex = '';
         /*for (let index = 0; index < document.querySelectorAll('.dsp_column[draggable="true"]').length; index++) {
             document.querySelectorAll('.dsp_column[draggable="true"]')[index].style.height = "calc(100% - 25px)";
         }*/
@@ -916,6 +920,8 @@ function run(settings){
 
         document.querySelector("#second_rack").value = "Single Rack";
         document.querySelector(".dsp_btn_second_rack_img").style.backgroundImage = `url(${chrome.runtime.getURL(ui_icon_define.column_single_rack)})`;
+    }else{
+        document.querySelector("#second_rack_element").style.flex = '0 0 0';
     }
     //
     create_profile_list_btn();
@@ -1485,8 +1491,8 @@ function run(settings){
     document.getElementById("second_rack").addEventListener("click", function(){
         if(second_rack_mode == false){
             //document.querySelector("#main_rack_element").style.height = "50vh";
-            document.querySelector("#first_rack_element").style.height = "50vh";
-            document.querySelector("#second_rack_element").style.height = "50vh";
+            //document.querySelector("#first_rack_element").style.height = "50vh";
+            document.querySelector("#second_rack_element").style.flex = '';
             //console.log(default_element.second_empty_column)
             //const second_rack_empty_html = `<section draggable="false" id="column_%column_num%" class="dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" style="height: calc(100% - 20px);min-width: 30rem;display: flex;align-items: center;justify-content: center;"><p>2段目<br>${i18n_message("ui_second_empty_column_message")}</p></div></section>`;
             const second_rack_default_html = default_element.second_empty_column.html.replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_tw_view_mode%", "0");
@@ -1507,9 +1513,9 @@ function run(settings){
             if(confirm(i18n_message("msg_second_rack_to_single_confirm"))){
                 document.querySelector("#second_rack_element").textContent = "";
                 document.querySelector("style[second_column_css]").textContent = ``;
-                document.querySelector("#first_rack_element").style.height = "100vh";
-                document.querySelector("#second_rack_element").style.height = "0";
-                document.querySelector("#second_rack_element").style.height = "0";
+                //document.querySelector("#first_rack_element").style.height = "100vh";
+                document.querySelector("#second_rack_element").style.flex = '0 0 0';
+                //document.querySelector("#second_rack_element").style.height = "0";
                 //append_object_css();
                 //column_dd();
                 column_settings_save("", last_load_profile);
