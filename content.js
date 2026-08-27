@@ -238,6 +238,9 @@ function run(settings){
     html{
         overflow-y:hidden !important;
     }
+    body{
+        margin: 0 !important;
+    }
     .main_bar_functions{
         display: flex;
         justify-content: center;
