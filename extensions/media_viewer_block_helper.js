@@ -26,7 +26,13 @@
         //引用の場合に格納される
         const quoted = e.target.closest('div[tabindex="0"][role="link"]');
         // 通常のメディア付きツイート
-        const img = e.target.closest('img, div[data-testid="videoComponent"]');
+        let img = e.target.closest('img, div[data-testid="videoComponent"]');
+
+        if(!img){
+            //新クライアント向けのフォールバック
+            img = document.evaluate('ancestor::div[.//*[@itemscope]][1]/*[1]', e.target, null, 9, null)?.singleNodeValue;
+        }
+
         if (!img) return;
 
         //プレイヤーが動作している場合のPropsを取得する
@@ -38,7 +44,12 @@
         //ルートのPropsを取得
         let root_props = get_props(img.closest('div[aria-labelledby][id]'), "Props");//:not([data-testid="card.wrapper"])
         if(quoted){
-            root_props = get_props(quoted, "Props")
+            root_props = get_props(quoted, "Props");
+        }
+
+        //新クライアント向けのフォールバック
+        if(!root_props){
+            root_props = get_props(img, "Props");
         }
 
         //プレイヤーが存在している場合の現在再生ソースを取得
@@ -46,6 +57,12 @@
 
         //メディアソースの一覧を取得
         let media_details = root_props?.children[1]?.props?.children[0]?.props?.mediaDetails;
+        if(!media_details){
+            //新クライアント向けのフォールバック
+            //Propsからメディア情報を取ろうとすると遅延の影響か何かで取れないのでFiberから取る
+            media_details = get_props(img, "Fiber")?.memoizedProps?.children?.props?.tweet?.media_entities2;
+            console.trace(root_props)
+        }
 
         //引用の場合のメディアソースの一覧を取得
         let media_details_quoted = root_props?.children[2]?.props?.tweet?.extended_entities?.media;
