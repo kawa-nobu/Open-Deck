@@ -24,7 +24,8 @@
         }
 
         //引用の場合に格納される
-        const quoted = e.target.closest('div[tabindex="0"][role="link"]');
+        let quoted = e.target.closest('div.mx-auto.aspect-video, div[tabindex="0"][role="link"]');
+
         // 通常のメディア付きツイート
         let img = e.target.closest('img, div[data-testid="videoComponent"]');
 
@@ -61,7 +62,6 @@
             //新クライアント向けのフォールバック
             //Propsからメディア情報を取ろうとすると遅延の影響か何かで取れないのでFiberから取る
             media_details = get_props(img, "Fiber")?.memoizedProps?.children?.props?.tweet?.media_entities2;
-            console.trace(root_props)
         }
 
         //引用の場合のメディアソースの一覧を取得
@@ -72,6 +72,11 @@
             //小さいサイズ表示になっている引用画像を取得する
             if(!media_details_quoted){
                 media_details_quoted = root_props?.children[0]?.[0]?.props?.children[1]?.props?.children[0]?.props?.children[1]?.props?.children?.props?.mediaDetails;
+            }
+
+            //新クライアント向けのフォールバック
+            if(!media_details_quoted){
+                media_details = root_props?.children?.props?.tweet?.media_entities2;
             }
         }
 
