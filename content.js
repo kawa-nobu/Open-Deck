@@ -238,6 +238,9 @@ function run(settings){
     html{
         overflow-y:hidden !important;
     }
+    body{
+        margin: 0 !important;
+    }
     .main_bar_functions{
         display: flex;
         justify-content: center;
@@ -250,6 +253,7 @@ function run(settings){
         margin: 0;
     }
     .opd_version_span{
+        font-size: 14px;
         cursor: pointer;
     }
     .opd_debug_menu{
@@ -298,18 +302,22 @@ function run(settings){
         background-color: #d5d5d5;
     }
     #main_rack_element{
+        display: flex;
+        flex-direction: column;
         position: fixed;
-        left:60px;
-        height:100vh;
-        max-width:calc(100vw - 60px);
-        width:calc(100vw - 60px);
-        overflow:scroll hidden;
+        inset: 0 0 0 60px;
+        overflow: scroll hidden;
     }
-    #first_rack_element{
-        /*overflow: hidden;*/
-    }
-    #second_rack_element{
-        /*overflow: hidden;*/
+    #first_rack_element,
+    #second_rack_element {
+        height: auto !important;
+        flex: 1 1 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: row;
+        width: max-content;
+        min-width: 100%;
+        overflow: hidden;
     }
     .dsp_column_emptycolumn p{
         text-align: center;
@@ -684,8 +692,8 @@ function run(settings){
     }
 
     /* メディアビューワー */
-    ::backdrop {
-        background: rgba(0, 0, 0, 0.9);
+    #opd_media_viewer::backdrop {
+        background: rgba(0, 0, 0, 0.6);
     }
     #opd_media_viewer:focus {
         outline: none;
@@ -697,20 +705,22 @@ function run(settings){
         outline: none;
     }
     .opd_media_viewer_func_btn.media_switch_btn{
-        width: 80px;
-        height: 80px;
+        border: 2px solid rgba(128, 128, 128, 0.4);
+    background: rgba(128, 128, 128, 0.3);
+        width: 60px;
+        height: 60px;
         margin: 10px;
-        border-radius: 10px;
+        border-radius: 100px;
         display: flex;
         justify-content: center;
         align-items: center;
     }
     .opd_media_viewer_func_btn_circle button{
-        border: 0;
-        background: #00000000;
+        border: 2px solid rgba(128, 128, 128, 0.4);
+    background: rgba(128, 128, 128, 0.3);
         cursor: pointer;
         outline: none;
-        border-radius: 10px;
+        border-radius: 100px;
     }
     button[disabled].opd_media_viewer_func_btn{
         visibility: hidden;
@@ -718,51 +728,48 @@ function run(settings){
     .opd_media_viewer_func_btn_icon_color{
         filter: brightness(0) saturate(100%) invert(96%) sepia(6%) saturate(0%) hue-rotate(285deg) brightness(115%) contrast(100%);
     }
+    .media_viewer_icon_close,
+    .media_viewer_icon_forward,
+    .media_viewer_icon_next,
+    .media_viewer_icon_download {
+        display: block;
+        background-size: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+    }
+    .opd_media_viewer_func_btn_circle button,
+    .opd_media_viewer_func_btn.media_switch_btn {
+        border: 2px solid rgba(128, 128, 128, 0.4);
+        background: rgba(128, 128, 128, 0.5);
+        cursor: pointer;
+        outline: none;
+        border-radius: 100px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .opd_media_viewer_func_btn:hover{
-        background: #2f2f2fa3;
+        background: rgba(128, 128, 128, 0.6);
     }
     .opd_media_viewer_func_btn_circle button:hover{
-        background: #2f2f2fa3;
+        background: rgba(128, 128, 128, 0.6);
     }
-    .media_viewer_icon_close{
-        display: block;
+    .media_viewer_icon_close {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.column_close)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 40px;
-        height: 40px;
-        padding: 5px;
     }
-    .media_viewer_icon_forward{
-        display: block;
+    .media_viewer_icon_forward {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.forward)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 30px;
-        padding: 5px;
     }
-    .media_viewer_icon_next{
-        display: block;
+    .media_viewer_icon_next {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.next)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 30px;
-        padding: 5px;
     }
-    .media_viewer_icon_download{
-        display: block;
+    .media_viewer_icon_download {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.download)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 30px;
-        padding: 5px;
     }
     </style>`);
     //カラム要素作成-挿入
@@ -865,9 +872,6 @@ function run(settings){
     //HTML挿入
     document.body.insertAdjacentElement("afterbegin", ins_html);
 
-    //favicon・タイトルを設定
-    set_title_favicon()
-
     //react-rootを監視しマスク処理をする
     observe_when_ready(
         () => document.getElementById("react-root"),
@@ -906,8 +910,8 @@ function run(settings){
     //2段目が存在する場合の処理
     if(first_column_end == true && second_column_end == true){
         second_rack_mode = true;
-        document.querySelector("#first_rack_element").style.height = "50vh";
-        document.querySelector("#second_rack_element").style.height = "50vh";
+        //document.querySelector("#first_rack_element").style.height = "50vh";
+        document.querySelector("#second_rack_element").style.flex = '';
         /*for (let index = 0; index < document.querySelectorAll('.dsp_column[draggable="true"]').length; index++) {
             document.querySelectorAll('.dsp_column[draggable="true"]')[index].style.height = "calc(100% - 25px)";
         }*/
@@ -916,6 +920,8 @@ function run(settings){
 
         document.querySelector("#second_rack").value = "Single Rack";
         document.querySelector(".dsp_btn_second_rack_img").style.backgroundImage = `url(${chrome.runtime.getURL(ui_icon_define.column_single_rack)})`;
+    }else{
+        document.querySelector("#second_rack_element").style.flex = '0 0 0';
     }
     //
     create_profile_list_btn();
@@ -1485,8 +1491,8 @@ function run(settings){
     document.getElementById("second_rack").addEventListener("click", function(){
         if(second_rack_mode == false){
             //document.querySelector("#main_rack_element").style.height = "50vh";
-            document.querySelector("#first_rack_element").style.height = "50vh";
-            document.querySelector("#second_rack_element").style.height = "50vh";
+            //document.querySelector("#first_rack_element").style.height = "50vh";
+            document.querySelector("#second_rack_element").style.flex = '';
             //console.log(default_element.second_empty_column)
             //const second_rack_empty_html = `<section draggable="false" id="column_%column_num%" class="dsp_column dsp_column_second_emptycolumn"><div opd_column_type="second_empty_column" style="height: calc(100% - 20px);min-width: 30rem;display: flex;align-items: center;justify-content: center;"><p>2段目<br>${i18n_message("ui_second_empty_column_message")}</p></div></section>`;
             const second_rack_default_html = default_element.second_empty_column.html.replaceAll("%column_num%", create_random_id()).replace("%column_banner_ch%", "").replace("%column_tw_view_mode%", "0");
@@ -1507,9 +1513,9 @@ function run(settings){
             if(confirm(i18n_message("msg_second_rack_to_single_confirm"))){
                 document.querySelector("#second_rack_element").textContent = "";
                 document.querySelector("style[second_column_css]").textContent = ``;
-                document.querySelector("#first_rack_element").style.height = "100vh";
-                document.querySelector("#second_rack_element").style.height = "0";
-                document.querySelector("#second_rack_element").style.height = "0";
+                //document.querySelector("#first_rack_element").style.height = "100vh";
+                document.querySelector("#second_rack_element").style.flex = '0 0 0';
+                //document.querySelector("#second_rack_element").style.height = "0";
                 //append_object_css();
                 //column_dd();
                 column_settings_save("", last_load_profile);
@@ -1955,87 +1961,6 @@ function main_dsp(react_root){
     react_root.style.overflow = "hidden";
 }
 
-//タイトルやfaviconを設定する
-function set_title_favicon(){
-    const OPD_TITLE = "Open-Deck";
-    const OPD_FAVICON_URL = chrome.runtime.getURL("icon.png");
-
-    //タイトルを設定する
-    document.head.querySelectorAll("title").forEach(elem => {
-        if(elem.dataset.opd !== "1") elem.remove();
-    });
-    let opd_title = document.head.querySelector('title[data-opd="1"]');
-    if(!opd_title){
-        opd_title = document.createElement("title");
-        opd_title.dataset.opd = "1";
-        opd_title.textContent = OPD_TITLE;
-        document.head.appendChild(opd_title);
-    }
-
-    //titleを監視
-    const title_observer = new MutationObserver(() => {
-        //自分の title の中身が変わっていたら戻す
-        if(opd_title.textContent !== OPD_TITLE){
-            opd_title.textContent = OPD_TITLE;
-        }
-        document.head.querySelectorAll("title").forEach(elem => {
-            if(elem.dataset.opd !== "1") elem.remove();
-        });
-    });
-    title_observer.observe(opd_title, {
-        childList: true,
-        characterData: true,
-        subtree: true
-    });
-    //headも監視
-    const head_title_observer = new MutationObserver(mutations => {
-        for(const m of mutations){
-            for(const node of m.addedNodes){
-                if(node.tagName === "TITLE" && node.dataset.opd !== "1"){
-                    node.remove();
-                }
-            }
-        }
-    });
-    head_title_observer.observe(document.head, { childList: true });
-
-    //faviconを設定する
-    document.head.querySelectorAll('link[rel="shortcut icon"], link[rel="icon"]').forEach(l => {
-        if(l.dataset.opd !== "1") l.remove();
-    });
-    let opd_favicon = document.head.querySelector('link[data-opd="1"]');
-    if(!opd_favicon){
-        opd_favicon = document.createElement("link");
-        opd_favicon.rel = "shortcut icon";
-        opd_favicon.href = OPD_FAVICON_URL;
-        opd_favicon.dataset.opd = "1";
-        document.head.appendChild(opd_favicon);
-    }
-
-    //favicon監視
-    const favicon_observer = new MutationObserver(() => {
-        if(opd_favicon.getAttribute("href") !== OPD_FAVICON_URL){
-            opd_favicon.setAttribute("href", OPD_FAVICON_URL);
-        }
-    });
-    favicon_observer.observe(opd_favicon, {
-        attributes: true,
-        attributeFilter: ["href", "rel"]
-    });
-    //head自体も監視
-    const head_favicon_observer = new MutationObserver(mutations => {
-        for(const m of mutations){
-            for(const node of m.addedNodes){
-                if(node.tagName === "LINK"
-                    && (node.rel === "shortcut icon" || node.rel === "icon")
-                    && node.dataset.opd !== "1"){
-                    node.remove();
-                }
-            }
-        }
-    });
-    head_favicon_observer.observe(document.head, { childList: true });
-}
 
 //Cookieからカラーモードを取得する
 function get_cookie_color_mode() {
