@@ -727,51 +727,48 @@ function run(settings){
     .opd_media_viewer_func_btn_icon_color{
         filter: brightness(0) saturate(100%) invert(96%) sepia(6%) saturate(0%) hue-rotate(285deg) brightness(115%) contrast(100%);
     }
-    .opd_media_viewer_func_btn:hover{
+    .media_viewer_icon_close,
+    .media_viewer_icon_forward,
+    .media_viewer_icon_next,
+    .media_viewer_icon_download {
+        display: block;
+        background-size: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+    }
+    .opd_media_viewer_func_btn_circle button,
+    .opd_media_viewer_func_btn.media_switch_btn {
+        border: 2px solid rgba(128, 128, 128, 0.4);
         background: rgba(128, 128, 128, 0.5);
+        cursor: pointer;
+        outline: none;
+        border-radius: 100px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .opd_media_viewer_func_btn:hover{
+        background: rgba(128, 128, 128, 0.6);
     }
     .opd_media_viewer_func_btn_circle button:hover{
-        background: rgba(128, 128, 128, 0.5);
+        background: rgba(128, 128, 128, 0.6);
     }
-    .media_viewer_icon_close{
-        display: block;
+    .media_viewer_icon_close {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.column_close)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 40px;
-        padding: 5px;
     }
-    .media_viewer_icon_forward{
-        display: block;
+    .media_viewer_icon_forward {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.forward)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 30px;
-        padding: 5px;
     }
-    .media_viewer_icon_next{
-        display: block;
+    .media_viewer_icon_next {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.next)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 30px;
-        padding: 5px;
     }
-    .media_viewer_icon_download{
-        display: block;
+    .media_viewer_icon_download {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.download)});
-        background-size: 20px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 30px;
-        height: 40px;
-        padding: 5px;
     }
     </style>`);
     //カラム要素作成-挿入
