@@ -253,6 +253,7 @@ function run(settings){
         margin: 0;
     }
     .opd_version_span{
+        font-size: 14px;
         cursor: pointer;
     }
     .opd_debug_menu{
