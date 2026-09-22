@@ -78,10 +78,16 @@
     "message": "すべて"
   },
   "ui_settings_view_mode_text_only": {
-    "message": "テキストのみ"
+    "message": "テキストのみ (引用なし)"
   },
   "ui_settings_view_mode_media_only": {
-    "message": "画像・動画付のみ"
+    "message": "画像・動画付のみ (引用なし)"
+  },
+  "ui_settings_view_mode_text_only_quote": {
+    "message": "テキストのみ (引用あり)"
+  },
+  "ui_settings_view_mode_media_only_quote": {
+    "message": "画像・動画付のみ (引用あり)"
   },
   "ui_settings_column_width_label": {
     "message": "カラム幅"

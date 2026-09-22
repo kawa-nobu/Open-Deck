@@ -78,10 +78,16 @@
     "message": "All"
   },
   "ui_settings_view_mode_text_only": {
-    "message": "Text only"
+    "message": "Text only (no quotes)"
   },
   "ui_settings_view_mode_media_only": {
-    "message": "With media only"
+    "message": "With images/videos only (no quotes)"
+  },
+  "ui_settings_view_mode_text_only_quote": {
+    "message": "Text only (with quotes)"
+  },
+  "ui_settings_view_mode_media_only_quote": {
+    "message": "With images/videos only (with quotes)"
   },
   "ui_settings_column_width_label": {
     "message": "Column width"
