@@ -89,6 +89,9 @@
   "ui_settings_view_mode_media_only_quote": {
     "message": "With images/videos only (with quotes)"
   },
+  "ui_settings_column_hide_rt_label": {
+    "message": "Hide reposts"
+  },
   "ui_settings_column_width_label": {
     "message": "Column width"
   },
