@@ -6,7 +6,7 @@ class OpdExtMediaViewer {
             const media_viewer_div = document.createElement("div");
             const media_viewer_dialog = document.createElement("dialog");
             //キーボード操作系
-            const key_controller = new AbortController();
+            const key_abort_controller = new AbortController();
             const key_map = { ArrowLeft: "forward", ArrowRight: "next" };
 
             const mediaHTMLAt = (idx) => {
@@ -110,7 +110,7 @@ class OpdExtMediaViewer {
                 event.preventDefault();
                 event.stopPropagation();
                 navigate(direction);
-            }, {capture: true, signal: key_controller.signal});
+            }, {capture: true, signal: key_abort_controller.signal});
 
 
             Object.assign(media_viewer_dialog, {
@@ -147,7 +147,7 @@ class OpdExtMediaViewer {
 
             function media_viewer_close(){
                 //キーボードのリスナーを解除する
-                key_controller.abort();
+                key_abort_controller.abort();
 
                 video_element = append_viewer_element.getElementsByTagName('video')[0];
                 if(video_element){
