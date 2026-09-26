@@ -5,6 +5,10 @@ class OpdExtMediaViewer {
             let current_media_idx = pre_index;
             const media_viewer_div = document.createElement("div");
             const media_viewer_dialog = document.createElement("dialog");
+            //キーボード操作系
+            const key_controller = new AbortController();
+            const key_map = { ArrowLeft: "forward", ArrowRight: "next" };
+
             const mediaHTMLAt = (idx) => {
                 const info = media_info[idx];
                 if (!info) return "";
@@ -50,7 +54,11 @@ class OpdExtMediaViewer {
                 if (["animated_gif","video"].includes(nextInfo.type) && current.tagName === "VIDEO") {
                     current.src = nextInfo.video_info.variants.at(-1).url;
                     current.load();
-                    current.play();
+                    //キー操作などで高速に動画の移動を繰り返すと、ユーザー操作起因の無害なAbortErrorが出るため握りつぶす
+                    current.play().catch((error) => {
+                        //AbortErrorではないその他のエラーはエラーとして出す
+                        if (error.name !== "AbortError") console.error(error);
+                    });
                     return;
                 }
                 if (nextInfo.type === "photo" && current.tagName === "IMG") {
@@ -70,6 +78,39 @@ class OpdExtMediaViewer {
                     }, {once: true});
                 }
             };
+
+            //メディアの前後移動処理
+            const navigate = (direction) => {
+                //前(forward)は-1、次(next)は+1する
+                const step = { forward: -1, next: 1 }[direction];
+                if (step === undefined) return;
+
+                //先頭より前、末尾より後ろには移動しない
+                const idx = current_media_idx + step;
+                if (idx < 0 || idx >= media_info.length) return;
+
+                //メディアを表示する
+                current_media_idx = idx;
+                setMedia(current_media_idx);
+
+                //移動後の位置に合わせて前後ボタンの有効/無効を更新する
+                this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
+            };
+
+            //キーボード操作処理
+            document.addEventListener("keydown", (event) => {
+                //IME変換中や修飾キー付きの操作はブラウザやページ側の動作を優先させたいので何もしない
+                if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+
+                const direction = key_map[event.key];
+                //左右キー以外は対象外なので何もしない
+                if (!direction) return;
+
+                //動画のシークやページ側のショートカットが同時に動かないように止める
+                event.preventDefault();
+                event.stopPropagation();
+                navigate(direction);
+            }, {capture: true, signal: key_controller.signal});
 
 
             Object.assign(media_viewer_dialog, {
@@ -105,6 +146,9 @@ class OpdExtMediaViewer {
             }
 
             function media_viewer_close(){
+                //キーボードのリスナーを解除する
+                key_controller.abort();
+
                 video_element = append_viewer_element.getElementsByTagName('video')[0];
                 if(video_element){
                     //稀にビューワーを閉じた後でもVideoが再生されてしまう場合があるので念のため、Videoを止めて消す
@@ -117,61 +161,27 @@ class OpdExtMediaViewer {
                 callback();
             }
 
+            //メディアビューワーを閉じる際の処理
             media_viewer_dialog.addEventListener("close", () => media_viewer_close());
-            media_viewer_dialog.querySelector("[data-close]")?.addEventListener("click", () => media_viewer_close());
+
+            //閉じるボタンの動作
+            media_viewer_dialog.querySelector("[data-close]")?.addEventListener("click", () => media_viewer_dialog.close());
 
             //背景クリックで閉じやすくする
             media_viewer_dialog.addEventListener("click", (event)=>{
                 const tag_name = event.target.tagName;
                 const allowed_tag = ["IMG", "VIDEO", "SPAN", "BUTTON"];
                 if(!allowed_tag.includes(tag_name)){
-                    media_viewer_close();
+                    media_viewer_dialog.close();
                 }
             })
 
 
             this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
 
-            media_viewer_dialog.querySelector("[data-media-forward]").addEventListener("click", () => {
-
-                this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
-
-                if (current_media_idx === 0) return;
-
-                const current_media_elem = media_viewer_dialog.querySelector("[data-media]");
-                const forward_idx = current_media_idx - 1;
-
-                if (["animated_gif","video"].includes(media_info[forward_idx]?.type) ) {
-                    current_media_elem.src = media_info[forward_idx].video_info.variants.at(-1).url;
-                }
-                if (media_info[forward_idx]?.type === "photo") {
-                    current_media_elem.src = media_info[forward_idx].media_url_https + '?name=orig';
-                }
-                current_media_idx -= 1;
-
-                setMedia(current_media_idx);
-
-                this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
-            });
-
-            media_viewer_dialog.querySelector("[data-media-next]").addEventListener("click", () => {
-                const next_idx = current_media_idx + 1;
-
-                if (media_info.length === next_idx) return;
-
-                const current_media_elem = media_viewer_dialog.querySelector("[data-media]");
-                if (["animated_gif","video"].includes(media_info[next_idx]?.type) ) {
-                    current_media_elem.src = media_info[next_idx].video_info.variants.at(-1).url;
-                }
-                if (media_info[next_idx]?.type === "photo") {
-                    current_media_elem.src = media_info[next_idx].media_url_https + '?name=orig';
-                }
-                current_media_idx += 1;
-
-                setMedia(current_media_idx);
-
-                this.SkipBtnDisabled(media_viewer_dialog, media_info, current_media_idx);
-            });
+            //各種ボタンの動作
+            media_viewer_dialog.querySelector("[data-media-forward]").addEventListener("click", () => navigate("forward"));
+            media_viewer_dialog.querySelector("[data-media-next]").addEventListener("click", () => navigate("next"));
 
             media_viewer_dialog.querySelector("[data-media-download]").addEventListener("click", () => {
                 this.DownloadMedia(media_info[current_media_idx]);
