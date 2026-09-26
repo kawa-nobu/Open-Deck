@@ -779,6 +779,27 @@ function run(settings){
     .media_viewer_icon_download {
         background-image: url(${chrome.runtime.getURL(ui_icon_define.download)});
     }
+    /* メディア読み込み中アニメーション */
+    .opd_media_viewer_loading {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        margin: 0 80px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: opd_media_viewer_spin 0.8s linear infinite;
+    }
+    .opd_media_viewer_loading[hidden] {
+        display: none;
+    }
+    /* 読み込み中はメディアを隠してスピナーだけ表示する */
+    .opd_media_viewer_loading:not([hidden]) ~ [data-media] {
+        display: none;
+    }
+    @keyframes opd_media_viewer_spin {
+        to { transform: rotate(360deg); }
+    }
     </style>`);
     //カラム要素作成-挿入
     let default_element_bar = `<span class="dsp_column_btn"><label class="dsp_column_settings_btn opd_ui_icon_color" title="${i18n_message("ui_column_settings_title")}"><input class="opd_settings_btn" type="button" value="S"></label></span><span class="dsp_column_btn"><input class="opd_banner" type="checkbox" title="${i18n_message("ui_column_banner_toggle_title")}" %column_banner_ch%><label class="dsp_column_banner_btn opd_ui_icon_color"></label></span><span class="dsp_column_btn"><input class="opd_top_bar" type="checkbox" title="${i18n_message("ui_column_top_toggle_title")}" %column_top_bar_ch%><label class="dsp_column_top_btn opd_ui_icon_color"></label></span>`;

@@ -44,6 +44,24 @@ class OpdExtMediaViewer {
                 } catch (error) {}
             };
 
+            //読み込み中表示状態の切り替えをする
+            const setMediaLoading = (is_loading) => {
+                media_viewer_dialog.querySelector("[data-loading]")?.toggleAttribute("hidden", !is_loading);
+            };
+
+            //メディアの読み込み完了やエラーで読み込み中表示を消す
+            const watchLoading = (elem) => {
+                //同じ要素に重複して状態監視をしない様にする
+                if (elem.dataset.loadWatched) return;
+                elem.dataset.loadWatched = "true";
+
+                //読み込み完了のイベント名はvideoとimgで異なるので、切り替える
+                const loaded_event = elem.tagName === "VIDEO" ? "loadeddata" : "load";
+
+                elem.addEventListener(loaded_event, () => setMediaLoading(false));
+                elem.addEventListener("error", () => setMediaLoading(false));
+            };
+
             const setMedia = (idx) => {
                 const current = media_viewer_dialog.querySelector("[data-media]");
                 const nextInfo = media_info[idx];
@@ -52,6 +70,7 @@ class OpdExtMediaViewer {
                 stopVideo(current);
 
                 if (["animated_gif","video"].includes(nextInfo.type) && current.tagName === "VIDEO") {
+                    setMediaLoading(true);
                     current.src = nextInfo.video_info.variants.at(-1).url;
                     current.load();
                     //キー操作などで高速に動画の移動を繰り返すと、ユーザー操作起因の無害なAbortErrorが出るため握りつぶす
@@ -62,6 +81,7 @@ class OpdExtMediaViewer {
                     return;
                 }
                 if (nextInfo.type === "photo" && current.tagName === "IMG") {
+                    setMediaLoading(true);
                     current.src = nextInfo.media_url_https + "?name=orig";
                     return;
                 }
@@ -71,6 +91,8 @@ class OpdExtMediaViewer {
                 const next_elment = wrapper.firstElementChild;
                 if (!next_elment) return;
 
+                setMediaLoading(true);
+                watchLoading(next_elment);
                 current.replaceWith(next_elment);
                 if (next_elment.tagName === "VIDEO") {
                     next_elment.addEventListener("loadedmetadata", () => {
@@ -126,6 +148,7 @@ class OpdExtMediaViewer {
 
                 <div style="display:flex;flex-direction:row;flex:1;min-height:0;overflow:hidden;align-items:center;width:fit-content;">
                     <button type="button" class="opd_media_viewer_func_btn media_switch_btn" data-media-forward><span class="media_viewer_icon_forward opd_media_viewer_func_btn_icon_color"></span></button>
+                    <div class="opd_media_viewer_loading" data-loading></div>
                     ${mediaHTMLAt(current_media_idx)}
                     <button type="button" class="opd_media_viewer_func_btn media_switch_btn" data-media-next><span class="media_viewer_icon_next opd_media_viewer_func_btn_icon_color"></span></button>
                 </div>
@@ -137,6 +160,14 @@ class OpdExtMediaViewer {
             `;
             media_viewer_div.appendChild(media_viewer_dialog);
             const append_viewer_element = document.body.appendChild(media_viewer_div);
+
+            //初期表示時のメディア読み込み中表示を行う
+            const initial_media = media_viewer_dialog.querySelector("[data-media]");
+            if (initial_media) {
+                watchLoading(initial_media);
+            } else {
+                setMediaLoading(false);
+            }
 
             //Videoの音量設定
             let video_element = append_viewer_element.getElementsByTagName('video')[0];
