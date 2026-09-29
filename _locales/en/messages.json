@@ -44,6 +44,9 @@
   "ui_toggle_second_rack_title": {
     "message": "Toggle multi-row layout"
   },
+  "ui_open_system_settings_title": {
+    "message": "Open system settings"
+  },
   "ui_profile_save_title": {
     "message": "Save profile"
   },

@@ -44,6 +44,9 @@
   "ui_toggle_second_rack_title": {
     "message": "カラム段切り替え"
   },
+  "ui_open_system_settings_title": {
+    "message": "システム設定を開く"
+  },
   "ui_profile_save_title": {
     "message": "プロファイル保存"
   },

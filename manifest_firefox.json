@@ -23,6 +23,8 @@
     "extensions/auto_reload_helper.js",
     "extensions/media_viewer_block_helper.js",
     "extensions/media_viewer/media_viewer.js",
+    "system_settings/system_settings.html",
+    "system_settings/system_settings.js",
     "icon.png",
     "icon/logo_icon.svg",
     "profile_debug.html",
