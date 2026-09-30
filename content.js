@@ -202,7 +202,9 @@ if(location.href == "https://twitter.com/run-opdeck" || location.href == "https:
         });
     }
 }
-function run(settings){
+async function run(settings){
+    //システム設定を準備する
+    const opd_system_settings = await OpdSystemSettingsManager.load();
     //console.log(settings)
     let profile_list_html;
     let profile_list_btn_html = "";
@@ -1076,6 +1078,8 @@ function run(settings){
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
                     }*/
                     /* TODO: querySelectorを毎回するのは非効率なので、後日まとめる */
+                    //ユーザー設定CSS挿入(サニタイズ済みのカスタムCSSを挿入)
+                    applyCustomCss(this, opd_system_settings.user_custom_css_twitter_sanitized);
                     //共通CSS挿入(スクロールバー細くする)
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_main_css>html{scrollbar-width:thin;}</style>`);
                     //RT非表示
@@ -1998,6 +2002,22 @@ function run(settings){
             return false;
         }
         return true;
+    }
+    //カラムにカスタムCSSを挿入する
+    function applyCustomCss(columnElement, css) {
+        //設定されていない場合は何もしない
+        if (!css) return;
+
+        const columnDocument = columnElement.contentWindow.document;
+
+        //Firefoxでは挿入後に中身を入れるとCSP違反になるため、中身を入れてから挿入する
+        const styleElement = columnDocument.createElement("style");
+        styleElement.setAttribute("opd_user_custom_css", "");
+        styleElement.textContent = css;
+
+        //head要素がまだ無い場合はhtml要素に挿入する
+        const insertTarget = columnDocument.head ?? columnDocument.documentElement;
+        insertTarget.append(styleElement);
     }
     //ランダムID作成
     function create_random_id(){
