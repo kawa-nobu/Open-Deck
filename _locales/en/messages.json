@@ -250,5 +250,47 @@
   },
   "label_api_search": {
     "message": "Search:"
+  },
+
+  "ui_system_settings_title": {
+    "message": "Open-Deck System Settings"
+  },
+  "ui_system_settings_help": {
+    "message": "Open-Deck System Settings Help"
+  },
+  "ui_custom_css_twitter_title": {
+    "message": "Custom CSS (Advanced / Twitter only / Applies on next launch)"
+  },
+  "ui_custom_css_notice_support": {
+    "message": "This is an advanced feature. No support is provided for custom CSS or any issues caused by using it."
+  },
+  "ui_custom_css_notice_sanitize": {
+    "message": "External URLs and other unsafe content are removed when saving, but complete safety cannot be guaranteed."
+  },
+  "ui_custom_css_notice_warning": {
+    "message": "CSS that someone asks you to paste may be dangerous."
+  },
+  "ui_custom_css_notice_confirm": {
+    "message": " Only use CSS you fully understand."
+  },
+  "ui_custom_css_notice_restart": {
+    "message": "Changes will take effect the next time you launch Open-Deck."
+  },
+  "ui_custom_css_placeholder": {
+    "message": "/* Enter CSS here */"
+  },
+  "ui_custom_css_apply_button": {
+    "message": "Save"
+  },
+  "app_custom_css_applied": {
+    "message": "Custom CSS saved.\nChanges will take effect the next time you launch Open-Deck."
+  },
+  "app_custom_css_applied_with_removed": {
+    "message": "Custom CSS saved.\nChanges will take effect the next time you launch Open-Deck.\n\nThe following rules contain unsafe content and will not be applied:\n\n$REMOVED_RULES$",
+    "placeholders": {
+      "removed_rules": {
+        "content": "$1"
+      }
+    }
   }
 }

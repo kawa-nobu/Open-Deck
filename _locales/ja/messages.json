@@ -250,5 +250,47 @@
   },
   "label_api_search": {
     "message": "検索:"
+  },
+
+    "ui_system_settings_title": {
+    "message": "Open-Deckシステム設定"
+  },
+  "ui_system_settings_help": {
+    "message": "Open-Deckシステム設定ヘルプ"
+  },
+  "ui_custom_css_twitter_title": {
+    "message": "カスタムCSS(上級者向け / Twitterのみ有効 / 次回起動時有効)"
+  },
+  "ui_custom_css_notice_support": {
+    "message": "上級者向け機能です。CSSの内容や設定したことによって発生した不具合について開発者はサポートしません。"
+  },
+  "ui_custom_css_notice_sanitize": {
+    "message": "外部URLなどは設定時に除去されますが、完全な安全は保証できません。"
+  },
+  "ui_custom_css_notice_warning": {
+    "message": "他人に「貼り付けて」と言われたCSSは危険な場合があります。"
+  },
+  "ui_custom_css_notice_confirm": {
+    "message": "必ず内容を理解した上で使用してください。"
+  },
+  "ui_custom_css_notice_restart": {
+    "message": "設定は次回Open-Deckの起動時から適用されます。"
+  },
+  "ui_custom_css_placeholder": {
+    "message": "/* ここにCSSを入力 */"
+  },
+  "ui_custom_css_apply_button": {
+    "message": "設定"
+  },
+  "app_custom_css_applied": {
+    "message": "カスタムCSSを設定しました。\n次回Open-Deckの起動時から適用されます。"
+  },
+  "app_custom_css_applied_with_removed": {
+    "message": "カスタムCSSを設定しました。\n次回Open-Deckの起動時から適用されます。\n\n安全でない記述を含むため、次のルールは適用されません:\n\n$REMOVED_RULES$",
+    "placeholders": {
+      "removed_rules": {
+        "content": "$1"
+      }
+    }
   }
 }

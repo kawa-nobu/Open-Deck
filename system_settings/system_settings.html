@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="ui_system_settings_title">Open-Deckシステム設定</title>
+    <script src="../system_setting_manager.js" charset="UTF-8"></script>
+    <script src="system_settings.js" charset="UTF-8"></script>
+    <style>
+        html {
+            color-scheme: light dark;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .header .area1 {
+            width: 100%;
+            max-width: 960px;
+        }
+
+        .header h2 {
+            margin: 0;
+        }
+
+        .settings_area {
+            display: grid;
+            gap: 20px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .setting_list {
+            margin: 0;
+        }
+
+        .setting_list>header {
+            margin-bottom: 8px;
+        }
+
+        .setting_list>header h3 {
+            margin: 0;
+        }
+
+        .box {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            overflow: hidden;
+        }
+
+        .session_list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .session_list .session_item {
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .session_list .session_item:last-child {
+            border-bottom: none;
+        }
+
+        .session_list .session_item>div,
+        .session_list .session_item>p {
+            margin: 0;
+            width: 100%;
+        }
+
+        .session_list .session_item>div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .session_list label {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* 項目内を縦並びにする */
+        .session_list .session_item>div.vertical {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .session_list .session_item>div.vertical p {
+            margin: 0;
+        }
+
+        .session_list .session_item>div.vertical button {
+            align-self: flex-end;
+        }
+
+        .custom_css_notice strong {
+            color: #c62828;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            resize: vertical;
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid #808080;
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        input[type="text"],
+        select {
+            background: #ffffff;
+            color: #111111;
+            border: 1px solid #808080;
+            border-radius: 4px;
+            padding: 8px 10px;
+            min-height: 36px;
+            font: inherit;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            flex-shrink: 0;
+            accent-color: #4f8cff;
+        }
+
+        button,
+        input[type="button"] {
+            border: 1px solid #808080;
+            border-radius: 4px;
+            padding: 8px 12px;
+            background: #f6f6f6;
+            color: inherit;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        button:hover,
+        input[type="button"]:hover {
+            background: #e9e9e9;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .session_list .session_item>div {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"],
+            select,
+            button,
+            input[type="button"] {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: initial;
+                color: initial;
+            }
+
+            .session_list .session_item {
+                border-bottom: 1px solid #ffffff36;
+            }
+
+            .box {
+                background: #ffffff26;
+                border: none;
+            }
+
+            input[type="text"],
+            select {
+                background: #1f1f1f;
+                color: #f3f3f3;
+                border: 1px solid rgb(135, 135, 135);
+            }
+
+            select option {
+                background: #1f1f1f;
+                color: #f3f3f3;
+            }
+
+            input[type="checkbox"] {
+                accent-color: #85b6ff;
+            }
+
+            button,
+            input[type="button"] {
+                background: #2b2b2b;
+                color: #f3f3f3;
+                border: 1px solid rgb(135, 135, 135);
+            }
+
+            button:hover,
+            input[type="button"]:hover {
+                background: #585858;
+            }
+
+            .custom_css_notice strong {
+                color: #ff8a80;
+            }
+
+            textarea {
+                background: #1f1f1f;
+                color: #f3f3f3;
+                border: 1px solid rgb(135, 135, 135);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <section class="area1">
+            <h2 data-i18n="ui_system_settings_title">Open-Deckシステム設定</h2>
+            <p><a href="https://kawa-nobu.github.io/Open-Deck-Wiki/docs/category/%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E7%89%88"
+                    target="_blank" rel="noopener noreferrer" data-i18n="ui_system_settings_help">Open-Deckシステム設定ヘルプ</a>
+            </p>
+        </section>
+    </div>
+    <div class="settings_area">
+        <section class="setting_list">
+            <header>
+                <h3 data-i18n="ui_custom_css_twitter_title">カスタムCSS(上級者向け / Twitterのみ有効 / 次回起動時有効)</h3>
+            </header>
+            <ul class="box session_list">
+                <li class="session_item">
+                    <div class="vertical custom_css_notice">
+                        <p data-i18n="ui_custom_css_notice_support">上級者向け機能です。CSSの内容や設定したことによって発生した不具合について開発者はサポートしません。
+                        </p>
+                        <p data-i18n="ui_custom_css_notice_sanitize">外部URLなどは設定時に除去されますが、完全な安全は保証できません。</p>
+                        <p><strong data-i18n="ui_custom_css_notice_warning">他人に「貼り付けて」と言われたCSSは危険な場合があります。</strong><span
+                                data-i18n="ui_custom_css_notice_confirm">必ず内容を理解した上で使用してください。</span></p>
+                        <p data-i18n="ui_custom_css_notice_restart">設定は次回Open-Deckの起動時から適用されます。</p>
+                        <textarea id="opd_custom_css_twitter" spellcheck="false" autocomplete="off"
+                            placeholder="/* ここにCSSを入力 */" data-i18n-placeholder="ui_custom_css_placeholder"></textarea>
+                        <button id="opd_custom_css_twitter_apply" data-i18n="ui_custom_css_apply_button">設定</button>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+</body>
+
+</html>

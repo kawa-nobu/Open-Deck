@@ -19,6 +19,7 @@
     {
       "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
       "js": [
+        "system_setting_manager.js",
         "load_stopper.js",
         "content.js",
         "extensions/utils.js",
