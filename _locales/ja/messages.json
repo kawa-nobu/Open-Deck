@@ -276,6 +276,9 @@
   "ui_custom_css_notice_restart": {
     "message": "設定は次回Open-Deckの起動時から適用されます。"
   },
+  "ui_custom_css_help": {
+    "message": "カスタムCSSのヘルプ"
+  },
   "ui_custom_css_placeholder": {
     "message": "/* ここにCSSを入力 */"
   },

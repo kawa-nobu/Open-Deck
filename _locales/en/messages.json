@@ -276,6 +276,9 @@
   "ui_custom_css_notice_restart": {
     "message": "Changes will take effect the next time you launch Open-Deck."
   },
+  "ui_custom_css_help": {
+    "message": "Custom CSS help"
+  },
   "ui_custom_css_placeholder": {
     "message": "/* Enter CSS here */"
   },
