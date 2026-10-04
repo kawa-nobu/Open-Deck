@@ -8,10 +8,13 @@ class OpdSystemSettingsManager {
     user_custom_css_twitter: "",
     user_custom_css_twitter_sanitized: "",
   };
+  
+  //Firefoxではchrome名前空間がPromiseを返さない場合があるため、browser名前空間を優先させる
+  static LOCAL_STORAGE_AREA = (globalThis.browser ?? chrome).storage.local;
 
   //設定を読み出し、デフォルト設定とキー構成が異なれば同期して保存する
   static async load() {
-    const storageData = await chrome.storage.local.get(this.STORAGE_KEY);
+    const storageData = await this.LOCAL_STORAGE_AREA.get(this.STORAGE_KEY);
 
     //保存データが無い場合(新規作成時)は空のオブジェクトとして扱う
     let storedSettings = storageData[this.STORAGE_KEY];
@@ -40,7 +43,7 @@ class OpdSystemSettingsManager {
       JSON.stringify(syncedSettings) !== JSON.stringify(storedSettings);
 
     if (isChanged) {
-      await chrome.storage.local.set({ [this.STORAGE_KEY]: syncedSettings });
+      await this.LOCAL_STORAGE_AREA.set({ [this.STORAGE_KEY]: syncedSettings });
     }
 
     return syncedSettings;
@@ -59,6 +62,6 @@ class OpdSystemSettingsManager {
     const currentSettings = await this.load();
     currentSettings[key] = value;
 
-    await chrome.storage.local.set({ [this.STORAGE_KEY]: currentSettings });
+    await this.LOCAL_STORAGE_AREA.set({ [this.STORAGE_KEY]: currentSettings });
   }
 }
