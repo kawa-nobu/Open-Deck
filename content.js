@@ -17,6 +17,8 @@ let profile_store;
 let last_load_profile = 0;
 let is_removed_default_style = false;
 let media_viewer_token = [];
+let opd_media_viewer = null;
+let opd_media_viewer_handler = null;
 const column_auto_update_state = {
     text_focus: {date: 0, active: false},
     media_viewer: {active: false},
@@ -226,23 +228,27 @@ async function run(settings){
         }
     });
     //画像表示パネル
-    const media_viewer = new OpdExtMediaViewer();
-    document.addEventListener('opd_send_media_info', (e) => {
-        const detail = JSON.parse(e.detail);
-        for (let index = 0; index < media_viewer_token.length; index++) {
-            const token = media_viewer_token[index];
-            if(detail.token === token){
-                //ビューワーを閉じた際のコールバック関数
-                function viewer_close(){
-                    column_auto_update_state.media_viewer.active = false;
+    opd_media_viewer = new OpdExtMediaViewer();
+    //プロファイル切替で再実行されても多重登録しないようにする
+    if(!opd_media_viewer_handler){
+        opd_media_viewer_handler = function(e){
+            const detail = JSON.parse(e.detail);
+            for (let index = 0; index < media_viewer_token.length; index++) {
+                const token = media_viewer_token[index];
+                if(detail.token === token){
+                    //ビューワーを閉じた際のコールバック関数
+                    function viewer_close(){
+                        column_auto_update_state.media_viewer.active = false;
+                    }
+
+                    column_auto_update_state.media_viewer.active = true;
+                    opd_media_viewer.Preview(detail.media_info, detail.selected_index, viewer_close);
+                    break;
                 }
-                
-                column_auto_update_state.media_viewer.active = true;
-                media_viewer.Preview(detail.media_info, detail.selected_index, viewer_close);
-                break;
             }
-        }
-    });
+        };
+        document.addEventListener('opd_send_media_info', opd_media_viewer_handler);
+    }
     //CSSタグ追加
     document.querySelector("head").insertAdjacentHTML("afterbegin", `<style second_column_css></style>
     <style opd_default_css>
@@ -1063,7 +1069,6 @@ async function run(settings){
 
             //バナー/表示モード変更
             column_object[index].addEventListener("load", function(){
-                console.log(this.getAttribute("opd_iframe_width_only"))
                 if(this.getAttribute("opd_iframe_width_only") != ''){
                     //console.log(this)
                     let opd_column_div = this.closest("div[opd_column_type]");
@@ -1082,8 +1087,6 @@ async function run(settings){
                     applyCustomCss(this, opd_system_settings.user_custom_css_twitter_sanitized);
                     //共通CSS挿入(スクロールバー細くする)
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_main_css>html{scrollbar-width:thin;}</style>`);
-                    //RT非表示
-                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_disable_rt_css></style>`);
                     //バナー表示ロード
                     if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
@@ -1101,24 +1104,27 @@ async function run(settings){
                     }
                     if(opd_column_top_visible_checkbox?.checked != true){
                         if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                            //div[data-testid="primaryColumn"] div[tabindex="0"][aria-label] div:has(form[role="search"]){display:none;}
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1)div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1)`;
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}div[data-testid="cellInnerDiv"]:has(button[aria-describedby], div[data-testid="UserAvatar-Container-unknown"]):not(:has(article[tabindex="-1"])){display:none;}`;
+                        }else if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;} div[role="progressbar"] + div{display:none;}div[data-testid="cellInnerDiv"]:has(button[aria-describedby], div[data-testid="UserAvatar-Container-unknown"]):not(:has(article[tabindex="-1"])){display:none;}`;
                         }else{
-                            if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;} div[role="progressbar"] + div{display:none;}`;
-                            }else{
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){display:none;}`;
-                            }
+                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}div[data-testid="cellInnerDiv"]:has(button[aria-describedby], div[data-testid="UserAvatar-Container-unknown"]):not(:has(article[tabindex="-1"])){display:none;}`;
                         }
                     }else{
-                        //console.log("else")
                         this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
+                    }
+
+                    //RT非表示設定読み込み適用
+                    this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_disable_rt_css></style>`);
+                    if(opd_column_hide_rt_tweet_opt?.checked){
+                        this.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = 'div[data-testid="cellInnerDiv"]:has(a>span[data-testid="socialContext"]){visibility: hidden; height: 0;}';
                     }
 
                     //ツイート表示項目設定読み込み適用
                     if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
                     }
+                    opd_column_tw_view_mode_opt.value = opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val");
                     switch (opd_column_tw_view_mode_opt.value) {
                         case "0":
                             //すべて
@@ -1264,80 +1270,6 @@ async function run(settings){
 
                 //他SNSカラム対応
                 if(this.getAttribute("opd_iframe_width_only") != ''){
-                    //バナー表示設定読み込み適用
-                    /*if(opd_column_banner_checkbox.checked == true){
-                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                    }else{
-                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
-                    }*/
-                    if(this.contentWindow.document.querySelector('head style[opd_banner_css]') == null){
-                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
-                    }
-                    if(opd_column_banner_checkbox?.checked != true){
-                        //console.log(this)
-                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
-                    }else{
-                        //console.log("else")
-                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
-                    }
-
-                    //トップ検索欄等削除適用
-                    if(this.contentWindow.document.querySelector('head style[opd_top_visible_css]') == null){
-                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_top_visible_css></style>`);
-                    }
-                    if(opd_column_top_visible_checkbox?.checked != true){
-                        //console.log("home_notcheck")
-                        if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "explore"){
-                            this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}div[data-testid="cellInnerDiv"]:has(button[aria-describedby], div[data-testid="UserAvatar-Container-unknown"]):not(:has(article[tabindex="-1"])){display:none;}`;
-                        }else{
-                            if(this.closest("div[opd_column_type]").getAttribute("opd_column_type") == "home"){
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;} div[role="progressbar"] + div{display:none;}div[data-testid="cellInnerDiv"]:has(button[aria-describedby], div[data-testid="UserAvatar-Container-unknown"]):not(:has(article[tabindex="-1"])){display:none;}`;
-                            }else{
-                                this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = `div[data-testid="primaryColumn"]>[tabindex="0"][aria-label]>div:nth-child(1){visibility: hidden; height: 0;top: calc(100vh - 60px);position: sticky;backdrop-filter: blur(0px) !important;}[data-testid="app-bar-back"]{visibility: visible; filter: none;}div[data-testid="cellInnerDiv"]:has(button[aria-describedby], div[data-testid="UserAvatar-Container-unknown"]):not(:has(article[tabindex="-1"])){display:none;}`;
-                            }
-                        }
-                    }else{
-                        //console.log("else")
-                        this.contentWindow.document.querySelector('head style[opd_top_visible_css]').textContent = ``;
-                    }
-
-                    //RT非表示設定読み込み適用
-                    if(opd_column_hide_rt_tweet_opt != null){
-                        if(opd_column_hide_rt_tweet_opt.checked){
-                            this.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = 'div[data-testid="cellInnerDiv"]:has(a>span[data-testid="socialContext"]){visibility: hidden; height: 0;}';
-                        }
-                    }
-                
-                    //ツイート表示項目設定読み込み適用
-                    if(this.contentWindow.document.querySelector("head style[opd_tw_view_mode_css]") == null){
-                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_tw_view_mode_css></style>`);
-                    }
-                    opd_column_tw_view_mode_opt.value = opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val")
-                    switch (opd_column_tw_view_mode_opt.getAttribute("column_tw_view_mode_val")) {
-                        case "0":
-                            //すべて
-                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                            break;
-                        case "1":
-                            //テキストのみ
-                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = tweet_visible_ctrl_selectors.text_only;
-                            break;
-                        case "2":
-                            //動画・画像のみ
-                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = tweet_visible_ctrl_selectors.media_only;
-                            break;
-                        case "3":
-                            //テキストのみ(引用元も含む)
-                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = tweet_visible_ctrl_selectors.text_only_quote;
-                            break;
-                        case "4":
-                            //動画・画像のみ(引用元も含む)
-                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = tweet_visible_ctrl_selectors.media_only_quote;
-                            break;
-                        default:
-                            this.contentWindow.document.querySelector('head style[opd_tw_view_mode_css]').textContent = ``;
-                            break;
-                    }
                     //自動更新初期適用
                     let reload_test = 0;
                     let auto_reload_int = null;//チェックボックスイベントにも再利用
@@ -1371,8 +1303,11 @@ async function run(settings){
                             const auto_reload_load_time = Number(auto_reload_time_input.value) * 1000;
                             auto_reload_time_input.disabled = true;
                             auto_reload_int = setInterval(function(){
-                                //console.log("update!")
-                                //console.log(auto_reload_target_elem.contentWindow)
+                                //カラムが閉じられていたらタイマーを止める
+                                if(!auto_reload_target_elem.isConnected){
+                                    clearInterval(auto_reload_int);
+                                    return;
+                                }
                                 const path_name = auto_reload_target_elem.contentWindow.location.pathname;
                                 if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                     if(auto_reload_target_elem.getAttribute("auto_reload_mouse_hover") == "false"){
@@ -1471,8 +1406,11 @@ async function run(settings){
                                 if(this.checked){
                                     auto_reload_time_input.disabled = true;
                                     auto_reload_int = setInterval(function(){
-                                        //console.log("update!")
-                                        //console.log(auto_reload_target_object.contentWindow)
+                                        //カラムが閉じられていたらタイマーを止める
+                                        if(!auto_reload_target_object.isConnected){
+                                            clearInterval(auto_reload_int);
+                                            return;
+                                        }
                                         const path_name = auto_reload_target_object.contentWindow.location.pathname;
                                         if(['/home', '/search'].includes(path_name) || path_name.startsWith('/i/lists')){
                                             if(auto_reload_target_object.getAttribute("auto_reload_mouse_hover") == "false"){
@@ -1515,6 +1453,8 @@ async function run(settings){
                         }
                         //ツイート表示モードイベント
                         opd_column_tw_view_mode_opt.addEventListener("change", function(){
+                            //再読み込み時に初期値へ戻らないよう属性も更新する
+                            this.setAttribute("column_tw_view_mode_val", this.value);
                             column_settings_save("", last_load_profile);
                             //console.log(this.closest("div[opd_column_type]").querySelector("iframe"))
                             let tw_view_mode_target_object = this.closest("div[opd_column_type]").querySelector("iframe");
@@ -1865,12 +1805,10 @@ async function run(settings){
                 const pin_checkbox = this.closest(".dsp_column").querySelector(".opd_pinned_btn")?.checked;
                 if(pin_checkbox == false || pin_checkbox == undefined){
                     this.closest(".dsp_column").remove();
-                    append_object_css();
                     column_settings_save("", last_load_profile);
                 }else{
                     if(confirm(i18n_message("msg_pinned_column_close_confirm"))){
                         this.closest(".dsp_column").remove();
-                        append_object_css();
                         column_settings_save("", last_load_profile);
                     }
                 }
