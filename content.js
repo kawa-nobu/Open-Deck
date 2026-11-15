@@ -7,6 +7,9 @@ if(is_prototype){
 }else{
     console.log("%cOpen-Deck", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${manifest.version}`);
 }
+//新クライアント判定フラグ
+//TODO: 新クライアントの判定を追加する
+let is_new_client = true;
 //
 const url_path = new URL(location.href);
 let is_added_system_color_mode = false;
@@ -49,7 +52,9 @@ const ui_icon_define = {
     download:"icon/download.svg",
     hashtag_restore:"icon/hashtag_restore.svg",
 }
-const tweet_visible_ctrl_selectors = {
+
+//ツイート表示モードのセレクタ集
+let tweet_visible_ctrl_selectors = {
     //引用を除く(従来の仕様に従い、引用ポストは中身に関係なく非表示にする)
     text_only: 'div[data-testid="cellInnerDiv"]:has([data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"], div[role="link"][tabindex="0"] [data-testid="Tweet-User-Avatar"]){visibility: hidden; height: 0;}',
     media_only: 'div[data-testid="cellInnerDiv"]:has([data-testid="tweet"]):not(:has([data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"])), div[data-testid="cellInnerDiv"]:has(div[role="link"][tabindex="0"] [data-testid="Tweet-User-Avatar"]){visibility: hidden; height: 0;}',
@@ -57,6 +62,18 @@ const tweet_visible_ctrl_selectors = {
     text_only_quote: 'div[data-testid="cellInnerDiv"]:has([data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"]){visibility: hidden; height: 0;}',
     media_only_quote: 'div[data-testid="cellInnerDiv"]:has([data-testid="tweet"]):not(:has([data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"])){visibility: hidden; height: 0;}',
 }
+//新クライアントでは新しいセレクタに置き換える
+if(is_new_client){
+    tweet_visible_ctrl_selectors = {
+        //引用を除く(従来の仕様に従い、引用ポストは中身に関係なく非表示にする)
+        text_only: 'li:has(a[data-engagement-action="media"], video, [data-slot="embedded-tweet-frame"]){visibility: hidden; height: 0;}',
+        media_only: 'li:has(> [data-href]):not(:has(a[data-engagement-action="media"], video)), li:has([data-slot="embedded-tweet-frame"]){visibility: hidden; height: 0;}',
+        //引用を含む(本人・引用元のどちらかにメディアがあれば「メディアあり」として判定する)
+        text_only_quote: 'li:has(a[data-engagement-action="media"], video){visibility: hidden; height: 0;}',
+        media_only_quote: 'li:has(> [data-href]):not(:has(a[data-engagement-action="media"], video)){visibility: hidden; height: 0;}',
+    }
+}
+
 //UNIX時間分秒変換
 function unix_time_mmss(input){
     const date = new Date(input * 1000);
@@ -1058,9 +1075,6 @@ async function run(settings){
 
         //カラム読み込み失敗検出
         watch_load_column(column_object);
-
-        //TODO: 新クライアントの判定を追加する
-        const is_new_client = true;
 
         for (let index = 0; index < column_object.length; index++) {
             column_object[index].removeAttribute("opd_init_webview");
