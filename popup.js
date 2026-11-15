@@ -1,2 +1,2 @@
-chrome.tabs.create({url:'https://twitter.com/run-opdeck'});
+chrome.tabs.create({url:'http://localhost:8787/run-opdeck'});
 window.close();

@@ -11,13 +11,14 @@
     "*://*.twitter.com/*",
     "*://*.twimg.com/*",
     "*://*.x.com/*",
-    "*://*.kwdev-sys.com/*"
+    "*://*.kwdev-sys.com/*",
+    "*://localhost/*"
   ],
   "permissions": ["storage", "webRequest", "declarativeNetRequest"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
+      "matches": ["https://*.twitter.com/*", "https://*.x.com/*", "*://localhost/*"],
       "js": [
         "load_stopper.js",
         "content.js",
@@ -32,7 +33,7 @@
   ],
   "web_accessible_resources": [
     {
-      "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
+      "matches": ["https://*.twitter.com/*", "https://*.x.com/*", "*://localhost/*"],
       "resources": [
         "extensions/utils_helper.js",
         "extensions/text_review_helper.js",
