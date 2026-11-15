@@ -57,7 +57,7 @@
         const current_video_source = video_wrapper_props?.children?.props?.playerState;
 
         //メディアソースの一覧を取得
-        let media_details = root_props?.children[1]?.props?.children[0]?.props?.mediaDetails;
+        let media_details = root_props?.children?.[1]?.props?.children?.[0]?.props?.mediaDetails;
         if(!media_details){
             //新クライアント向けのフォールバック
             //Propsからメディア情報を取ろうとすると遅延の影響か何かで取れないのでFiberから取る
@@ -65,13 +65,13 @@
         }
 
         //引用の場合のメディアソースの一覧を取得
-        let media_details_quoted = root_props?.children[2]?.props?.tweet?.extended_entities?.media;
+        let media_details_quoted = root_props?.children?.[2]?.props?.tweet?.extended_entities?.media;
         if(quoted){
-            media_details_quoted = root_props?.children[0]?.[0]?.props?.children[1]?.props?.children[5]?.props?.children?.props?.mediaDetails;
+            media_details_quoted = root_props?.children?.[0]?.[0]?.props?.children?.[1]?.props?.children?.[5]?.props?.children?.props?.mediaDetails;
             
             //小さいサイズ表示になっている引用画像を取得する
             if(!media_details_quoted){
-                media_details_quoted = root_props?.children[0]?.[0]?.props?.children[1]?.props?.children[0]?.props?.children[1]?.props?.children?.props?.mediaDetails;
+                media_details_quoted = root_props?.children?.[0]?.[0]?.props?.children?.[1]?.props?.children?.[0]?.props?.children?.[1]?.props?.children?.props?.mediaDetails;
             }
 
             //新クライアント向けのフォールバック

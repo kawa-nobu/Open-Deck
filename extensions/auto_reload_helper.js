@@ -1,6 +1,5 @@
 //自動更新機能用
 (() => {
-    let path_old = null;
     let opd_reload_token = null;
     let reload_func = ()=>{};
     let isFocusDisabled = false;
@@ -48,26 +47,25 @@
         return originalFocus.call(this, Object.assign({}, options, { preventScroll: true }));
     };
 
-    // URLで画面の遷移を監視する
-    new MutationObserver(function(){
-        const path_search = `${location.pathname}${location.search}`;
-        if(path_old === path_search){
-            return;
+    //タイムライン更新関数
+    reload_func = ()=>{
+        get_on_refresh_props(document.querySelector('section[role="region"]'))?.onRefresh();
+    };
+
+    //onRefreshの存在するmemoizedPropsを取得する
+    function get_on_refresh_props(elem, max_hop = 30){
+        let fiber = get_props(elem, "Fiber");
+        let hop = 0;
+        while (fiber && hop++ < max_hop) {
+            const memoized_props = fiber.memoizedProps;
+            if (typeof fiber.memoizedProps?.onRefresh === 'function') {
+                return memoized_props;
+            }
+            fiber = fiber.return;
         }
-        //sectionの要素を取得する
-        const section = document.querySelector('section[role="region"]');
-        if(!section) return;
-        //Propsを取得する
-        const props = get_props(section, "Props");
-        const refresh = props?.children[1]?.props.children[2]?._owner?.memoizedProps?.onRefresh;
-        if (!refresh){
-            // 関数が存在しない場合、無意味な関数を設定しておく
-            reload_func = ()=>{};
-            return;
-        }
-        reload_func = refresh;
-        path_old = path_search;
-    }).observe(document, {childList: true, subtree: true});
+        return null;
+    }
+
     //ReactProps取得関数
     function get_props(elem, type){
         const prop_type = type === "Props" ? type : "Fiber";
