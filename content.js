@@ -8,8 +8,7 @@ if(is_prototype){
     console.log("%cOpen-Deck", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${manifest.version}`);
 }
 //新クライアント判定フラグ
-//TODO: 新クライアントの判定を追加する
-let is_new_client = true;
+let is_new_client = !!window.__TSR_ROUTER__ || !document.getElementById('react-root');;
 //
 const url_path = new URL(location.href);
 let is_added_system_color_mode = false;
