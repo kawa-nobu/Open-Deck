@@ -1059,6 +1059,9 @@ async function run(settings){
         //カラム読み込み失敗検出
         watch_load_column(column_object);
 
+        //TODO: 新クライアントの判定を追加する
+        const is_new_client = true;
+
         for (let index = 0; index < column_object.length; index++) {
             column_object[index].removeAttribute("opd_init_webview");
 
@@ -1083,6 +1086,25 @@ async function run(settings){
                         this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css>header[role="banner"]{content-visibility:hidden; }</style>`);
                     }*/
                     /* TODO: querySelectorを毎回するのは非効率なので、後日まとめる */
+                    //新クライアント向けCSS追加
+                    if(is_new_client){
+                        this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_new_client_css>
+                            /* ナビゲーションバーを従来の様に横配置にする */
+                            div:has(> [data-bottom-bar]) {
+                              inset: 0 auto 0 4px; height: fit-content; margin-block: auto; z-index: 100;
+                              flex-direction: column; align-items: center; gap: 12px;
+
+                              & > [data-bottom-bar] {
+                                flex-direction: column; width: 56px !important; height: auto !important;
+                                & > :is(span, [inert]) { display: none }
+                                & > div { flex: none; aspect-ratio: 1 }
+                                & [aria-current] { background: #7f7f7f2e }
+                              }
+                              & > [data-compose-fab] { position: static; translate: none }
+                            }
+                            :root { --x-bottom-bar-clearance: 0px !important }
+                        </style>`);
+                    }
                     //ユーザー設定CSS挿入(サニタイズ済みのカスタムCSSを挿入)
                     applyCustomCss(this, opd_system_settings.user_custom_css_twitter_sanitized);
                     //共通CSS挿入(スクロールバー細くする)
@@ -1093,7 +1115,7 @@ async function run(settings){
                     }
                     if(opd_column_banner_checkbox?.checked != true){
                         //console.log(this)
-                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
+                        this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `div:has(> [data-bottom-bar]), header[role="banner"]{display:none};`;
                     }else{
                         //console.log("else")
                         this.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
@@ -1334,7 +1356,7 @@ async function run(settings){
                                 banner_mode_target_object.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_banner_css></style>`);
                             }
                             if(this.checked != true){
-                                banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `header[role="banner"]{display:none};`;
+                                banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = `div:has(> [data-bottom-bar]), header[role="banner"]{display:none};`;
                             }else{
                                 banner_mode_target_object.contentWindow.document.querySelector('head style[opd_banner_css]').textContent = ``;
                             }
