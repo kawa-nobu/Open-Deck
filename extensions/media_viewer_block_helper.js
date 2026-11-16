@@ -1,6 +1,7 @@
 //メディアビューワー停止用
 (() => {
     let opd_send_media_info_token = null;
+    const is_new_client = !document.getElementById('react-root');
     //カラム側の画像表示を停止させて、表示画像などの情報をOPD側に渡す
     /*
     TODO:ツイートページのツイートに画像や動画付きの引用が付いていて、引用のメディアをクリックした際に元のメディアが表示される問題を修正する。
@@ -29,9 +30,10 @@
         // 通常のメディア付きツイート
         let img = e.target.closest('img, div[data-testid="videoComponent"]');
 
-        if(!img){
+        if(!img && is_new_client){
             //新クライアント向けのフォールバック
-            img = document.evaluate('ancestor::div[.//*[@itemscope]][1]/*[1]', e.target, null, 9, null)?.singleNodeValue;
+            img = e.target;
+            while(img && !get_props(img, "Fiber")) img = img.parentElement;
         }
 
         if (!img) return;
@@ -56,12 +58,22 @@
         //プレイヤーが存在している場合の現在再生ソースを取得
         const current_video_source = video_wrapper_props?.children?.props?.playerState;
 
+        let selected_media_url = null;
+
         //メディアソースの一覧を取得
         let media_details = root_props?.children?.[1]?.props?.children?.[0]?.props?.mediaDetails;
         if(!media_details){
             //新クライアント向けのフォールバック
-            //Propsからメディア情報を取ろうとすると遅延の影響か何かで取れないのでFiberから取る
-            media_details = get_props(img, "Fiber")?.memoizedProps?.children?.props?.tweet?.media_entities2;
+            //Fiberを走査して最寄りのポストのメディア一覧とクリックされたメディアを取得する
+            for(let fiber = get_props(img, "Fiber"); fiber; fiber = fiber.return){
+                selected_media_url ??= fiber.memoizedProps?.media?.media_url_https;
+                const media_entities = fiber.memoizedProps?.tweet?.media_entities2;
+                if(media_entities?.length){
+                    //メディア自身の領域のクリックでなければ対象外とする
+                    if(selected_media_url) media_details = media_entities;
+                    break;
+                }
+            }
         }
 
         //引用の場合のメディアソースの一覧を取得
@@ -76,7 +88,7 @@
 
             //新クライアント向けのフォールバック
             if(!media_details_quoted){
-                media_details = root_props?.children?.props?.tweet?.media_entities2;
+                media_details ??= root_props?.children?.props?.tweet?.media_entities2;
             }
         }
 
@@ -84,6 +96,9 @@
         if(!media_details && !media_details_quoted) return;
 
         media_details ??= media_details_quoted;
+
+        //Relay内部データなどの不要なデータを減らす
+        media_details = media_details.map(({ __fragments, __fragmentOwner, ...plain_media }) => plain_media);
         
         //ビューワー自体の動作を止める
         e.preventDefault();
@@ -95,6 +110,17 @@
         if(video_elem){
             video_elem.pause();
             video_elem.muted = true;
+        }
+
+        //新クライアントは動画情報などをRelayStoreへ格納しているので、情報をストアから都度取得する
+        const relay_environment = get_relay_environment(img);
+        if (relay_environment) {
+            const source = relay_environment.getStore().getSource();
+            media_details = media_details.map((media) => {
+                const record = source.get(media.__id);
+                const video_info = source.get(record?.video_info?.__ref);
+                return { ...media, id_str: record?.id_str, ...(video_info && { video_info: { ...video_info, variants: video_info.variants.__refs.map((ref) => ({ ...source.get(ref) })) } }) };
+            });
         }
 
         //画像の現在値とメディア情報を送信する
@@ -109,7 +135,7 @@
                 }));
                 is_send = true;
                 break;
-            }else if(current_video_source?.posterImage === media?.media_url_https){
+            }else if(current_video_source?.posterImage === media?.media_url_https || (selected_media_url && selected_media_url === media?.media_url_https)){
                 window.parent.document.dispatchEvent(new CustomEvent('opd_send_media_info', {
                     bubbles: true,
                     composed: true,
@@ -134,6 +160,13 @@
         const prop_type = type === "Props" ? type : "Fiber";
         const propsKey = Object.getOwnPropertyNames(elem).find(k => k.includes(`__react${prop_type}$`));
         return propsKey ? elem[propsKey] : null;
+    }
+    //RelayStore取得関数
+    function get_relay_environment(elem){
+        for (let fiber = get_props(elem, "Fiber"); fiber; fiber = fiber.return) {
+            const environment = fiber.memoizedProps?.environment;
+            if (environment?.getStore) return environment;
+        }
     }
     //機能動作用のトークンを設定
     document.addEventListener('opd_send_media_info_init', (e)=>{
