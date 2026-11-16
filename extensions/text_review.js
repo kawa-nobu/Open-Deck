@@ -6,6 +6,7 @@ class OpdExtTextReview {
         this.Init = (column_frame, icons, ui_lang) => {
             const column_window = column_frame.contentWindow;
             //初期化
+            let last_editor = null;
             let editable_elem = null;
             let is_textarea_empty = true;
             let review_state = false;
@@ -116,6 +117,13 @@ class OpdExtTextReview {
                 .opd_text_review_indication_apply_panel button:hover{
                     opacity: 0.8;
                 }
+                /* 文章校正パネルなどの位置を含めて整える */
+                [data-modal-slot-surface]:has([data-media-upload-dropzone]){
+                    scrollbar-gutter: stable both-edges;
+                }
+                div[data-media-upload-dropzone] > .opd_post_functions{
+                    margin-left: 1px;
+                }
             </style>`);
             //機能のボタン類を束ねる
             const function_btns = [
@@ -141,21 +149,30 @@ class OpdExtTextReview {
             
             column_window.document.addEventListener("focusin", (ev) => {
                 //テキストエリアフォーカスタイミングで文字有無のカウンタを仕込む
-                if (ev.target && ev.target.isContentEditable) {
+                const is_textarea = ev.target?.tagName === 'TEXTAREA' && ev.target.matches('[aria-multiline="true"]');
+
+                if (ev.target && (ev.target.isContentEditable || is_textarea)) {
                     editable_elem = ev.target;
-                    if(!editable_elem.getAttribute("opd_text_counter")){
-                        //input イベントでは半角文字の削除が取得できないため、MutationObserver を使う
-                        const editor_observer = new MutationObserver((mutations, obs) => {
-                            is_textarea_empty = editable_elem.innerText.trim() === '';
-                            if(is_textarea_empty){
+                    last_editor = ev.target;
+                    if (!editable_elem.getAttribute("opd_text_counter")) {
+                        const update_empty = () => {
+                            const text = is_textarea ? editable_elem.value : editable_elem.innerText;
+                            is_textarea_empty = text.trim() === '';
+                            if (is_textarea_empty){
                                 column_window.document.getElementById("opd_post_text_review").setAttribute("disabled", "");
                             }else{
                                 column_window.document.getElementById("opd_post_text_review").removeAttribute("disabled");
                             }
-                        }).observe(editable_elem, {
-                            childList: true,
-                            subtree: true
-                        });
+                        };
+                        if(is_textarea){
+                            editable_elem.addEventListener("input", update_empty);
+                        }else{
+                            //input イベントでは半角文字の削除が取得できないため、MutationObserver を使う
+                            new MutationObserver(update_empty).observe(editable_elem, {
+                                childList: true,
+                                subtree: true
+                            });
+                        }
                         editable_elem.setAttribute("opd_text_counter", "true");
                     }
                 }else{
@@ -177,24 +194,38 @@ class OpdExtTextReview {
 
                 //文章校正ボタンを仕込む
                 //既存のボタン類のパネルに組み込むと、他のボタンが表示されなくなる現象があるので仕方なく文字数カウンタの下に配置している
-                const btnAddTarget = column_window.document.querySelector('div[data-testid="toolBar"]');
+                const btnAddTarget = column_window.document.querySelector('div[data-testid="toolBar"]')
+                    ?? [...column_window.document.querySelectorAll('div[data-media-upload-dropzone] form')].at(-1);
+
                 const function_panel = column_window.document.querySelector('div.opd_post_functions');
                 if (btnAddTarget && !function_panel) {
                     //テーマカラー取得&ボタンカラー設定
-                    const theme_color = this.CssChecker(getComputedStyle(column_window.document.querySelector('div[data-testid="progressBar-bar"]')).backgroundColor);
-                    column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_theme_css>.opd_functions_btn_icon_color{background-color:${theme_color};}.opd_function_btn:not([disabled]):hover{border-radius: 100px;transition-duration: 0.2s;background-color:${theme_color.replace(")", ", 0.1)")};}.opd_text_review_panel{background-color:${theme_color.replace(")", ", 0.1)")};}</style>`);
+                    const progress_bar = column_window.document.querySelector('div[data-testid="progressBar-bar"]');
+                    const theme_color = this.CssChecker((progress_bar && column_window.getComputedStyle(progress_bar).backgroundColor) || 'var(--x-fg-brand)');
+                    const theme_alpha = `color-mix(in srgb, ${theme_color} 10%, transparent)`;
+                    column_window.document.head.insertAdjacentHTML("beforeend", `<style opd_post_textreview_theme_css>.opd_functions_btn_icon_color{background-color:${theme_color};}.opd_function_btn:not([disabled]):hover{border-radius: 100px;transition-duration: 0.2s;background-color:${theme_alpha};}.opd_text_review_panel{background-color:${theme_alpha};}</style>`);
                     //校正ボタンパネル追加
                     btnAddTarget.insertAdjacentHTML('afterend', `<div class="opd_post_functions">${function_btns.join("")}</div><div class="opd_text_review_panel"></div>`);
                     //校正ボタン動作追加
                     column_window.document.getElementById("opd_post_text_review").addEventListener("click", async ()=>{
-                        editable_elem = column_window.document.querySelector('div[contenteditable="true"][data-testid*="tweetTextarea"]');
-                        if(!review_state && editable_elem && !is_textarea_empty){
+                        //最後にフォーカスしたエディタが画面に残っていればそれを使う
+                        const focused_editor = last_editor?.isConnected ? last_editor : null;
+                        editable_elem = focused_editor ?? column_window.document.querySelector('div[contenteditable="true"][data-testid*="tweetTextarea"], textarea[aria-multiline="true"]');
+
+                        //選択中のエディタの中身を直接確認する(新クライアントはtextareaなのでvalue、旧UIはinnerTextで取得している)
+                        const review_text = (editable_elem?.tagName === 'TEXTAREA' ? editable_elem.value : editable_elem?.innerText)?.trim();
+
+                        if(!review_state && review_text){
                             review_state = true;
                             const review_panel = column_window.document.querySelector('div.opd_text_review_panel');
                             review_panel.textContent = "";
                             review_panel.insertAdjacentHTML("beforeend", `<div>${this.UITexts[this.opd_use_lang].textReview_panelTitle.message}</div><div><div class="opd_text_review_loader"></div>${this.UITexts[this.opd_use_lang].textReview_inProgress.message}</div>`);
-                            await this.Review(editable_elem.innerText.trim(), review_panel, column_window);
-                            review_state = false;
+                            
+                            try {
+                                await this.Review(review_text, review_panel, column_window);
+                            }finally{
+                                review_state = false;
+                            }
                         }
                     });
 
@@ -219,6 +250,9 @@ class OpdExtTextReview {
                             detail: JSON.stringify({ is_firefox: this.IsFirefox() })
                         }));
                     });
+                }else if(btnAddTarget && function_panel && function_panel.previousElementSibling !== btnAddTarget){
+                    //新クライアントでは、フォームが変わったのでパネル類を移動する
+                    btnAddTarget.after(function_panel, column_window.document.querySelector('div.opd_text_review_panel'));
                 }
             }).observe(column_window.document, {
                 childList: true,
