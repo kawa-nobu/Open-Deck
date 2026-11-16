@@ -1152,7 +1152,7 @@ async function run(settings){
                     //RT非表示設定読み込み適用
                     this.contentWindow.document.querySelector("head").insertAdjacentHTML("beforeend", `<style opd_disable_rt_css></style>`);
                     if(opd_column_hide_rt_tweet_opt?.checked){
-                        this.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = 'li:has(article span[aria-hidden="false"] svg[data-icon^="icon-repost"]), div[data-testid="cellInnerDiv"]:has(a>span[data-testid="socialContext"]){visibility: hidden; height: 0;}';
+                        this.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = 'li:has(article svg[data-icon^="icon-repost"]), div[data-testid="cellInnerDiv"]:has(a>span[data-testid="socialContext"]){visibility: hidden; height: 0;}';
                     }
 
                     //ツイート表示項目設定読み込み適用
@@ -1468,7 +1468,7 @@ async function run(settings){
                             opd_column_hide_rt_tweet_opt.addEventListener("change", function(){
                                 const target_column_frame = this.closest("div[opd_column_type]").querySelector("iframe");
                                 if(this.checked){
-                                    target_column_frame.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = 'li:has(article span[aria-hidden="false"] svg[data-icon^="icon-repost"]), div[data-testid="cellInnerDiv"]:has(a>span[data-testid="socialContext"]){visibility: hidden; height: 0;}';
+                                    target_column_frame.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = 'li:has(article svg[data-icon^="icon-repost"]), div[data-testid="cellInnerDiv"]:has(a>span[data-testid="socialContext"]){visibility: hidden; height: 0;}';
                                 }else{
                                     target_column_frame.contentWindow.document.querySelector('head style[opd_disable_rt_css]').textContent = ``;
                                 }
