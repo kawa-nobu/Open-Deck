@@ -8,7 +8,7 @@ if(is_prototype){
     console.log("%cOpen-Deck", "background:#a1f4ff;padding:5px;border-radius:5px", `Version:${manifest.version}`);
 }
 //新クライアント判定フラグ
-const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion']);
+const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion'].includes(key));
 //
 const url_path = new URL(location.href);
 let is_added_system_color_mode = false;

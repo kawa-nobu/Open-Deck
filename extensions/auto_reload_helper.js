@@ -1,6 +1,6 @@
 //自動更新機能用
 (() => {
-    const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion']);
+    const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion'].includes(key));
     let opd_reload_token = null;
     let reload_func = () => { };
     let isFocusDisabled = false;
