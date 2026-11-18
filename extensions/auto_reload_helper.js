@@ -1,9 +1,10 @@
 //自動更新機能用
 (() => {
+    const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion'].includes(key));
     let opd_reload_token = null;
-    let reload_func = ()=>{};
+    let reload_func = () => { };
     let isFocusDisabled = false;
-    
+
     //ユーザー操作でフォーカス無効化を解除する
     ['mousedown', 'keydown', 'touchstart'].forEach(type => {
         document.addEventListener(type, () => {
@@ -12,7 +13,7 @@
     });
 
     // 自動更新時にフォーカスされる問題があるので、scrollIntoViewとfocusを一時的に無効化する
-    HTMLElement.prototype.scrollIntoView = function(options) {
+    HTMLElement.prototype.scrollIntoView = function (options) {
         //フォーカス無効化が有効だった場合はフォーカスを無視する
         if (isFocusDisabled) return;
 
@@ -40,20 +41,24 @@
     };
 
     const originalFocus = HTMLElement.prototype.focus;
-    HTMLElement.prototype.focus = function(options) {
-        if (isFocusDisabled){
+    HTMLElement.prototype.focus = function (options) {
+        if (isFocusDisabled) {
             return;
         }
         return originalFocus.call(this, Object.assign({}, options, { preventScroll: true }));
     };
 
     //タイムライン更新関数
-    reload_func = ()=>{
+    reload_func = () => {
+        //新クライアントの場合は新しいAPIを使うようにする
+        if (is_new_client) return get_new_client_timeline_api(document.querySelector('main section[aria-labelledby]'))?.fetchTop({ requestContext: 'ptr' });
+
+        //旧クライアントは従来通りのものを使う
         get_on_refresh_props(document.querySelector('section[role="region"]'))?.onRefresh();
     };
 
     //onRefreshの存在するmemoizedPropsを取得する
-    function get_on_refresh_props(elem, max_hop = 30){
+    function get_on_refresh_props(elem, max_hop = 30) {
         let fiber = get_props(elem, "Fiber");
         let hop = 0;
         while (fiber && hop++ < max_hop) {
@@ -66,14 +71,36 @@
         return null;
     }
 
+    //新クライアントのタイムラインAPIを取得する
+    function get_new_client_timeline_api(elem, max_hop = 30) {
+        let fiber = get_props(elem, "Fiber");
+        let hop = 0;
+        while (fiber && hop++ < max_hop) {
+            //ホームなど、外側からrefが渡されている場合
+            const api = fiber.memoizedProps?.api?.current;
+            if (typeof api?.fetchTop === 'function') {
+                return api;
+            }
+            //外側からrefが渡されていない画面はラッパーがuseRefに保持しているものを使用する
+            for (let state = fiber.memoizedState; state; state = state.next) {
+                const state_api = state.memoizedState?.current?.api;
+                if (typeof state_api?.fetchTop === 'function') {
+                    return state_api;
+                }
+            }
+            fiber = fiber.return;
+        }
+        return null;
+    }
+
     //ReactProps取得関数
-    function get_props(elem, type){
+    function get_props(elem, type) {
         const prop_type = type === "Props" ? type : "Fiber";
         const propsKey = Object.getOwnPropertyNames(elem).find(k => k.includes(`__react${prop_type}$`));
         return propsKey ? elem[propsKey] : null;
     }
     //機能動作用のトークンを設定
-    window.addEventListener('opd_column_reload_init', (e)=>{
+    window.addEventListener('opd_column_reload_init', (e) => {
         try {
             const detail = JSON.parse(e.detail);
             opd_reload_token = detail.token;
@@ -84,9 +111,9 @@
     //自動更新イベントを追加する
     window.addEventListener('opd_column_reload', (e) => {
         const detail = JSON.parse(e.detail);
-        if(opd_reload_token && opd_reload_token !== detail.token) return;
+        if (opd_reload_token && opd_reload_token !== detail.token) return;
 
-        if(typeof reload_func !== 'function') return;
+        if (typeof reload_func !== 'function') return;
 
         try {
             isFocusDisabled = true;

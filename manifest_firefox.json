@@ -67,7 +67,7 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://twitter.com/*", "https://x.com/*"],
+      "matches": ["https://twitter.com/*", "http://localhost:8787/*"],
       "js": [
         "system_setting_manager.js",
         "load_stopper.js",
