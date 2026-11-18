@@ -1,6 +1,6 @@
 //自動更新機能用
 (() => {
-    const is_new_client = !!window.__TSR_ROUTER__ || !document.getElementById('react-root');
+    const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion']);
     let opd_reload_token = null;
     let reload_func = () => { };
     let isFocusDisabled = false;

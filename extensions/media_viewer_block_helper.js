@@ -1,7 +1,7 @@
 //メディアビューワー停止用
 (() => {
     let opd_send_media_info_token = null;
-    const is_new_client = !document.getElementById('react-root');
+    const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion']);
     //カラム側の画像表示を停止させて、表示画像などの情報をOPD側に渡す
     /*
     TODO:ツイートページのツイートに画像や動画付きの引用が付いていて、引用のメディアをクリックした際に元のメディアが表示される問題を修正する。

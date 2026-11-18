@@ -1,6 +1,6 @@
 // 文章校正機能で使用する、カスタムな文字置換イベントを作成する
 (() => {
-    const is_new_client = !document.getElementById('react-root');
+    const is_new_client = Object.keys(document.querySelector('html').dataset).some(key=>['appEnv', 'appVersion']);
     let router = null;
     const textarea_hashtags = new Map();
     let in_compose = false;
